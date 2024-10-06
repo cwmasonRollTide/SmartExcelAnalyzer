@@ -9,10 +9,8 @@ public interface IVectorDbRepository
 {
     Task<string> SaveDocumentAsync(List<Dictionary<string, object>> excelData, Dictionary<string, object> summary);
     
-    Task<(
-        List<Dictionary<string, object>> RelevantRows, 
-        Dictionary<string, object> Summary)> 
-    QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10);
+    Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> 
+        QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10);
 }
 
 public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLMRepository) : IVectorDbRepository

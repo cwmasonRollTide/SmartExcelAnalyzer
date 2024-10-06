@@ -1,6 +1,7 @@
 using MediatR;
 using FluentValidation;
 using Persistence.Repositories;
+using Persistence.Models.DTOs;
 
 namespace Application.Queries;
 
@@ -15,19 +16,20 @@ public class SubmitQueryValidator : AbstractValidator<SubmitQuery>
     }
 }
 
-public class SubmitQuery : IRequest<string>
+public class SubmitQuery : IRequest<QueryAnswer>
 {
     public required string Query { get; set; }
     public required string DocumentId { get; set; }
 }
 
-public class SubmitQueryHandler(ILLMRepository lLMRepository) : IRequestHandler<SubmitQuery, string>
+public class SubmitQueryHandler(ILLMRepository lLMRepository) : IRequestHandler<SubmitQuery, QueryAnswer>
 {
     private readonly ILLMRepository _lLMRepository = lLMRepository;
 
-    public async Task<string> Handle(SubmitQuery request, CancellationToken cancellationToken) 
+    public async Task<QueryAnswer> Handle(SubmitQuery request, CancellationToken cancellationToken) 
     {
-        var result = await _lLMRepository.QueryLLM(request.DocumentId, request.Query);
+        var result = await _lLMRepository.QueryLLM(request.DocumentId, request.Query, cancellationToken);
+        
         return result;
     }
 }

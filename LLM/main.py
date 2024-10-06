@@ -27,6 +27,10 @@ class Query(BaseModel):
     document_id: str
     question: str
 
+class QueryResponse(Query): 
+    answer: str
+    relevantRows: list
+
 @app.post("/query")
 async def process_query(query: Query):
     try:
@@ -53,7 +57,12 @@ async def process_query(query: Query):
         prompt = f"""Given the following Excel data summary: {summary_text} And these relevant rows: {context} Question: {query.question} Answer:"""
         result = model(prompt, max_length=250, do_sample=False)[0]['generated_text']
         print(result)
-        return {"answer": result}
+        return {
+            "answer": result,
+            "question": query.question,
+            "documentId": query.document,
+            "relevantRows": relevant_rows
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
