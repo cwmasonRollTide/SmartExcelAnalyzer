@@ -1,14 +1,16 @@
 using System.Data;
 using System.Text;
 using ExcelDataReader;
+using Application.Models;
 using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography;
 using System.Collections.Concurrent;
 
 namespace Application.Services;
 
 public interface IExcelFileService
 {
-    Task<(List<Dictionary<string, object>> Rows, Dictionary<string, object> Summary)>  PrepareExcelFileForLLMAsync(IFormFile file);
+    Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file);
 }
 
 public class ExcelFileService : IExcelFileService
@@ -18,7 +20,16 @@ public class ExcelFileService : IExcelFileService
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
-    public async Task<(List<Dictionary<string, object>> Rows, Dictionary<string, object> Summary)> PrepareExcelFileForLLMAsync(IFormFile file)
+    /// <summary>
+    /// Prepare the given Excel file for LLM by reading the file and extracting the data and summary statistics
+    /// This method reads the Excel file, extracts the data into a list of rows, and calculates summary statistics for the data
+    /// This data will be translated into vectors and stored in the database for querying by the LLM model. The vectors will be
+    /// compared against the vector that the LLM generates for the question to find the most relevant rows. It will use the most relevant
+    /// rows to answer the question or provide the data whatever it may be.
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    public async Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file)
     {
         using var stream = file.OpenReadStream();
         using var reader = ExcelReaderFactory.CreateReader(stream);
@@ -43,29 +54,111 @@ public class ExcelFileService : IExcelFileService
         return (Rows: [.. rows], Summary: summaryTask.Result);//When am I gonna get used to spread operators in C#? sometimes I just do as resharper tells me
     }
 
-    private static async Task<Dictionary<string, object>> CalculateSummaryStatisticsAsync(DataTable table)
+    /// <summary>
+    /// Calculate summary statistics for the given table
+    /// This method calculates the sum, average, min, and max for each numeric column in the table.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    private static async Task<ExcelFileSummary> CalculateSummaryStatisticsAsync(DataTable table) =>
+    await Task.Run(() =>
     {
-        return await Task.Run(() =>
+        var summary = new ExcelFileSummary
         {
-            var summary = new Dictionary<string, object>
-            {
-                ["RowCount"] = table.Rows.Count,
-                ["ColumnCount"] = table.Columns.Count,
-                ["Columns"] = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
-            };
-            var numericColumns = table.Columns.Cast<DataColumn>()
-                .Where(c => c.DataType == typeof(int) || c.DataType == typeof(double) || c.DataType == typeof(float))
+            RowCount = table.Rows.Count,
+            ColumnCount = table.Columns.Count,
+            Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
+        };
+
+        var numericColumns = GetNumericColumns(table);
+        var stringColumns = GetStringColumns(table);
+
+        Parallel.Invoke(
+            () => CalculateNumericColumnStatistics(table, numericColumns, summary),
+            () => CalculateStringColumnHashes(table, stringColumns, summary)
+        );
+
+        return summary;
+    });
+
+    private static List<DataColumn> GetNumericColumns(DataTable table) => table.Columns.Cast<DataColumn>()
+            .Where(c => c.DataType == typeof(int) || c.DataType == typeof(double) || c.DataType == typeof(float))
+            .ToList();
+
+    /// <summary>
+    /// Calculate the sum, average, min, and max for each numeric column in the given table
+    /// Parallelizes the calculation of each statistic for each numeric column
+    /// </summary>
+    /// <param name="table"></param>
+    /// <param name="numericColumns"></param>
+    /// <param name="summary"></param>
+    private static void CalculateNumericColumnStatistics(DataTable table, List<DataColumn> numericColumns, ExcelFileSummary summary)
+    {
+        Parallel.ForEach(numericColumns, column =>
+        {
+            var columnName = column.ColumnName;
+            var values = table.AsEnumerable()
+                .Where(row => row[column] != DBNull.Value)
+                .Select(row => Convert.ToDouble(row[column]))
                 .ToList();
-            foreach (var column in numericColumns)
+
+            if (values.Count > 0)
             {
-                var columnName = column.ColumnName;
-                var values = table.AsEnumerable().Select(row => Convert.ToDouble(row[column])).ToList();
-                summary[$"{columnName}_Sum"] = values.Sum();
-                summary[$"{columnName}_Average"] = values.Average();
-                summary[$"{columnName}_Min"] = values.Min();
-                summary[$"{columnName}_Max"] = values.Max();
+                summary.Sums[columnName] = values.Sum();
+                summary.Averages[columnName] = values.Average();
+                summary.Mins[columnName] = values.Min();
+                summary.Maxs[columnName] = values.Max();
             }
-            return summary;
         });
+    }
+
+    private static List<DataColumn> GetStringColumns(DataTable table) => table.Columns.Cast<DataColumn>()
+            .Where(c => c.DataType == typeof(string))
+            .ToList();
+
+    /// <summary>
+    /// Calculate the SHA256 hash of each string value in the given columns
+    /// Parallelizes the hashing of each string value in the given columns
+    /// </summary>
+    /// <param name="table"></param>
+    /// <param name="stringColumns"></param>
+    /// <param name="summary"></param>
+    private static void CalculateStringColumnHashes(DataTable table, List<DataColumn> stringColumns, ExcelFileSummary summary)
+    {
+        Parallel.ForEach(stringColumns, column =>
+        {
+            var columnName = column.ColumnName;
+            var hashedValues = new Dictionary<string, string>();
+
+            foreach (var row in table.AsEnumerable())
+            {
+                var value = row[column]?.ToString();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var hashedValue = ComputeHash(value);
+                    hashedValues[value] = hashedValue;
+                }
+            }
+
+            summary.HashedStrings[columnName] = hashedValues;
+        });
+    }
+
+    /// <summary>
+    /// Compute the SHA256 hash of the given input
+    /// Should change it the same way every time
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    private static string ComputeHash(string input)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+        var builder = new StringBuilder();
+        foreach (var b in bytes)
+        {
+            builder.Append(b.ToString("x2"));
+        }
+        return builder.ToString();
     }
 }

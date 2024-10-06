@@ -15,20 +15,19 @@ public class SubmitQueryValidator : AbstractValidator<SubmitQuery>
     }
 }
 
-public class SubmitQuery : IRequest<List<Dictionary<string, object>>>
+public class SubmitQuery : IRequest<string>
 {
     public required string Query { get; set; }
     public required string DocumentId { get; set; }
 }
 
-public class SubmitQueryHandler(IVectorDbRepository vectorDbRepository) : IRequestHandler<SubmitQuery, List<Dictionary<string, object>>>
+public class SubmitQueryHandler(ILLMRepository lLMRepository) : IRequestHandler<SubmitQuery, string>
 {
-    private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
+    private readonly ILLMRepository _lLMRepository = lLMRepository;
 
-    public async Task<List<Dictionary<string, object>>> Handle(SubmitQuery request, CancellationToken cancellationToken) 
+    public async Task<string> Handle(SubmitQuery request, CancellationToken cancellationToken) 
     {
-        
-        
-
+        var result = await _lLMRepository.QueryLLM(request.DocumentId, request.Query);
+        return result;
     }
 }

@@ -1,44 +1,41 @@
 using Persistence.Models;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Text;
 
 namespace Persistence.Repositories;
 
 public interface ILLMRepository
 {
-    Task<float[]?> ComputeEmbedding(string documentId, string text);
-    // Task<string> ProcessEmbeddingAsync(string documentId, string question);
+    Task<string> QueryLLM(string document_id, string question);
+    Task<float[]?> ComputeEmbedding(string documentId, string question);
 }
 
-public class LLMRepository(IHttpClientFactory httpClientFactory, IOptions<LLMServiceOptions> options) : ILLMRepository
+public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<string> queryRepo, IWebRepository<float[]?> computeRepo) : ILLMRepository
 {
-    private readonly LLMServiceOptions _options = options.Value;
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly LLMServiceOptions _llmOptions = options.Value;
+    private readonly IWebRepository<string> _queryRepo = queryRepo;
+    private readonly IWebRepository<float[]?> _computeRepo = computeRepo;
 
     /// <summary>
-    /// Compute the embedding of the given text using the LLM service
-    /// Sends a post request to the LLM service with the text and returns the embedding as a float array
+    /// Query the LLM model with a given document_id and question
+    /// Calls the /query endpoint of the LLM service
+    /// Returns the answer to the question as interpreted by the LLM model
+    /// Given the question provided, the LLM will use the most relevant rows 
+    /// from the excel sheet to answer the question
     /// </summary>
-    /// <param name="text"></param>
+    /// <param name="document_id"></param>
+    /// <param name="question"></param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    // public async Task<float[]> QueryLLM(string text)
-    // {
-    //     var response = await _httpClientFactory.CreateClient().PostAsync(_options.LLM_SERVICE_URL, new StringContent(text));
-    //     response.EnsureSuccessStatusCode();
-    //     var embeddingJson = await response.Content.ReadAsStringAsync();
-    //     return JsonSerializer.Deserialize<float[]>(embeddingJson) ?? throw new InvalidOperationException("Failed to deserialize embedding");
-    // }
+    public async Task<string> QueryLLM(string document_id, string question) => 
+        await _queryRepo.PostAsync(_llmOptions.LLM_SERVICE_URL + "/query", new { document_id, question });
 
-    public async Task<float[]?> ComputeEmbedding(string document_id, string question)
-    {
-        var client = _httpClientFactory.CreateClient();
-        var query = new { document_id, question };
-        var content = new StringContent(JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync(_options.LLM_SERVICE_URL + "/compute_embedding", content);
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<float[]>(result);
-    }
+    /// <summary>
+    /// Compute the embedding of a given text
+    /// Calls the /compute_embedding endpoint of the LLM service
+    /// Returns a vector which represents the text as interpreted by the LLM model
+    /// </summary>
+    /// <param name="document_id"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public async Task<float[]?> ComputeEmbedding(string document_id, string data) => 
+        await _computeRepo.PostAsync(_llmOptions.LLM_SERVICE_URL + "/compute_embedding", new { document_id, data });
 }

@@ -8,7 +8,11 @@ namespace Persistence.Repositories;
 public interface IVectorDbRepository
 {
     Task<string> SaveDocumentAsync(List<Dictionary<string, DataRow>> excelData, Dictionary<string, Summary> summary);
-    Task<(List<Dictionary<string, DataRow>> RelevantRows, Dictionary<string, Summary> Summary)> QueryVectors(string documentId, float[] query);
+    
+    Task<(
+        List<Dictionary<string, DataRow>> RelevantRows, 
+        Dictionary<string, Summary> Summary)> 
+    QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10);
 }
 
 public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLMRepository) : IVectorDbRepository
@@ -21,6 +25,24 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
         string documentId = await StoreVectors(excelData);
         await StoreSummary(documentId, summary);
         return documentId;
+    }
+
+    public async Task<(List<Dictionary<string, DataRow>> RelevantRows, Dictionary<string, Summary> Summary)> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10)
+    {
+        var serializerSettings = new JsonSerializerOptions();
+        var relevantDocuments = await _context.Documents
+            .Where(d => d.Id == documentId)
+            .OrderByDescending(d => CalculateSimilarity(d.Embedding, queryVector!))
+            .Take(topRelevantCount)
+            .ToListAsync();
+        var relevantRows = relevantDocuments
+            .Select(d => JsonSerializer.Deserialize<Dictionary<string, DataRow>>(d.Content)!)
+            .ToList();
+        var summary = await _context.Summaries
+            .Where(s => s.Id == documentId)
+            .Select(s => JsonSerializer.Deserialize<Dictionary<string, Summary>>(s.Content, serializerSettings))
+            .FirstOrDefaultAsync() ?? [];
+        return (RelevantRows: relevantRows, Summary: summary);
     }
 
     private async Task<string> StoreVectors(List<Dictionary<string, DataRow>> rows)
@@ -39,32 +61,14 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
         await _context.SaveChangesAsync();
     }
 
-    public async Task<(List<Dictionary<string, DataRow>> RelevantRows, Dictionary<string, Summary> Summary)> QueryVectors(string documentId, float[] queryVector)
-    {
-        var serializerSettings = new JsonSerializerOptions();
-        var relevantDocuments = await _context.Documents
-            .Where(d => d.Id == documentId)
-            .OrderByDescending(d => CalculateSimilarity(d.Embedding, queryVector!))
-            .Take(10)
-            .ToListAsync();
-        var relevantRows = relevantDocuments
-            .Select(d => JsonSerializer.Deserialize<Dictionary<string, DataRow>>(d.Content)!)
-            .ToList();
-        var summary = await _context.Summaries
-            .Where(s => s.Id == documentId)
-            .Select(s => JsonSerializer.Deserialize<Dictionary<string, Summary>>(s.Content, serializerSettings))
-            .FirstOrDefaultAsync() ?? [];
-        return (RelevantRows: relevantRows, Summary: summary);
-    }
-
     private async Task<Document> GenerateDocument(string documentId, Dictionary<string, DataRow> row) 
     {
-        var serializedDoc = JsonSerializer.Serialize(row);
-        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedDoc);
+        var serializedExcelDataRow = JsonSerializer.Serialize(row);
+        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedExcelDataRow);
         return new()
         {
             Id = documentId,
-            Content = serializedDoc,
+            Content = serializedExcelDataRow,
             Embedding = embedding!
         };
     }
@@ -85,7 +89,7 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
 
     /// <summary>
     /// Helper class for vector math operations.
-    /// Vector math is at the core of many machine learning algorithms,
+    /// Vector math enables machine learning 
     /// and it is essential for tasks such as calculating distances,
     /// angles, and projections between vectors.
     /// </summary>

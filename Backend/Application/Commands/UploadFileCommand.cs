@@ -15,21 +15,20 @@ public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
     }
 }
 
-public class UploadFileCommand : IRequest<string>
+public class UploadFileCommand : IRequest<string?>
 {
     public required IFormFile File { get; set; }
 }
 
-public class UploadFileCommandHandler(IExcelFileService excelService, IVectorDbRepository vectorDbRepository) : IRequestHandler<UploadFileCommand, string>
+public class UploadFileCommandHandler(IExcelFileService excelService, IVectorDbRepository vectorDbRepository) : IRequestHandler<UploadFileCommand, string?>
 {
     private readonly IExcelFileService _excelService = excelService;
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
 
-    public async Task<string> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken)
     {
-        var (Rows, Summary) = await _excelService.PrepareExcelFileForLLMAsync(request.File);
-        if (Rows == null || Summary == null)
-            throw new Exception("Failed to prepare Excel file for LLM.");
+        var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File);
+        if (Rows == null || Summary == null) return null;
         var documentId = await _vectorDbRepository.SaveDocumentAsync(request.File.FileName, Rows, Summary);
         return documentId;
     }

@@ -1,4 +1,7 @@
+os
+json
+torch
 fastapi
 uvicorn
+psycopg2
 transformers
-torch

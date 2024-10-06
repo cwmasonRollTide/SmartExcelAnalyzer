@@ -22,7 +22,9 @@ builder.Services.AddSwaggerGen();
 // Add your other services here
 
 builder.Services.AddHttpClient();
+
 builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQuery>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommand>());
 builder.Services.AddScoped<ILLMRepository, LLMRepository>();
