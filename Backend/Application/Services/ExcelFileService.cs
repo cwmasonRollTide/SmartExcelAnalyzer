@@ -10,7 +10,7 @@ namespace Application.Services;
 
 public interface IExcelFileService
 {
-    Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file);
+    Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default);
 }
 
 public class ExcelFileService : IExcelFileService
@@ -29,8 +29,9 @@ public class ExcelFileService : IExcelFileService
     /// </summary>
     /// <param name="file"></param>
     /// <returns></returns>
-    public async Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file)
+    public async Task<(List<Dictionary<string, object>> Rows, ExcelFileSummary Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
+        var parallelOptions = new ParallelOptions { CancellationToken = cancellationToken };
         using var stream = file.OpenReadStream();
         using var reader = ExcelReaderFactory.CreateReader(stream);
         var result = reader.AsDataSet(new ExcelDataSetConfiguration()
@@ -44,12 +45,12 @@ public class ExcelFileService : IExcelFileService
         var rows = new ConcurrentBag<Dictionary<string, object>>();//Thread safe collectionsssss
         var rowTask = Task.Run(() =>
         {
-            Parallel.ForEach(table.AsEnumerable(), row =>
+            Parallel.ForEach(table.AsEnumerable(), parallelOptions, row =>
             {
                 rows.Add(table.Columns.Cast<DataColumn>().ToDictionary(col => col.ColumnName, col => row[col] == DBNull.Value ? null! : row[col]));
             });
-        });
-        var summaryTask = CalculateSummaryStatisticsAsync(table);
+        }, parallelOptions.CancellationToken);
+        var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
         await Task.WhenAll(rowTask, summaryTask);
         return (Rows: [.. rows], Summary: summaryTask.Result);//When am I gonna get used to spread operators in C#? sometimes I just do as resharper tells me
     }
@@ -60,26 +61,26 @@ public class ExcelFileService : IExcelFileService
     /// </summary>
     /// <param name="table"></param>
     /// <returns></returns>
-    private static async Task<ExcelFileSummary> CalculateSummaryStatisticsAsync(DataTable table) =>
-    await Task.Run(() =>
-    {
-        var summary = new ExcelFileSummary
+    private static async Task<ExcelFileSummary> CalculateSummaryStatisticsAsync(DataTable table, ParallelOptions parallelOptions) =>
+        await Task.Run(() =>
         {
-            RowCount = table.Rows.Count,
-            ColumnCount = table.Columns.Count,
-            Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
-        };
+            var summary = new ExcelFileSummary
+            {
+                RowCount = table.Rows.Count,
+                ColumnCount = table.Columns.Count,
+                Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
+            };
 
-        var numericColumns = GetNumericColumns(table);
-        var stringColumns = GetStringColumns(table);
+            var numericColumns = GetNumericColumns(table);
+            var stringColumns = GetStringColumns(table);
 
-        Parallel.Invoke(
-            () => CalculateNumericColumnStatistics(table, numericColumns, summary),
-            () => CalculateStringColumnHashes(table, stringColumns, summary)
-        );
+            Parallel.Invoke(parallelOptions,
+                () => CalculateNumericColumnStatistics(table, numericColumns, summary),
+                () => CalculateStringColumnHashes(table, stringColumns, summary)
+            );
 
-        return summary;
-    });
+            return summary;
+        }, parallelOptions.CancellationToken);
 
     private static List<DataColumn> GetNumericColumns(DataTable table) => table.Columns.Cast<DataColumn>()
             .Where(c => c.DataType == typeof(int) || c.DataType == typeof(double) || c.DataType == typeof(float))

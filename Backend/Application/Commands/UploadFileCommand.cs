@@ -25,11 +25,11 @@ public class UploadFileCommandHandler(IExcelFileService excelService, IVectorDbR
     private readonly IExcelFileService _excelService = excelService;
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
 
-    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
         var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File);
         if (Rows == null || Summary == null) return null;
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(request.File.FileName, Rows, Summary);
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(Rows, new Dictionary<string, object> { { "Summary", Summary } });
         return documentId;
     }
 }

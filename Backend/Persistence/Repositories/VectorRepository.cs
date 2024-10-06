@@ -7,11 +7,11 @@ namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(List<Dictionary<string, DataRow>> excelData, Dictionary<string, Summary> summary);
+    Task<string> SaveDocumentAsync(List<Dictionary<string, object>> excelData, Dictionary<string, object> summary);
     
     Task<(
-        List<Dictionary<string, DataRow>> RelevantRows, 
-        Dictionary<string, Summary> Summary)> 
+        List<Dictionary<string, object>> RelevantRows, 
+        Dictionary<string, object> Summary)> 
     QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10);
 }
 
@@ -20,14 +20,18 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
     private readonly ApplicationDbContext _context = context;
     private readonly ILLMRepository _llmRepository = lLMRepository;
 
-    public async Task<string> SaveDocumentAsync(List<Dictionary<string, DataRow>> excelData, Dictionary<string, Summary> summary)
+    public async Task<string> SaveDocumentAsync(List<Dictionary<string, object>> excelData, Dictionary<string, object> summary)
     {
         string documentId = await StoreVectors(excelData);
         await StoreSummary(documentId, summary);
         return documentId;
     }
 
-    public async Task<(List<Dictionary<string, DataRow>> RelevantRows, Dictionary<string, Summary> Summary)> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10)
+    public async Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> 
+        QueryVectorData(
+            string documentId, 
+            float[] queryVector, 
+            int topRelevantCount = 10)
     {
         var serializerSettings = new JsonSerializerOptions();
         var relevantDocuments = await _context.Documents
@@ -36,16 +40,16 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
             .Take(topRelevantCount)
             .ToListAsync();
         var relevantRows = relevantDocuments
-            .Select(d => JsonSerializer.Deserialize<Dictionary<string, DataRow>>(d.Content)!)
+            .Select(d => JsonSerializer.Deserialize<Dictionary<string, object>>(d.Content)!)
             .ToList();
         var summary = await _context.Summaries
             .Where(s => s.Id == documentId)
-            .Select(s => JsonSerializer.Deserialize<Dictionary<string, Summary>>(s.Content, serializerSettings))
+            .Select(s => JsonSerializer.Deserialize<Dictionary<string, object>>(s.Content, serializerSettings))
             .FirstOrDefaultAsync() ?? [];
         return (RelevantRows: relevantRows, Summary: summary);
     }
 
-    private async Task<string> StoreVectors(List<Dictionary<string, DataRow>> rows)
+    private async Task<string> StoreVectors(List<Dictionary<string, object>> rows)
     {
         var documentId = Guid.NewGuid().ToString();
         var documentTasks = rows.Select(row => GenerateDocument(documentId, row)).ToList();
@@ -55,20 +59,20 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
         return documentId;
     }
 
-    private async Task StoreSummary(string documentId, Dictionary<string, Summary> summary)
+    private async Task StoreSummary(string documentId, Dictionary<string, object> summary)
     {
         _context.Summaries.Add(new Summary { Id = documentId, Content = JsonSerializer.Serialize(summary) });
         await _context.SaveChangesAsync();
     }
 
-    private async Task<Document> GenerateDocument(string documentId, Dictionary<string, DataRow> row) 
+    private async Task<Document> GenerateDocument(string documentId, Dictionary<string, object> row) 
     {
-        var serializedExcelDataRow = JsonSerializer.Serialize(row);
-        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedExcelDataRow);
+        var serializedExcelobject = JsonSerializer.Serialize(row);
+        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedExcelobject);
         return new()
         {
             Id = documentId,
-            Content = serializedExcelDataRow,
+            Content = serializedExcelobject,
             Embedding = embedding!
         };
     }

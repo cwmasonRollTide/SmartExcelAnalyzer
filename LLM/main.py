@@ -31,7 +31,7 @@ class Query(BaseModel):
 async def process_query(query: Query):
     try:
         # Connect to the vector database where we store the documents and summaries (excel rows and summary of excel sheets)
-        conn = psycopg2.connect("dbname=vectordb user=admin password=password host=localhost")
+        conn = psycopg2.connect(DB_CONNECTION_STRING)
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
         # Fetch relevant rows and summary
