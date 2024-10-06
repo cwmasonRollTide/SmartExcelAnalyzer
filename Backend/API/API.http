@@ -1,7 +1,7 @@
 @API_HostAddress = http://localhost:5001
 
-GET {{API_HostAddress}}/analysis/
-POST {{API_HostAddress}}/analysis/
+POST {{API_HostAddress}}/api/analysis/upload
+POST {{API_HostAddress}}/api/analysis/query
 Accept: application/json
 
 ###

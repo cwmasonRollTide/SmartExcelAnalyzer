@@ -2,13 +2,15 @@ version: '3.8'
 
 services:
   llm-service:
-    build: 
+    build:
       context: ./LLM
-      dockerfile: Dockerfile
+      dockerfile: llm.Dockerfile
     ports:
-      - "5000:5000"
-    volumes:
-      - ./models:/app/models
+      - "8000:8000"
+    environment:
+      - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
+      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=localhost sslmode=disable"
 
   backend:
     build: 
@@ -17,10 +19,12 @@ services:
     ports:
       - "5001:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - LLM_SERVICE_URL=http://llm-service:5000
+      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=db sslmode=disable"
     depends_on:
       - llm-service
+      - db
 
   frontend:
     build:
@@ -32,6 +36,15 @@ services:
       - REACT_APP_API_URL=http://localhost:5001
     depends_on:
       - backend
+  
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: smartexcelanalyzer
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  models:
+  pgdata:

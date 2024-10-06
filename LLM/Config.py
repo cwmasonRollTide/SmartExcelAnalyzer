@@ -1,0 +1,6 @@
+from enum import Enum
+
+class EnvironmentVariables(Enum):
+    TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
+    EMBEDDING_MODEL = "EMBEDDING_MODEL"
+    DB_CONNECTION_STRING = "DB_CONNECTION_STRING"

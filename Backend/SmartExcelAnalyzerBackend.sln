@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{EA00AEF6-9DFD-4B31-BED6-2834015FD3DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{4564C4C5-030A-42B9-84B4-DFE4EFFD424A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{E3E071FA-0F4D-4A8B-9CFD-F0CECF3D2D9A}"
 EndProject
 Global
@@ -28,10 +26,6 @@ Global
 		{EA00AEF6-9DFD-4B31-BED6-2834015FD3DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA00AEF6-9DFD-4B31-BED6-2834015FD3DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA00AEF6-9DFD-4B31-BED6-2834015FD3DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4564C4C5-030A-42B9-84B4-DFE4EFFD424A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4564C4C5-030A-42B9-84B4-DFE4EFFD424A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4564C4C5-030A-42B9-84B4-DFE4EFFD424A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4564C4C5-030A-42B9-84B4-DFE4EFFD424A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3E071FA-0F4D-4A8B-9CFD-F0CECF3D2D9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E3E071FA-0F4D-4A8B-9CFD-F0CECF3D2D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3E071FA-0F4D-4A8B-9CFD-F0CECF3D2D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
