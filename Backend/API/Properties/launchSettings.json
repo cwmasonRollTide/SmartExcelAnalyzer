@@ -36,6 +36,18 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Host=localhost;Username=admin;Password=password;Database=smartexcelanalyzer",
+        "LLMServiceOptions__LLM_SERVICE_URL": "http://localhost:5000",
+        "DB_CONNECTION_STRING": "Host=localhost;Username=admin;Password=password;Database=smartexcelanalyzer",
+        "LLM_SERVICE_URL": "http://localhost:5000"
+      }
     }
   }
 }

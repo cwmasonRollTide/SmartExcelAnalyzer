@@ -1,20 +1,45 @@
-using Persistence.Models;
-using Persistence.Models.DTOs;
+using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
+using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 
 public interface ILLMRepository
 {
     Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default);
-    Task<float[]?> ComputeEmbedding(string documentId, string question, CancellationToken cancellationToken = default);
+    Task<float[]?> ComputeEmbedding(string document_id, string question, CancellationToken cancellationToken = default);
 }
 
-public class LLMRepository(IOptions<LLMServiceOptions> options, IWebService<QueryAnswer> queryService, IWebService<float[]?> computeService) : ILLMRepository
+/// <summary>
+/// Repository for interfacing with the LLM service
+/// This repository is responsible for querying the LLM model
+/// and computing the embeddings of text
+/// It uses the WebRepository to make HTTP requests to the LLM service
+/// The LLM service is a REST API which provides endpoints for querying the model
+/// and computing the embeddings of text
+/// The LLM service is a separate service which is responsible for running the LLM model (in python server)
+/// </summary>
+/// <param name="options"></param>
+/// <param name="queryService"></param>
+/// <param name="computeService"></param>
+public class LLMRepository(
+    IOptions<LLMServiceOptions> options, 
+    IWebRepository<QueryAnswer> queryService, 
+    IWebRepository<float[]?> computeService ) : ILLMRepository
 {
+    /// <summary>
+    /// Options for the LLM service
+    /// Contains the URL of the LLM service
+    /// </summary>
     private readonly LLMServiceOptions _llmOptions = options.Value;
-    private readonly IWebService<QueryAnswer> _queryService = queryService;
-    private readonly IWebService<float[]?> _computeService = computeService;
+    
+    /// <summary>
+    /// Web repository for querying the LLM model
+    /// </summary>
+    private readonly IWebRepository<QueryAnswer> _queryService = queryService;
+    private readonly IWebRepository<float[]?> _computeService = computeService;
+    private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
+    private string COMPUTE_URL => _llmOptions.LLM_SERVICE_URL + "/compute_embedding";
 
     /// <summary>
     /// Query the LLM model with a given document_id and question
@@ -26,8 +51,16 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebService<Quer
     /// <param name="document_id"></param>
     /// <param name="question"></param>
     /// <returns></returns>
-    public async Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default) => 
-        await _queryService.PostAsync(_llmOptions.LLM_SERVICE_URL + "/query", new { document_id, question }, cancellationToken);
+    public async Task<QueryAnswer> QueryLLM(
+        string document_id, 
+        string question, 
+        CancellationToken cancellationToken = default
+    ) =>    
+        await _queryService.PostAsync(
+            QUERY_URL, 
+            new { document_id, question }, 
+            cancellationToken
+        );
 
     /// <summary>
     /// Compute the embedding of a given text
@@ -35,8 +68,16 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebService<Quer
     /// Returns a vector which represents the text or data as interpreted by the LLM model
     /// </summary>
     /// <param name="document_id"></param>
-    /// <param name="data"></param>
+    /// <param name="text"></param>
     /// <returns></returns>
-    public async Task<float[]?> ComputeEmbedding(string document_id, string data, CancellationToken cancellationToken = default) => 
-        await _computeService.PostAsync(_llmOptions.LLM_SERVICE_URL + "/compute_embedding", new { document_id, data }, cancellationToken);
+    public async Task<float[]?> ComputeEmbedding(
+        string document_id, 
+        string text, 
+        CancellationToken cancellationToken = default
+    ) => 
+        await _computeService.PostAsync(
+            COMPUTE_URL, 
+            new { document_id, text }, 
+            cancellationToken
+        );
 }

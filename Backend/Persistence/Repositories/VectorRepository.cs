@@ -1,77 +1,115 @@
-using System.Data;
+
 using System.Text.Json;
-using Persistence.Models;
+using Domain.Persistence;
+using Domain.Persistence.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(List<Dictionary<string, object>> excelData, Dictionary<string, object> summary);
-    
-    Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> 
-        QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10);
+    Task<string> SaveDocumentAsync(VectorResponse vectorSpreadsheetData, CancellationToken cancellationToken);
+    Task<VectorResponse> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
 }
 
-public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLMRepository) : IVectorDbRepository
+public class VectorDbRepository(
+    ILLMRepository lLMRepository,
+    ApplicationDbContext context
+) : IVectorDbRepository
 {
     private readonly ApplicationDbContext _context = context;
     private readonly ILLMRepository _llmRepository = lLMRepository;
+    private readonly JsonSerializerOptions _serializerSettings = new();
 
-    public async Task<string> SaveDocumentAsync(List<Dictionary<string, object>> excelData, Dictionary<string, object> summary)
+    /// <summary>
+    /// Save the document to the database.
+    /// The document is represented as a list of rows, where each row is a dictionary of column names and values.
+    /// The document is stored in the database as a list of vectors, where each vector is the embedding of a row.
+    /// The summary is stored in the database as a dictionary of summary statistics.
+    /// </summary>
+    /// <param name="vectorSpreadsheetData">RelevantRows, and Summary</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<string> SaveDocumentAsync(
+        VectorResponse vectorSpreadsheetData, 
+        CancellationToken cancellationToken = default
+    )
     {
-        string documentId = await StoreVectors(excelData);
-        await StoreSummary(documentId, summary);
-        return documentId;
+        var documentId = await StoreVectors(vectorSpreadsheetData.RelevantRows);
+        var summarySuccess = await StoreSummary(documentId, vectorSpreadsheetData.Summary);
+        if (!summarySuccess.HasValue) 
+        {
+            // Rollback the document if the summary was not saved
+            _context.Documents.RemoveRange(_context.Documents.Where(d => d.Id == documentId));
+            await _context.SaveChangesAsync(cancellationToken);
+            return null!;
+        }
+        return documentId;// Succeeded, return an identifier to be able to get the document later
     }
 
-    public async Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> 
-        QueryVectorData(
-            string documentId, 
-            float[] queryVector, 
-            int topRelevantCount = 10)
+    public async Task<VectorResponse> QueryVectorData(
+        string documentId, 
+        float[] queryVector, 
+        int topRelevantCount = 10,
+        CancellationToken cancellationToken = default
+    )
     {
-        var serializerSettings = new JsonSerializerOptions();
         var relevantDocuments = await _context.Documents
             .Where(d => d.Id == documentId)
             .OrderByDescending(d => CalculateSimilarity(d.Embedding, queryVector!))
             .Take(topRelevantCount)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         var relevantRows = relevantDocuments
-            .Select(d => JsonSerializer.Deserialize<Dictionary<string, object>>(d.Content)!)
+            .Select(d => JsonSerializer.Deserialize<Dictionary<string, object>>(d.Content, _serializerSettings)!)
             .ToList();
         var summary = await _context.Summaries
             .Where(s => s.Id == documentId)
-            .Select(s => JsonSerializer.Deserialize<Dictionary<string, object>>(s.Content, serializerSettings))
-            .FirstOrDefaultAsync() ?? [];
-        return (RelevantRows: relevantRows, Summary: summary);
+            .Select(s => JsonSerializer.Deserialize<Dictionary<string, object>>(s.Content, _serializerSettings))
+            .FirstOrDefaultAsync(cancellationToken) ?? [];
+        return new()
+        {
+            Summary = summary,
+            RelevantRows = relevantRows
+        };
     }
 
-    private async Task<string> StoreVectors(List<Dictionary<string, object>> rows)
+    private async Task<string> StoreVectors(
+        List<Dictionary<string, object>> rows, 
+        CancellationToken cancellationToken = default
+    )
     {
         var documentId = Guid.NewGuid().ToString();
-        var documentTasks = rows.Select(row => GenerateDocument(documentId, row)).ToList();
+        var documentTasks = rows.Select(row => GenerateDocument(documentId, row, cancellationToken)).ToList();
         var documents = await Task.WhenAll(documentTasks);
         _context.Documents.AddRange(documents);
-        await _context.SaveChangesAsync();
+        var result = await _context.SaveChangesAsync(cancellationToken);
+        if (result <= 0) return null!;
         return documentId;
     }
 
-    private async Task StoreSummary(string documentId, Dictionary<string, object> summary)
+    private async Task<int?> StoreSummary(
+        string documentId, 
+        Dictionary<string, object> summary, 
+        CancellationToken cancellationToken = default
+    )
     {
         _context.Summaries.Add(new Summary { Id = documentId, Content = JsonSerializer.Serialize(summary) });
-        await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Document> GenerateDocument(string documentId, Dictionary<string, object> row) 
+    private async Task<Document> GenerateDocument(
+        string documentId, 
+        Dictionary<string, object> row, 
+        CancellationToken cancellationToken = default
+    ) 
     {
-        var serializedExcelobject = JsonSerializer.Serialize(row);
-        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedExcelobject);
+        var serializedData = JsonSerializer.Serialize(row);
+        var embedding = await _llmRepository.ComputeEmbedding(documentId, serializedData, cancellationToken);
         return new()
         {
             Id = documentId,
-            Content = serializedExcelobject,
-            Embedding = embedding!
+            Embedding = embedding!,
+            Content = serializedData
         };
     }
 
@@ -83,7 +121,7 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
     /// <param name="b"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    private static float CalculateSimilarity(float[] a, float[] b)
+    public static float CalculateSimilarity(float[] a, float[] b)
     {
         if (a.Length != b.Length) throw new ArgumentException("Vectors must be of the same length");
         return VectorMath.DotProduct(a, b) / (VectorMath.Magnitude(a) * VectorMath.Magnitude(b));
@@ -95,7 +133,7 @@ public class VectorDbRepository(ApplicationDbContext context, ILLMRepository lLM
     /// and it is essential for tasks such as calculating distances,
     /// angles, and projections between vectors.
     /// </summary>
-    private static class VectorMath
+    public static class VectorMath
     {
         /// <summary>
         /// Calculate the dot product of two vectors.

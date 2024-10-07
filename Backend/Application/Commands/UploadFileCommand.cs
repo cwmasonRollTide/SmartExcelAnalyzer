@@ -27,9 +27,9 @@ public class UploadFileCommandHandler(IExcelFileService excelService, IVectorDbR
 
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File);
+        var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File, cancellationToken);
         if (Rows == null || Summary == null) return null;
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(Rows, new Dictionary<string, object> { { "Summary", Summary } });
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(Rows, Summary, cancellationToken);
         return documentId;
     }
 }

@@ -1,4 +1,4 @@
-namespace Application.Models;
+namespace Domain.Application;
 
 public class ExcelFileSummary
 {

@@ -1,4 +1,4 @@
-namespace Persistence.Models;
+namespace Domain.Persistence.Configuration;
 
 public class LLMServiceOptions
 {

@@ -21,7 +21,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - LLM_SERVICE_URL=http://llm-service:5000
-      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=db sslmode=disable"
+      - DB_CONNECTION_STRING="Host=localhost;Username=admin;Password=password;Database=smartexcelanalyzer"
     depends_on:
       - llm-service
       - db

@@ -1,4 +1,4 @@
-using Persistence.Models;
+using Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;

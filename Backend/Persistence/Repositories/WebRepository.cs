@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace Persistence.Repositories;
 
-public interface IWebService<T>
+public interface IWebRepository<T>
 {
     Task<T> PostAsync(string endpoint, object payload, CancellationToken cancellationToken = default);
 }
 
-public class WebService<T>(IHttpClientFactory httpClientFactory) : IWebService<T>
+public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     public async Task<T> PostAsync(string endpoint, object payload, CancellationToken cancellationToken = default)

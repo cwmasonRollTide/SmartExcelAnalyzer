@@ -1,4 +1,4 @@
-namespace Persistence.Models.DTOs;
+namespace Domain.Persistence.DTOs;
 
 public class QueryAnswer
 {
