@@ -6,8 +6,8 @@ namespace Persistence.Repositories;
 
 public interface ILLMRepository
 {
+    Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default);
     Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default);
-    Task<float[]?> ComputeEmbedding(string document_id, string question, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -24,17 +24,18 @@ public interface ILLMRepository
 /// <param name="computeService"></param>
 public class LLMRepository(
     IOptions<LLMServiceOptions> options, 
-    IWebRepository<QueryAnswer> queryService, 
-    IWebRepository<float[]?> computeService ) : ILLMRepository
+    IWebRepository<float[]?> computeService,
+    IWebRepository<QueryAnswer> queryService 
+) : ILLMRepository
 {
     /// <summary>
     /// Options for the LLM service
     /// Contains the URL of the LLM service
     /// </summary>
     private readonly LLMServiceOptions _llmOptions = options.Value;
-    
+
     /// <summary>
-    /// Web repository for querying the LLM model
+    /// Web repositories for querying the LLM model
     /// </summary>
     private readonly IWebRepository<QueryAnswer> _queryService = queryService;
     private readonly IWebRepository<float[]?> _computeService = computeService;
@@ -71,13 +72,12 @@ public class LLMRepository(
     /// <param name="text"></param>
     /// <returns></returns>
     public async Task<float[]?> ComputeEmbedding(
-        string document_id, 
         string text, 
         CancellationToken cancellationToken = default
     ) => 
         await _computeService.PostAsync(
             COMPUTE_URL, 
-            new { document_id, text }, 
+            new { text }, 
             cancellationToken
         );
 }

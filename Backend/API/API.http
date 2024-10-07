@@ -1,7 +1,8 @@
 @API_HostAddress = http://localhost:5001
 
-POST {{API_HostAddress}}/api/analysis/upload
+GET {{API_HostAddress}}/health
 POST {{API_HostAddress}}/api/analysis/query
+POST {{API_HostAddress}}/api/analysis/upload
 Accept: application/json
 
 ###

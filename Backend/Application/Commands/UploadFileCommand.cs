@@ -1,6 +1,7 @@
 using MediatR;
 using FluentValidation;
 using Application.Services;
+using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 
@@ -20,16 +21,35 @@ public class UploadFileCommand : IRequest<string?>
     public required IFormFile File { get; set; }
 }
 
-public class UploadFileCommandHandler(IExcelFileService excelService, IVectorDbRepository vectorDbRepository) : IRequestHandler<UploadFileCommand, string?>
+/// <summary>
+/// UploadFileCommandHandler handles the UploadFileCommand request
+/// dependencies: IExcelFileService, IVectorDbRepository
+/// Returns the documentId of the uploaded file if successful, otherwise null
+/// </summary>
+/// <param name="excelService"></param>
+/// <param name="vectorDbRepository"></param>
+public class UploadFileCommandHandler(
+    IExcelFileService excelService,
+    IVectorDbRepository vectorDbRepository
+) : IRequestHandler<UploadFileCommand, string?>
 {
     private readonly IExcelFileService _excelService = excelService;
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
 
-    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
+    public async Task<string?> Handle(
+        UploadFileCommand request, 
+        CancellationToken cancellationToken = default
+    )
     {
         var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File, cancellationToken);
-        if (Rows == null || Summary == null) return null;
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(Rows, Summary, cancellationToken);
+        if (Rows is null || Summary is null) return null;
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(
+            new VectorQueryResponse 
+            {
+                Summary = Summary,
+                RelevantRows = Rows
+            }, cancellationToken
+        );
         return documentId;
     }
 }

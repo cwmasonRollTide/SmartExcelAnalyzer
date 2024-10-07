@@ -1,48 +1,59 @@
-using Application.Commands;
+using Persistence;
+using API.Middleware;
 using Application.Queries;
 using Application.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Persistence;
-using Persistence.Models;
+using Application.Commands;
+using Domain.Persistence.DTOs;
 using Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Domain.Persistence.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllers();
-
-// Configure EF Core
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));  // or UseNpgsql() for PostgreSQL
-
-builder.Services.AddSwaggerGen();
-
-// Add your other services here
-
 builder.Services.AddHttpClient();
+builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 
-builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
+// Database
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
+// LLM Service Options
+var llmServiceUrl = Environment.GetEnvironmentVariable("LLM_SERVICE_URL");
+if (!string.IsNullOrEmpty(llmServiceUrl))
+    builder.Services.Configure<LLMServiceOptions>(options => options.LLM_SERVICE_URL = llmServiceUrl);
+else
+    builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
+
+// MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQuery>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommand>());
-builder.Services.AddScoped<ILLMRepository, LLMRepository>();
+
+// Validators
+
+// Services
 builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
+
+// Repositories
+builder.Services.AddScoped<ILLMRepository, LLMRepository>();
 builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
+builder.Services.AddScoped<IWebRepository<float[]?>, WebRepository<float[]?>>();
+builder.Services.AddScoped<IWebRepository<QueryAnswer>, WebRepository<QueryAnswer>>();
 
-
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
+// app.UseHttpsRedirection();
+// app.UseAuthorization();
+app.UseRouting();
 app.MapControllers();
+app.MapHealthChecks("/health");
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

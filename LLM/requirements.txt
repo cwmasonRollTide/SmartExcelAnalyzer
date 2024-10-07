@@ -4,4 +4,6 @@ torch
 fastapi
 uvicorn
 psycopg2
+pydantic
 transformers
+psycopg2-binary

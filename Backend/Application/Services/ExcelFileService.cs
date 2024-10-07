@@ -10,7 +10,7 @@ namespace Application.Services;
 
 public interface IExcelFileService
 {
-    Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, ExcelFileSummary> Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default);
+    Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default);
 }
 
 public class ExcelFileService : IExcelFileService
@@ -29,7 +29,7 @@ public class ExcelFileService : IExcelFileService
     /// </summary>
     /// <param name="file"></param>
     /// <returns></returns>
-    public async Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, ExcelFileSummary> Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default)
+    public async Task<(List<Dictionary<string, object>> RelevantRows, Dictionary<string, object> Summary)> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
         var parallelOptions = new ParallelOptions { CancellationToken = cancellationToken };
         using var stream = file.OpenReadStream();
@@ -62,7 +62,7 @@ public class ExcelFileService : IExcelFileService
     /// <param name="table"></param>
     /// <param name="parallelOptions"></param>
     /// <returns></returns>
-    private static async Task<Dictionary<string, ExcelFileSummary>> CalculateSummaryStatisticsAsync(
+    private static async Task<Dictionary<string, object>> CalculateSummaryStatisticsAsync(
         DataTable table, 
         ParallelOptions parallelOptions
     ) =>
@@ -80,7 +80,7 @@ public class ExcelFileService : IExcelFileService
                 () => CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions),
                 () => CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions)
             );
-            return new Dictionary<string, ExcelFileSummary> { { "Summary", summary } };
+            return new Dictionary<string, object> { { "Summary", summary } };
         }, parallelOptions.CancellationToken);
 
     private static List<DataColumn> GetNumericColumns(DataTable table) => 

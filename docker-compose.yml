@@ -7,10 +7,15 @@ services:
       dockerfile: llm.Dockerfile
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     environment:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=localhost sslmode=disable"
+      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=db sslmode=disable"
 
   backend:
     build: 
@@ -21,7 +26,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - LLM_SERVICE_URL=http://llm-service:5000
-      - DB_CONNECTION_STRING="Host=localhost;Username=admin;Password=password;Database=smartexcelanalyzer"
+      - DB_CONNECTION_STRING="Host=db;Username=admin;Password=password;Database=smartexcelanalyzer"
     depends_on:
       - llm-service
       - db

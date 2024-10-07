@@ -13,7 +13,9 @@ public class SubmitQueryValidator : AbstractValidator<SubmitQuery>
         RuleFor(x => x.Query).NotEmpty().WithMessage("Query is required.");
         RuleFor(x => x.DocumentId).NotNull().WithMessage("DocumentId is required.");
         RuleFor(x => x.DocumentId).NotEmpty().WithMessage("DocumentId is required.");
-        RuleFor(x => x.RelevantRowsCount).GreaterThanOrEqualTo(0).WithMessage("RelevantRowsCount must be greater than or equal to 0.");
+        RuleFor(x => x.RelevantRowsCount)
+            .GreaterThanOrEqualTo(0).WithMessage("RelevantRowsCount must be greater than or equal to 0.")
+            .When(x => x.RelevantRowsCount.HasValue);
     }
 }
 
@@ -33,26 +35,34 @@ public class SubmitQueryHandler(
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
 
     /// <summary>
-    /// Handles the SubmitQuery request
+    /// Handles the SubmitQuery request. Asks
     /// 
+    /// dependencies: ILLMRepository, IVectorDbRepository
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<QueryAnswer> Handle(
         SubmitQuery request, 
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default
+    ) 
     {
-        var result = await _llmRepository.QueryLLM(request.DocumentId, request.Query, cancellationToken);
+        var result = await _llmRepository.QueryLLM(
+            question: request.Query, 
+            document_id: request.DocumentId, 
+            cancellationToken: cancellationToken
+        );
         if (request.RelevantRowsCount.HasValue)
         {
-            var embedding = await _llmRepository.ComputeEmbedding(request.DocumentId, request.Query, cancellationToken);
-            if (embedding == null) return result;
+            var embedding = await _llmRepository.ComputeEmbedding(
+                text: request.Query, 
+                cancellationToken
+            );
             var vectorResponse = await _vectorDbRepository.QueryVectorData(
+                queryVector: embedding!, 
                 documentId: request.DocumentId, 
-                queryVector: embedding, 
-                topRelevantCount: (int)request.RelevantRowsCount!, 
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken,
+                topRelevantCount: (int)request.RelevantRowsCount!
             );
             result.RelevantRows = vectorResponse.RelevantRows;
         }
