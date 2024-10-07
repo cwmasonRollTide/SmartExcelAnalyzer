@@ -1,9 +1,9 @@
 using MediatR;
 using FluentValidation;
 using Application.Services;
-using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Commands;
 
@@ -30,26 +30,47 @@ public class UploadFileCommand : IRequest<string?>
 /// <param name="vectorDbRepository"></param>
 public class UploadFileCommandHandler(
     IExcelFileService excelService,
-    IVectorDbRepository vectorDbRepository
+    IVectorDbRepository vectorDbRepository,
+    ILogger<UploadFileCommandHandler> logger
 ) : IRequestHandler<UploadFileCommand, string?>
 {
-    private readonly IExcelFileService _excelService = excelService;
-    private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
+    #region Constants
+    private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
+    private const string LogFailedToPrepareExcelFile = "Failed to prepare excel file {FileName} for LLM.";
+    private const string LogSavingDocument = "Saving file {Filename} with id {DocumentId} to the vector database.";
+    #endregion
 
-    public async Task<string?> Handle(
-        UploadFileCommand request, 
-        CancellationToken cancellationToken = default
-    )
+    #region Dependencies
+    private readonly IExcelFileService _excelService = excelService;
+    private readonly ILogger<UploadFileCommandHandler> _logger = logger;
+    private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
+    #endregion
+
+    #region Handle Method
+    /// <summary>
+    /// Handles the UploadFileCommand request. Prepares the excel file for the LLM and saves it to the vector database.
+    /// Parses the excel file and computes the embedding of each row with the LLM.
+    /// Saves the way the LLM computes the embedding of all the rows of each excel file in the database
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    /// DocumentId? string. If it is null, the operation failed either at the parsing stage
+    /// or the saving to the vector db stage
+    /// </returns>
+    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        var ( Rows, Summary ) = await _excelService.PrepareExcelFileForLLMAsync(request.File, cancellationToken);
-        if (Rows is null || Summary is null) return null;
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(
-            new VectorQueryResponse 
-            {
-                Summary = Summary,
-                RelevantRows = Rows
-            }, cancellationToken
-        );
+        _logger.LogInformation(LogPreparingExcelFile, request.File.FileName);
+        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
+        if (summarizedExcelData is null)
+        {
+            _logger.LogInformation(LogFailedToPrepareExcelFile, request.File.FileName);
+            return null;
+        }
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(summarizedExcelData, cancellationToken);
+        if (documentId is null) return null;
+        _logger.LogInformation(LogSavingDocument, request.File.FileName, documentId);
         return documentId;
     }
+    #endregion
 }

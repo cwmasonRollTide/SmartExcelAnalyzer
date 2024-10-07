@@ -9,8 +9,8 @@ namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(VectorQueryResponse vectorSpreadsheetData, CancellationToken cancellationToken);
-    Task<VectorQueryResponse> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
+    Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken);
+    Task<SummarizedExcelData> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
 }
 
 public class VectorDbRepository(
@@ -32,7 +32,7 @@ public class VectorDbRepository(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<string> SaveDocumentAsync(
-        VectorQueryResponse vectorSpreadsheetData, 
+        SummarizedExcelData vectorSpreadsheetData, 
         CancellationToken cancellationToken = default
     )
     {
@@ -49,7 +49,7 @@ public class VectorDbRepository(
         return documentId;
     }
 
-    public async Task<VectorQueryResponse> QueryVectorData(
+    public async Task<SummarizedExcelData> QueryVectorData(
         string documentId, 
         float[] queryVector, 
         int topRelevantCount = 10,

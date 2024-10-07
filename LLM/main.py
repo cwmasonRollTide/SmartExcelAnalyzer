@@ -34,18 +34,13 @@ class ComputeEmbedding(BaseModel):
 @app.get("/health", response_model=dict)
 async def health():
     """
-    Perform a health check by testing the connection to the database and loading the pretrained models.
+    Perform a health check by loading the pretrained models.
 
     Returns:
         dict: A dictionary containing the status of the health check.
     """
     try:
         print("Performing health check...")
-        conn = psycopg2.connect()
-        curr = conn.cursor()
-        curr.execute("SELECT 1")
-        conn.close()
-        print("Database connection successful.")
         AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
         AutoModel.from_pretrained(EMBEDDING_MODEL)
         pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
@@ -70,10 +65,8 @@ async def process_query(query: Query) -> QueryResponse:
         QueryResponse: The generated answer along with the relevant rows.
     """
     try:
-        # Connect to the vector database where we store the documents and summaries (excel rows and summary of excel sheets)
         conn = psycopg2.connect(DB_CONNECTION_STRING)
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        # Fetch relevant rows and summary
         cur.execute("""
             SELECT content FROM documents 
             WHERE id = %s 
