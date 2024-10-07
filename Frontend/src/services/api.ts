@@ -19,7 +19,7 @@ type Query = {
   documentId: string;
 };
 
-interface QueryResponse extends Query {
+export interface QueryResponse extends Query {
   answer: string;
   relevantRows: any[];
 }
