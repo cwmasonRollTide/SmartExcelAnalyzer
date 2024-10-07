@@ -19,9 +19,15 @@ public interface ILLMRepository
 /// and computing the embeddings of text
 /// The LLM service is a separate service which is responsible for running the LLM model (in python server)
 /// </summary>
-/// <param name="options"></param>
-/// <param name="queryService"></param>
-/// <param name="computeService"></param>
+/// <param name="options">
+///     Options for the LLM service
+/// </param>
+/// <param name="queryService">
+///     Web repository for querying the LLM model - specifically the /query endpoint
+/// </param>
+/// <param name="computeService">
+///     Web repository for computing the embeddings of text - specifically the /compute_embedding endpoint
+/// </param>
 public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<float[]?> computeService, IWebRepository<QueryAnswer> queryService) : ILLMRepository
 {
     #region Service URLs

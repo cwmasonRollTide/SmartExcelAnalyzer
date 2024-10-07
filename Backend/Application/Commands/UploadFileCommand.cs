@@ -23,7 +23,7 @@ public class UploadFileCommand : IRequest<string?>
 
 /// <summary>
 /// UploadFileCommandHandler handles the UploadFileCommand request
-/// dependencies: IExcelFileService, IVectorDbRepository
+/// dependencies: IExcelFileService, IVectorDbRepository, ILogger<UploadFileCommandHandler>
 /// Returns the documentId of the uploaded file if successful, otherwise null
 /// </summary>
 /// <param name="excelService"></param>

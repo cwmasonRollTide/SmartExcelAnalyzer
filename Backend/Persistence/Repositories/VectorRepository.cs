@@ -14,6 +14,15 @@ public interface IVectorDbRepository
     Task<SummarizedExcelData> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Repository for interfacing with the VectorDb repository
+/// This repository is responsible for storing and querying the vectors of documents
+/// It uses the LLM repository to compute the embeddings of the documents
+/// The VectorDb repository is a database which stores the vectors of the documents
+/// </summary>
+/// <param name="lLMRepository"></param>
+/// <param name="context"></param>
+/// <param name="logger"></param>
 public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbContext context, ILogger<VectorDbRepository> logger) : IVectorDbRepository
 {
     #region Log Message Constants
@@ -21,6 +30,8 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     private const string LogSavedDocumentSuccess = @"Saved document with id {DocumentId} to the database.";
     private const string LogFailedToSaveDocument = "Failed to save vectors of the document to the database.";
     private const string LogFailedToSaveSummary = "Failed to save the summary of the document to the database.";
+    private const string LogQueryingVectorDb = "Querying the VectorDb for the most relevant rows for document {DocumentId}.";
+    private const string LogQueryingVectorDbSuccess = "Querying the VectorDb for the most relevant rows for document {DocumentId} was successful. Found {RelevantRowsCount} relevant rows.";
     #endregion
 
     #region Dependencies
@@ -59,6 +70,14 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
         return documentId;
     }
 
+    /// <summary>
+    /// Query the database for the most relevant rows to a given query vector.
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <param name="queryVector"></param>
+    /// <param name="topRelevantCount"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<SummarizedExcelData> QueryVectorData(
         string documentId, 
         float[] queryVector, 
@@ -66,6 +85,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation(LogQueryingVectorDb, documentId);
         var relevantDocuments = await _context.Documents
             .Where(d => d.Id == documentId)
             .OrderByDescending(d => VectorMath.CalculateSimilarity(d.Embedding, queryVector!))
@@ -78,6 +98,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
             .Where(s => s.Id == documentId)
             .Select(s => JsonSerializer.Deserialize<Dictionary<string, object>>(s.Content, _serializerSettings))
             .FirstOrDefaultAsync(cancellationToken) ?? [];
+        _logger.LogInformation(LogQueryingVectorDbSuccess, documentId, relevantRows.Count);
         return new()
         {
             Summary = summary,
@@ -86,10 +107,8 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     }
     #endregion
 
-    private async Task<string?> StoreVectors(
-        List<Dictionary<string, object>> rows, 
-        CancellationToken cancellationToken = default
-    )
+    #region Private Methods
+    private async Task<string?> StoreVectors(List<Dictionary<string, object>> rows, CancellationToken cancellationToken = default)
     {
         var documentId = Guid.NewGuid().ToString();
         var documentTasks = rows.Select(row => GenerateDocument(documentId, row, cancellationToken)).ToList();
@@ -100,11 +119,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
         return documentId;
     }
 
-    private async Task<int?> StoreSummary(
-        string documentId, 
-        Dictionary<string, object> summary, 
-        CancellationToken cancellationToken = default
-    )
+    private async Task<int?> StoreSummary(string documentId, Dictionary<string, object> summary, CancellationToken cancellationToken = default)
     {
         _context.Summaries.Add(new Summary { Id = documentId, Content = JsonSerializer.Serialize(summary) });
         return await _context.SaveChangesAsync(cancellationToken);
@@ -118,22 +133,15 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     /// <param name="row"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<Document> GenerateDocument(
-        string documentId, 
-        Dictionary<string, object> row, 
-        CancellationToken cancellationToken = default
-    ) 
+    private async Task<Document> GenerateDocument(string documentId, Dictionary<string, object> row, CancellationToken cancellationToken = default) 
     {
         var serializedData = JsonSerializer.Serialize(row);
-        var embedding = await _llmRepository.ComputeEmbedding(
-            serializedData, 
-            cancellationToken
-        );
         return new()
         {
             Id = documentId,
-            Embedding = embedding!,
-            Content = serializedData
+            Content = serializedData,
+            Embedding = (await _llmRepository.ComputeEmbedding(serializedData, cancellationToken))!
         };
     }
+    #endregion
 }

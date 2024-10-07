@@ -40,24 +40,35 @@ public class ExcelFileService : IExcelFileService
         using var reader = ExcelReaderFactory.CreateReader(stream);
         var result = reader.AsDataSet(new ExcelDataSetConfiguration()
         {
-            ConfigureDataTable = _ => new()
+            ConfigureDataTable = _ => new ExcelDataTableConfiguration()
             {
-                UseHeaderRow = true
+                UseHeaderRow = true,
+                ReadHeaderRow = rowReader =>
+                {
+                    var columnNames = new List<string>();
+                    for (int i = 0; i < rowReader.FieldCount; i++)
+                    {
+                        columnNames.Add(rowReader.GetValue(i)?.ToString() ?? $"Column{i + 1}");
+                    }
+                    columnNames.ToArray();
+                }
             }
         });
+
         var table = result.Tables[0];
         var rows = new ConcurrentBag<Dictionary<string, object>>();
         var concurrentTable = new ConcurrentBag<DataRow>(table.AsEnumerable());
-        var rowTask = Task.Run(async () =>
+        var addingRowsTasks = Task.Run(async () =>
         {
             await Parallel.ForEachAsync(concurrentTable, parallelOptions, (row, token) =>
             {
                 rows.Add(table.Columns.Cast<DataColumn>().ToDictionary(col => col.ColumnName, col => row[col] == DBNull.Value ? null! : row[col]));
                 return ValueTask.CompletedTask;
             });
-        }, parallelOptions.CancellationToken);
+        }, cancellationToken);
         var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
-        await Task.WhenAll(rowTask, summaryTask);
+        await addingRowsTasks;
+        await summaryTask;
         return new SummarizedExcelData
         {
             RelevantRows = [.. rows],
@@ -72,48 +83,45 @@ public class ExcelFileService : IExcelFileService
     /// <param name="table"></param>
     /// <param name="parallelOptions"></param>
     /// <returns></returns>
-    private static async Task<Dictionary<string, object>> CalculateSummaryStatisticsAsync(
-        DataTable table, 
-        ParallelOptions parallelOptions
-    ) =>
-        await Task.Run(() =>
+    private static async Task<Dictionary<string, object>> CalculateSummaryStatisticsAsync(DataTable table, ParallelOptions parallelOptions) 
+    {
+        var summary = new ExcelFileSummary
         {
-            var summary = new ExcelFileSummary
-            {
-                RowCount = table.Rows.Count,
-                ColumnCount = table.Columns.Count,
-                Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
-            };
-            var stringColumns = GetStringColumns(table);
-            var numericColumns = GetNumericColumns(table);
-            Parallel.Invoke(parallelOptions,
-                async () => await CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions),
-                async () => await CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions)
-            );
-            return new Dictionary<string, object> { { "Summary", summary } };
-        }, parallelOptions.CancellationToken);
+            RowCount = table.Rows.Count,
+            ColumnCount = table.Columns.Count,
+            Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
+        };
+        var stringColumns = GetStringColumns(table);
+        var numericColumns = GetNumericColumns(table);
+        await CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions);
+        await CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions);
+        return new Dictionary<string, object> { { "Summary", summary } };
+    }            
 
     /// <summary>
     /// Get the numeric columns from the given table
     /// </summary>
     /// <param name="table"></param>
     /// <returns></returns>
-    private static List<DataColumn> GetNumericColumns(DataTable table) => 
-        table.Columns.Cast<DataColumn>()
-            .Where(IsNumericColumn)
-            .ToList();
+    private static List<DataColumn> GetNumericColumns(DataTable table) => table.Columns.Cast<DataColumn>().Where(c => IsNumericColumn(c, table)).ToList();
 
     /// <summary>
     /// Check if the given column is of a numeric type
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
-    private static bool IsNumericColumn(DataColumn column) =>
-        column.DataType == typeof(int) || 
-        column.DataType == typeof(double) || 
-        column.DataType == typeof(float) || 
-        column.DataType == typeof(decimal) || 
-        column.DataType == typeof(long);
+    private static bool IsNumericColumn(DataColumn column, DataTable table)
+    {
+        if (column.DataType == typeof(int) || column.DataType == typeof(double) || 
+            column.DataType == typeof(float) || column.DataType == typeof(decimal) || 
+            column.DataType == typeof(long))
+        {
+            return true;
+        }
+        return table.AsEnumerable()
+            .Where(row => row[column] != DBNull.Value)
+            .All(row => double.TryParse(row[column].ToString(), out _));
+    }
 
     /// <summary>
     /// Calculate the sum, average, min, and max for each numeric column in the given table
@@ -123,7 +131,7 @@ public class ExcelFileService : IExcelFileService
     /// <param name="numericColumns"></param>
     /// <param name="summary"></param>
     /// <param name="parallelOptions"></param>
-    private static async Task CalculateNumericColumnStatistics(
+     private static async Task CalculateNumericColumnStatistics(
         DataTable table, 
         List<DataColumn> numericColumns, 
         ExcelFileSummary summary, 
@@ -154,11 +162,7 @@ public class ExcelFileService : IExcelFileService
     /// </summary>
     /// <param name="table"></param>
     /// <returns></returns>
-    private static List<DataColumn> GetStringColumns(DataTable table) => 
-        table.Columns.Cast<DataColumn>()
-            .Where(IsStringColumn)
-            .ToList();
-
+    private static List<DataColumn> GetStringColumns(DataTable table) => table.Columns.Cast<DataColumn>().Where(IsStringColumn).ToList();
     private static bool IsStringColumn(DataColumn column) => column.DataType == typeof(string);
 
     /// <summary>
