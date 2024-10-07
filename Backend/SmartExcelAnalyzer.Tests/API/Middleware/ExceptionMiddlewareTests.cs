@@ -4,6 +4,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace SmartExcelAnalyzer.Tests.API.Middleware;
 
@@ -55,7 +56,41 @@ public class ExceptionMiddlewareTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(exceptionMessage)),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ValidationExceptionThrown_ReturnsValidationError()
+    {
+        const string exceptionMessage = "A validation exception occurred.";
+        var context = new DefaultHttpContext();
+        context.Response.Body = new MemoryStream();
+        static Task next(HttpContext httpContext)
+        {
+            throw new ValidationException(exceptionMessage);
+        }
+        var middleware = new ExceptionMiddleware(next, _loggerMock.Object);
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        context.Response.ContentType.Should().Contain("application/json");
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(context.Response.Body);
+        var responseBody = await reader.ReadToEndAsync();
+        
+        responseBody.Should().Contain(exceptionMessage);
+        responseBody.Should().Contain("400");
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()
             ),

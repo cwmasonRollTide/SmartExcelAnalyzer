@@ -2,7 +2,7 @@ using Domain.Persistence;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence;
+namespace Persistence.Database;
 
 [ExcludeFromCodeCoverage]
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)

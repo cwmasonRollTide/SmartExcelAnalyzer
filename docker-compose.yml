@@ -15,7 +15,7 @@ services:
     environment:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - DB_CONNECTION_STRING="dbname=smartexcelanalyzer user=admin password=password host=db sslmode=disable"
+      - DB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017/smartexcelanalyzer
 
   backend:
     build: 
@@ -26,10 +26,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - LLM_SERVICE_URL=http://llm-service:5000
-      - DB_CONNECTION_STRING="Host=db;Username=admin;Password=password;Database=smartexcelanalyzer"
+      - MONGODB_DATABASE_NAME=smartexcelanalyzer
+      - MONGODB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017
     depends_on:
       - llm-service
-      - db
+      - mongodb
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 120s
@@ -48,20 +49,37 @@ services:
     depends_on:
       - backend
   
-  db:
-    image: postgres:13
+  mongodb:
+    image: mongo:5.0
     environment:
-      POSTGRES_DB: smartexcelanalyzer
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: smartexcelanalyzer
+    ports:
+      - "27017:27017"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d smartexcelanalyzer"]
-      interval: 120s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mongodata:/data/db
+
+  # Uncomment the following section to use PostgreSQL instead of MongoDB
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_DB: smartexcelanalyzer
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: password
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U admin -d smartexcelanalyzer"]
+  #     interval: 120s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 10s
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  mongodata:

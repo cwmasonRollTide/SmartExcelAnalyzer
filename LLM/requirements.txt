@@ -1,6 +1,7 @@
 # os
 json
 torch
+pymongo
 fastapi
 uvicorn
 psycopg2

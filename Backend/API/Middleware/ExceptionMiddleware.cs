@@ -1,11 +1,9 @@
 using System.Net;
+using FluentValidation;
 
 namespace API.Middleware;
 
-public class ExceptionMiddleware(
-    RequestDelegate next, 
-    ILogger<ExceptionMiddleware> logger
-)
+public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
     private readonly ILogger<ExceptionMiddleware> _logger = logger;
@@ -16,6 +14,11 @@ public class ExceptionMiddleware(
         {
             await _next(context);
         }
+        catch (ValidationException validationException)
+        {
+            _logger.LogError(validationException, "A validation exception occurred.");
+            await HandleExceptionAsync(context, validationException, HttpStatusCode.BadRequest);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unhandled exception occurred.");
@@ -23,10 +26,10 @@ public class ExceptionMiddleware(
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception, HttpStatusCode statusCode = HttpStatusCode.InternalServerError)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int)statusCode;
         return context.Response.WriteAsJsonAsync(new
         {
             exception.Message,

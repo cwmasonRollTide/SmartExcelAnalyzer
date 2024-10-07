@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace SmartExcelAnalyzer.Tests.TestUtilities;
 
+[ExcludeFromCodeCoverage]
 public class MockDbSet<T> : Mock<DbSet<T>> where T : class
 {
     private readonly List<T> _data;

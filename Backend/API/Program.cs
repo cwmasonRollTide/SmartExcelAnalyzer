@@ -1,4 +1,3 @@
-using Persistence;
 using System.Text;
 using API.Middleware;
 using Application.Queries;
@@ -10,8 +9,10 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
+using Persistence.Database;
+using MongoDB.Driver;
 
-[assembly: ExcludeFromCodeCoverage]
+// [assembly: ExcludeFromCodeCoverage]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,18 @@ builder.Services.AddHealthChecks();
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
+
+var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING") 
+    ?? builder.Configuration.GetConnectionString("MongoDB");
+var mongoDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME")
+    ?? builder.Configuration["MongoDB:DatabaseName"];
+builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+builder.Services.AddScoped(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoDatabaseName);
+});
+builder.Services.AddScoped<IDatabaseWrapper, NoSqlDatabaseWrapper>();
 
 // LLM Service Options
 var llmServiceUrl = Environment.GetEnvironmentVariable("LLM_SERVICE_URL");
