@@ -105,8 +105,7 @@ public class SubmitQueryHandler(
                 _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
                 return null;
             }
-            result.RelevantRows = vectorResponse.RelevantRows;
-            _logger.LogInformation(LogRelevantRowsCount, vectorResponse.RelevantRows.Count);
+            result.RelevantRows = vectorResponse.Rows!;
         }
         _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;

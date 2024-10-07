@@ -1,5 +1,6 @@
 using System.Text;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories;
 
@@ -14,6 +15,7 @@ public interface IWebRepository<T>
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <param name="httpClientFactory"></param>
+[ExcludeFromCodeCoverage]
 public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;

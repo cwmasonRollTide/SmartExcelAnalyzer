@@ -5,6 +5,7 @@ using Domain.Persistence;
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace Persistence.Repositories;
 
@@ -54,13 +55,13 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     public async Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(LogStartingSaveDocument);
-        var documentId = await StoreVectors(vectorSpreadsheetData.RelevantRows, cancellationToken);
+        var documentId = await StoreVectors(vectorSpreadsheetData.Rows!, cancellationToken);
         if (documentId is null) 
         {
             _logger.LogWarning(LogFailedToSaveDocument);
             return null!;
         }
-        var summarySuccess = await StoreSummary(documentId, vectorSpreadsheetData.Summary, cancellationToken);
+        var summarySuccess = await StoreSummary(documentId, vectorSpreadsheetData.Summary!, cancellationToken);
         if (!summarySuccess.HasValue) 
         {
             _logger.LogWarning(LogFailedToSaveSummary);
@@ -92,23 +93,22 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
             .Take(topRelevantCount)
             .ToListAsync(cancellationToken);
         var relevantRows = relevantDocuments
-            .Select(d => JsonSerializer.Deserialize<Dictionary<string, object>>(d.Content, _serializerSettings)!)
-            .ToList();
+            .Select(d => JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(d.Content, _serializerSettings)!);
         var summary = await _context.Summaries
             .Where(s => s.Id == documentId)
-            .Select(s => JsonSerializer.Deserialize<Dictionary<string, object>>(s.Content, _serializerSettings))
+            .Select(s => JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(s.Content, _serializerSettings))
             .FirstOrDefaultAsync(cancellationToken) ?? [];
-        _logger.LogInformation(LogQueryingVectorDbSuccess, documentId, relevantRows.Count);
+        _logger.LogInformation(LogQueryingVectorDbSuccess, documentId, relevantRows.Count());
         return new()
         {
             Summary = summary,
-            RelevantRows = relevantRows
+            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantRows)
         };
     }
     #endregion
 
     #region Private Methods
-    private async Task<string?> StoreVectors(List<Dictionary<string, object>> rows, CancellationToken cancellationToken = default)
+    private async Task<string?> StoreVectors(ConcurrentBag<ConcurrentDictionary<string, object>> rows, CancellationToken cancellationToken = default)
     {
         var documentId = Guid.NewGuid().ToString();
         var documentTasks = rows.Select(row => GenerateDocument(documentId, row, cancellationToken)).ToList();
@@ -119,7 +119,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
         return documentId;
     }
 
-    private async Task<int?> StoreSummary(string documentId, Dictionary<string, object> summary, CancellationToken cancellationToken = default)
+    private async Task<int?> StoreSummary(string documentId, ConcurrentDictionary<string, object> summary, CancellationToken cancellationToken = default)
     {
         _context.Summaries.Add(new Summary { Id = documentId, Content = JsonSerializer.Serialize(summary) });
         return await _context.SaveChangesAsync(cancellationToken);
@@ -133,7 +133,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     /// <param name="row"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<Document> GenerateDocument(string documentId, Dictionary<string, object> row, CancellationToken cancellationToken = default) 
+    private async Task<Document> GenerateDocument(string documentId, ConcurrentDictionary<string, object> row, CancellationToken cancellationToken = default) 
     {
         var serializedData = JsonSerializer.Serialize(row);
         return new()

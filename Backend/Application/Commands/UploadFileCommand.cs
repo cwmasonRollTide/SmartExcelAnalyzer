@@ -4,6 +4,7 @@ using Application.Services;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace Application.Commands;
 
@@ -12,13 +13,13 @@ public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
     public UploadFileCommandValidator()
     {
         RuleFor(x => x.File).NotNull().WithMessage("File is required.");
-        RuleFor(x => x.File.Length).GreaterThan(0).WithMessage("File is empty.");
+        RuleFor(x => x.File).Must(file => file is not null && file.Length > 0).WithMessage("File is empty.");
     }
 }
 
 public class UploadFileCommand : IRequest<string?>
 {
-    public required IFormFile File { get; set; }
+    public IFormFile? File { get; set; }
 }
 
 /// <summary>

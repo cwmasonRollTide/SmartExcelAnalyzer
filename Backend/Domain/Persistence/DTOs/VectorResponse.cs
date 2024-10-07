@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Persistence.DTOs;
@@ -5,6 +6,6 @@ namespace Domain.Persistence.DTOs;
 [ExcludeFromCodeCoverage]
 public class SummarizedExcelData
 {
-    public required Dictionary<string, object> Summary { get; init; }
-    public required List<Dictionary<string, object>> RelevantRows { get; init; }
+    public ConcurrentDictionary<string, object>? Summary { get; init; }
+    public ConcurrentBag<ConcurrentDictionary<string, object>>? Rows { get; init; }
 }
