@@ -22,26 +22,30 @@ public interface ILLMRepository
 /// <param name="options"></param>
 /// <param name="queryService"></param>
 /// <param name="computeService"></param>
-public class LLMRepository(
-    IOptions<LLMServiceOptions> options, 
-    IWebRepository<float[]?> computeService,
-    IWebRepository<QueryAnswer> queryService 
-) : ILLMRepository
+public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<float[]?> computeService, IWebRepository<QueryAnswer> queryService) : ILLMRepository
 {
+    #region Service URLs
+    private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
+    private string COMPUTE_URL => _llmOptions.LLM_SERVICE_URL + "/compute_embedding";
+    #endregion
+
+    #region Dependencies
     /// <summary>
     /// Options for the LLM service
     /// Contains the URL of the LLM service
     /// </summary>
     private readonly LLMServiceOptions _llmOptions = options.Value;
-
     /// <summary>
-    /// Web repositories for querying the LLM model
+    /// Web repository for querying the LLM model
     /// </summary>
     private readonly IWebRepository<QueryAnswer> _queryService = queryService;
+    /// <summary>
+    /// Web repository for calling the compute function of the LLM model
+    /// </summary>
     private readonly IWebRepository<float[]?> _computeService = computeService;
-    private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
-    private string COMPUTE_URL => _llmOptions.LLM_SERVICE_URL + "/compute_embedding";
+    #endregion
 
+    #region Public Methods
     /// <summary>
     /// Query the LLM model with a given document_id and question
     /// Calls the /query endpoint of the LLM service
@@ -49,19 +53,17 @@ public class LLMRepository(
     /// Given the question provided, the LLM will use the most relevant rows 
     /// from the excel sheet to answer the question
     /// </summary>
-    /// <param name="document_id"></param>
-    /// <param name="question"></param>
-    /// <returns></returns>
-    public async Task<QueryAnswer> QueryLLM(
-        string document_id, 
-        string question, 
-        CancellationToken cancellationToken = default
-    ) =>    
-        await _queryService.PostAsync(
-            QUERY_URL, 
-            new { document_id, question }, 
-            cancellationToken
-        );
+    /// <param name="document_id">
+    ///     The document_id of the excel sheet which contains the data
+    /// </param>
+    /// <param name="question">
+    ///     The question to ask the LLM model
+    /// </param>
+    /// <returns>
+    ///     QueryAnswer. The answer to the question as interpreted by the LLM model
+    /// </returns>
+    public async Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default) =>    
+        await _queryService.PostAsync(QUERY_URL, new { document_id, question }, cancellationToken);
 
     /// <summary>
     /// Compute the embedding of a given text
@@ -70,14 +72,11 @@ public class LLMRepository(
     /// </summary>
     /// <param name="document_id"></param>
     /// <param name="text"></param>
-    /// <returns></returns>
-    public async Task<float[]?> ComputeEmbedding(
-        string text, 
-        CancellationToken cancellationToken = default
-    ) => 
-        await _computeService.PostAsync(
-            COMPUTE_URL, 
-            new { text }, 
-            cancellationToken
-        );
+    /// <returns>
+    /// Vector representing the text or data
+    /// </returns>
+    public async Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default) => 
+        await _computeService.PostAsync(COMPUTE_URL, new { text }, cancellationToken);
+
+    #endregion
 }

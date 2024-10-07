@@ -3,25 +3,34 @@ using System.Text.Json;
 using Domain.Utilities;
 using Domain.Persistence;
 using Domain.Persistence.DTOs;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken);
+    Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default);
     Task<SummarizedExcelData> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
 }
 
-public class VectorDbRepository(
-    ILLMRepository lLMRepository,
-    ApplicationDbContext context
-) : IVectorDbRepository
+public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbContext context, ILogger<VectorDbRepository> logger) : IVectorDbRepository
 {
+    #region Log Message Constants
+    private const string LogStartingSaveDocument = "Starting to save document to the database.";
+    private const string LogSavedDocumentSuccess = @"Saved document with id {DocumentId} to the database.";
+    private const string LogFailedToSaveDocument = "Failed to save vectors of the document to the database.";
+    private const string LogFailedToSaveSummary = "Failed to save the summary of the document to the database.";
+    #endregion
+
+    #region Dependencies
     private readonly ApplicationDbContext _context = context;
+    private readonly ILogger<VectorDbRepository> _logger = logger;
     private readonly ILLMRepository _llmRepository = lLMRepository;
     private readonly JsonSerializerOptions _serializerSettings = new();
+    #endregion
 
+    #region Public Methods
     /// <summary>
     /// Save the document to the database.
     /// The document is represented as a list of rows, where each row is a dictionary of column names and values.
@@ -31,21 +40,22 @@ public class VectorDbRepository(
     /// <param name="vectorSpreadsheetData">RelevantRows, and Summary</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string> SaveDocumentAsync(
-        SummarizedExcelData vectorSpreadsheetData, 
-        CancellationToken cancellationToken = default
-    )
+    public async Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation(LogStartingSaveDocument);
         var documentId = await StoreVectors(vectorSpreadsheetData.RelevantRows, cancellationToken);
+        if (documentId is null) 
+        {
+            _logger.LogWarning(LogFailedToSaveDocument);
+            return null!;
+        }
         var summarySuccess = await StoreSummary(documentId, vectorSpreadsheetData.Summary, cancellationToken);
         if (!summarySuccess.HasValue) 
         {
-            // Rollback the document if the summary was not saved
-            _context.Documents.RemoveRange(_context.Documents.Where(d => d.Id == documentId));
-            await _context.SaveChangesAsync(cancellationToken);
+            _logger.LogWarning(LogFailedToSaveSummary);
             return null!;
         }
-        // Succeeded, return an identifier to be able to get the document later
+        _logger.LogInformation(LogSavedDocumentSuccess, documentId);
         return documentId;
     }
 
@@ -74,8 +84,9 @@ public class VectorDbRepository(
             RelevantRows = relevantRows
         };
     }
+    #endregion
 
-    private async Task<string> StoreVectors(
+    private async Task<string?> StoreVectors(
         List<Dictionary<string, object>> rows, 
         CancellationToken cancellationToken = default
     )
