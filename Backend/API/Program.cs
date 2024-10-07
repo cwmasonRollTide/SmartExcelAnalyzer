@@ -1,4 +1,5 @@
 using Persistence;
+using System.Text;
 using API.Middleware;
 using Application.Queries;
 using Application.Services;
@@ -10,13 +11,16 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Persistence.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+builder.Services.AddLogging();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 
 // Database
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 // LLM Service Options
@@ -26,12 +30,15 @@ else builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSect
 
 // MediatR
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQueryHandler>());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommandHandler>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQuery>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommand>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQueryValidator>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommandValidator>());
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQueryHandler>());
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommandHandler>());
+// builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<SubmitQueryValidator>());
+// builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<UploadFileCommandValidator>());
+
 
 // Services
 builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
@@ -42,6 +49,7 @@ builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
 builder.Services.AddScoped<IWebRepository<float[]?>, WebRepository<float[]?>>();
 builder.Services.AddScoped<IWebRepository<QueryAnswer>, WebRepository<QueryAnswer>>();
 
+// Swagger
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -52,6 +60,8 @@ if (app.Environment.IsDevelopment())
 }
 // app.UseHttpsRedirection();
 // app.UseAuthorization();
+
+// Middleware
 app.UseRouting();
 app.MapControllers();
 app.MapHealthChecks("/health");

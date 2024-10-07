@@ -1,6 +1,7 @@
 using Moq;
 using MediatR;
 using API.Controllers;
+using FluentAssertions;
 using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
@@ -34,7 +35,7 @@ public class AnalysisControllerTests
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<QueryAnswer>(okResult.Value);
-        Assert.Equal(queryAnswer, returnValue);
+        returnValue.Should().BeEquivalentTo(queryAnswer);
     }
 
     [Fact]
@@ -45,11 +46,11 @@ public class AnalysisControllerTests
         _mediatorMock
             .Setup(m => m.Send(It.IsAny<UploadFileCommand>(), default))
             .ReturnsAsync(documentId);
-            
+
         var result = await Sut.UploadFile(fileMock.Object);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         string returnValue = Assert.IsType<string>(okResult.Value);
-        Assert.Equal(documentId, returnValue);
+        returnValue.Should().Be(documentId);
     }
 }

@@ -34,10 +34,12 @@ public class UploadFileCommandHandler(
     ILogger<UploadFileCommandHandler> logger
 ) : IRequestHandler<UploadFileCommand, string?>
 {
-    #region Constants
+    #region Log Message Constants
     private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
+    private const string LogSavingDocument = "Saving file {Filename} to the vector database.";
     private const string LogFailedToPrepareExcelFile = "Failed to prepare excel file {FileName} for LLM.";
-    private const string LogSavingDocument = "Saving file {Filename} with id {DocumentId} to the vector database.";
+    private const string LogFailedSavingVectorDb = "Failed to save file {Filename} to the vector database.";
+    private const string LogSavedDocumentSuccess = "Saving file {Filename} with id {DocumentId} to the vector database.";
     #endregion
 
     #region Dependencies
@@ -67,9 +69,14 @@ public class UploadFileCommandHandler(
             _logger.LogInformation(LogFailedToPrepareExcelFile, request.File.FileName);
             return null;
         }
+        _logger.LogInformation(LogSavingDocument, request.File.FileName);
         var documentId = await _vectorDbRepository.SaveDocumentAsync(summarizedExcelData, cancellationToken);
-        if (documentId is null) return null;
-        _logger.LogInformation(LogSavingDocument, request.File.FileName, documentId);
+        if (documentId is null)  
+        {
+            _logger.LogInformation(LogFailedSavingVectorDb, request.File.FileName);
+            return null;
+        }
+        _logger.LogInformation(LogSavedDocumentSuccess, request.File.FileName, documentId);
         return documentId;
     }
     #endregion

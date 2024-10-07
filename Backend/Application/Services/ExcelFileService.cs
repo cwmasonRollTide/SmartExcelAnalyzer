@@ -14,13 +14,16 @@ public interface IExcelFileService
     Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// ExcelFileService is responsible for preparing Excel files for the LLM
+/// It reads the Excel file, extracts the data, and calculates summary statistics
+/// The data and summary statistics are stored in the database for querying by the LLM model
+/// The data is translated into vectors and stored in the database for querying by the LLM model
+/// The vectors are compared against the vector that the LLM generates for the question to find the most relevant rows
+/// It will use the most relevant rows to answer the question or provide the data
+/// </summary>
 public class ExcelFileService : IExcelFileService
 {
-    public ExcelFileService()
-    {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-    }
-
     /// <summary>
     /// Prepare the given Excel file for LLM by reading the file and extracting the data and summary statistics
     /// This method reads the Excel file, extracts the data into a list of rows, and calculates summary statistics for the data
@@ -43,11 +46,11 @@ public class ExcelFileService : IExcelFileService
             }
         });
         var table = result.Tables[0];
-        // Thread-safe collection
         var rows = new ConcurrentBag<Dictionary<string, object>>();
+        var concurrentTable = new ConcurrentBag<DataRow>(table.AsEnumerable());
         var rowTask = Task.Run(async () =>
         {
-            await Parallel.ForEachAsync(table.AsEnumerable(), parallelOptions, (row, token) =>
+            await Parallel.ForEachAsync(concurrentTable, parallelOptions, (row, token) =>
             {
                 rows.Add(table.Columns.Cast<DataColumn>().ToDictionary(col => col.ColumnName, col => row[col] == DBNull.Value ? null! : row[col]));
                 return ValueTask.CompletedTask;
@@ -84,8 +87,8 @@ public class ExcelFileService : IExcelFileService
             var stringColumns = GetStringColumns(table);
             var numericColumns = GetNumericColumns(table);
             Parallel.Invoke(parallelOptions,
-                () => CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions),
-                () => CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions)
+                async () => await CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions),
+                async () => await CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions)
             );
             return new Dictionary<string, object> { { "Summary", summary } };
         }, parallelOptions.CancellationToken);
@@ -172,6 +175,8 @@ public class ExcelFileService : IExcelFileService
     /// Should change it the same way every time
     /// </summary>
     /// <param name="input"></param>
-    /// <returns></returns>
+    /// <returns>
+    ///     The SHA256 hash of the input
+    /// </returns>
     private static string ComputeHash(string input) => string.Concat(SHA256.HashData(Encoding.UTF8.GetBytes(input)).Select(b => b.ToString("x2")));
 }
