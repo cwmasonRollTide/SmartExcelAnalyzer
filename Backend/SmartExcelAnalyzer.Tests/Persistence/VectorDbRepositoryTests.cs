@@ -26,8 +26,8 @@ public class VectorDbRepositoryTests
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
-        _mockDocumentSet = new MockDbSet<Document>(new List<Document>());
-        _mockSummarySet = new MockDbSet<Summary>(new List<Summary>());
+        _mockDocumentSet = new MockDbSet<Document>([]);
+        _mockSummarySet = new MockDbSet<Summary>([]);
         _contextMock = new Mock<ApplicationDbContext>(options);
 
         _contextMock.Setup(c => c.Documents).Returns(_mockDocumentSet.Object);
@@ -94,7 +94,29 @@ public class VectorDbRepositoryTests
             .ReturnsAsync([1.0f]);
         _contextMock.SetupSequence(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(-1)
-            .ReturnsAsync(0);
+            .ReturnsAsync(1);
+
+        var result = await _repository.SaveDocumentAsync(data);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SaveDocumentAsync_ShouldReturnNullWhenSavingRowsSucceeds_ButSavingSummaryFails()
+    {
+        var data = new SummarizedExcelData
+        {
+            Rows =
+            [
+                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
+            ],
+            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
+        };
+        _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([1.0f]);
+        _contextMock.SetupSequence(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(-1)
+            .ReturnsAsync(4);
 
         var result = await _repository.SaveDocumentAsync(data);
 
@@ -108,7 +130,7 @@ public class VectorDbRepositoryTests
         var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
         var documents = new List<Document>
         {
-            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = new float[] { 1.0f, 2.0f, 3.0f } }
+            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = [1.0f, 2.0f, 3.0f] }
         };
         var summaries = new List<Summary>
         {

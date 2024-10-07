@@ -3,6 +3,8 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
+namespace SmartExcelAnalyzer.Tests.TestUtilities;
+
 [ExcludeFromCodeCoverage]
 public class TestAsyncQueryProvider<TEntity>(IQueryProvider inner) : IAsyncQueryProvider
 {
@@ -18,10 +20,7 @@ public class TestAsyncQueryProvider<TEntity>(IQueryProvider inner) : IAsyncQuery
         return new TestAsyncEnumerable<TElement>(expression);
     }
 
-    public object Execute(Expression expression)
-    {
-        return _inner.Execute(expression);
-    }
+    public object Execute(Expression expression) => _inner.Execute(expression)!;
 
     public TResult Execute<TResult>(Expression expression)
     {

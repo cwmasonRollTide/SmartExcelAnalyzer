@@ -1,5 +1,9 @@
 using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
+namespace SmartExcelAnalyzer.Tests.TestUtilities;
+
+[ExcludeFromCodeCoverage]
 public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
 {
     public TestAsyncEnumerable(IEnumerable<T> enumerable)
@@ -15,5 +19,5 @@ public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, I
         return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
     }
 
-    IQueryProvider IQueryable.Provider => (IQueryProvider)new TestAsyncQueryProvider<T>(this);
+    IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this);
 }

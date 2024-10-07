@@ -1,3 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
+namespace SmartExcelAnalyzer.Tests.TestUtilities;
+
+[ExcludeFromCodeCoverage]
 public class TestAsyncEnumerator<T>(IEnumerator<T> inner) : IAsyncEnumerator<T>
 {
     private readonly IEnumerator<T> _inner = inner;

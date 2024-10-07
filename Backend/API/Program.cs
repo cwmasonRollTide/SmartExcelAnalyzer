@@ -25,11 +25,13 @@ builder.Services.AddHealthChecks();
 // Database
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
 
 // LLM Service Options
 var llmServiceUrl = Environment.GetEnvironmentVariable("LLM_SERVICE_URL");
 if (!string.IsNullOrEmpty(llmServiceUrl)) builder.Services.Configure<LLMServiceOptions>(options => options.LLM_SERVICE_URL = llmServiceUrl);
-else builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
+else builder.Services.ConfigureOptions(builder.Configuration.GetSection("LLMServiceOptions"));
+builder.Services.AddScoped<ILLMRepository, LLMRepository>();
 
 // MediatR
 builder.Services.AddFluentValidationAutoValidation();
@@ -42,13 +44,10 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Up
 // builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<SubmitQueryValidator>());
 // builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<UploadFileCommandValidator>());
 
-
 // Services
 builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
 
 // Repositories
-builder.Services.AddScoped<ILLMRepository, LLMRepository>();
-builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
 builder.Services.AddScoped<IWebRepository<float[]?>, WebRepository<float[]?>>();
 builder.Services.AddScoped<IWebRepository<QueryAnswer>, WebRepository<QueryAnswer>>();
 

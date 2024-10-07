@@ -65,7 +65,7 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
             return null!;
         }
         var summarySuccess = await StoreSummary(documentId, vectorSpreadsheetData.Summary!, cancellationToken);
-        if (!summarySuccess.HasValue) 
+        if (!summarySuccess.HasValue || summarySuccess < 0) 
         {
             _logger.LogWarning(LogFailedToSaveSummary);
             return null!;
