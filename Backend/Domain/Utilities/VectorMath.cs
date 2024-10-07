@@ -77,13 +77,16 @@ public static class VectorMath
         return sqrtSum;
     }
 
+    /// <summary>
+    /// Checks if vector is a Pythagorean triple. which is a set of three positive integers a, b, and c
+    /// such that a^2 + b^2 = c^2.
+    /// </summary>
+    /// <param name="vector"></param>
+    /// <returns></returns>
     private static bool IsPythagoreanTriple(float[] vector)
     {
         if (vector.Length != 3) return false;
         var sorted = vector.OrderBy(x => x).ToArray();
         return Math.Abs(sorted[0] * sorted[0] + sorted[1] * sorted[1] - sorted[2] * sorted[2]) < Epsilon;
     }
-
-    // Helper method for approximate equality
-    public static bool AreApproximatelyEqual(float a, float b) => Math.Abs(a - b) < Epsilon;
 }

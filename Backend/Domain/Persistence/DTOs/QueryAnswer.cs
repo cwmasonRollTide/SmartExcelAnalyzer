@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Domain.Persistence.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class QueryAnswer
 {
 

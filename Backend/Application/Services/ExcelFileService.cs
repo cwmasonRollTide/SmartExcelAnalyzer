@@ -93,10 +93,27 @@ public class ExcelFileService : IExcelFileService
             return new Dictionary<string, object> { { "Summary", summary } };
         }, parallelOptions.CancellationToken);
 
+    /// <summary>
+    /// Get the numeric columns from the given table
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
     private static List<DataColumn> GetNumericColumns(DataTable table) => 
         table.Columns.Cast<DataColumn>()
-            .Where(c => c.DataType == typeof(int) || c.DataType == typeof(double) || c.DataType == typeof(float))
+            .Where(IsNumericColumn)
             .ToList();
+
+    /// <summary>
+    /// Check if the given column is of a numeric type
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
+    private static bool IsNumericColumn(DataColumn column) =>
+        column.DataType == typeof(int) || 
+        column.DataType == typeof(double) || 
+        column.DataType == typeof(float) || 
+        column.DataType == typeof(decimal) || 
+        column.DataType == typeof(long);
 
     /// <summary>
     /// Calculate the sum, average, min, and max for each numeric column in the given table
@@ -139,8 +156,10 @@ public class ExcelFileService : IExcelFileService
     /// <returns></returns>
     private static List<DataColumn> GetStringColumns(DataTable table) => 
         table.Columns.Cast<DataColumn>()
-            .Where(c => c.DataType == typeof(string))
+            .Where(IsStringColumn)
             .ToList();
+
+    private static bool IsStringColumn(DataColumn column) => column.DataType == typeof(string);
 
     /// <summary>
     /// Calculate the SHA256 hash of each string value in the given columns

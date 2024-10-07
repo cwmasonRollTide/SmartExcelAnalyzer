@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Domain.Application;
 
+[ExcludeFromCodeCoverage]
 public class ExcelFileSummary
 {
     public int RowCount { get; set; }

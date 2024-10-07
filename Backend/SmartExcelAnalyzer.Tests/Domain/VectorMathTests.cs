@@ -19,7 +19,9 @@ public class VectorMathTests
     [InlineData(new float[] { 3, 4, 0 }, new float[] { 0, 0, 5 }, 0f, "Pythagorean triple (3,4,5) - orthogonal case")]
     public void CalculateSimilarity_VariousScenarios_ReturnsExpectedResult(float[] vectorA, float[] vectorB, float expected, string scenario)
     {
-        VectorMath.CalculateSimilarity(vectorA, vectorB).Should().BeApproximately(expected, VectorMath.Epsilon, $"Scenario: {scenario}");
+        VectorMath.CalculateSimilarity(vectorA, vectorB)
+            .Should()
+            .BeApproximately(expected, VectorMath.Epsilon, $"Scenario: {scenario}");
     }
 
     [Fact]
@@ -30,8 +32,7 @@ public class VectorMathTests
 
         Action act = () => VectorMath.CalculateSimilarity(vectorA, vectorB);
 
-        act
-            .Should()
+        act.Should()
             .Throw<ArgumentException>()
             .WithMessage("Vectors must be of the same length");
     }
@@ -135,9 +136,9 @@ public class VectorMathTests
     [InlineData(new float[] { 8, 9, 12 }, 17)]
     [InlineData(new float[] { 6, 8, 10 }, 14)]
     public void Magnitude_AdditionalVectors_ReturnsExpectedResult(float[] vector, float expected)
-        {
-            VectorMath.Magnitude(vector).Should().BeApproximately(expected, VectorMath.Epsilon);
-        }
+    {
+        VectorMath.Magnitude(vector).Should().BeApproximately(expected, VectorMath.Epsilon);
+    }
 
     [Fact]
     public void CalculateSimilarity_SameVectors_ReturnsOne()
