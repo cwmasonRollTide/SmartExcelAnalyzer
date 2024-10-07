@@ -8,7 +8,10 @@ using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
+
+[assembly: ExcludeFromCodeCoverage]
 
 var builder = WebApplication.CreateBuilder(args);
 

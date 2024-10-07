@@ -39,7 +39,10 @@ public class VectorDbRepository(ILLMRepository lLMRepository, ApplicationDbConte
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<VectorDbRepository> _logger = logger;
     private readonly ILLMRepository _llmRepository = lLMRepository;
-    private readonly JsonSerializerOptions _serializerSettings = new();
+    private readonly JsonSerializerOptions _serializerSettings = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
     #endregion
 
     #region Public Methods
