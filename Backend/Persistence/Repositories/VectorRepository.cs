@@ -27,8 +27,8 @@ public class VectorDbRepository(IDatabaseWrapper databaseWrapper, ILogger<Vector
     private const string LogSavedDocumentSuccess = @"Saved document with id {DocumentId} to the database.";
     private const string LogFailedToSaveDocument = "Failed to save vectors of the document to the database.";
     private const string LogFailedToSaveSummary = @"Failed to save the summary of the document with Id {Id} to the database.";
-    private const string LogQueryingVectorDb = "Querying the VectorDb for the most relevant rows for document {DocumentId}.";
     private const string LogQueryingSummaryFailed = "Failed to query the summary of the document with Id {Id} from the database.";
+    private const string LogQueryingVectorDbStart = @"Querying the VectorDb for the most relevant rows for document {DocumentId}.";
     private const string LogQueryingDocumentsFailed = "Failed to query the relevant rows of the document with Id {Id} from the database.";
     private const string LogQueryingVectorDbSuccess = "Querying the VectorDb for the most relevant rows for document {DocumentId} was successful. Found {RelevantRowsCount} relevant rows.";
     #endregion
@@ -82,7 +82,7 @@ public class VectorDbRepository(IDatabaseWrapper databaseWrapper, ILogger<Vector
         CancellationToken cancellationToken = default
     )
     {
-        _logger.LogInformation(LogQueryingVectorDb, documentId);
+        _logger.LogInformation(LogQueryingVectorDbStart, documentId);
         var relevantDocuments = await _database.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount, cancellationToken);
         if (relevantDocuments is null)
         {

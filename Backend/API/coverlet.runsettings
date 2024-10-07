@@ -2,11 +2,14 @@
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="XPlat Code Coverage">
+      <DataCollector friendlyName="XPlat Code Coverage" >
         <Configuration>
           <Format>cobertura</Format>
           <Exclude>[*]Program.cs</Exclude>
           <ExcludeByFile>**/*Program.cs</ExcludeByFile>
+          <ExcludeByFile>./Program.cs</ExcludeByFile>
+          <ExcludeByFile>**/Program.cs</ExcludeByFile>
+          <ExcludeByFile>**_\\src/**/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

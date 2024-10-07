@@ -48,7 +48,7 @@
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <ExcludeByFile>**/*Program.cs</ExcludeByFile>
-    <ExcludeByFile>**/*Program.cs;**/*.cshtml;**/*.razor</ExcludeByFile>
+    <ExcludeByFile>**/Program.cs;**/*.cshtml;**/*.razor</ExcludeByFile>
   </PropertyGroup>
 
   <ItemGroup>
