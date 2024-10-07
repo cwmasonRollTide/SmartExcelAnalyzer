@@ -8,7 +8,7 @@ from transformers import pipeline
 from fastapi import FastAPI, HTTPException
 from transformers import AutoTokenizer, AutoModel
 
-class EnvironmentVariables(Enum):
+class EnvironmentVariables(str, Enum):
     TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
     EMBEDDING_MODEL = "EMBEDDING_MODEL"
     DB_CONNECTION_STRING = "DB_CONNECTION_STRING"
@@ -28,9 +28,9 @@ default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 default_db_connection_string = "mongodb://admin:password@localhost:27017/smartexcelanalyzer"
 
-EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL, default_embedding_model)
-DB_CONNECTION_STRING = os.getenv(EnvironmentVariables.DB_CONNECTION_STRING, default_db_connection_string)
-TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL, default_text_generation_model)
+EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
+DB_CONNECTION_STRING = os.getenv(EnvironmentVariables.DB_CONNECTION_STRING.value, default_db_connection_string)
+TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
 
 app = FastAPI()
 model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)

@@ -17,6 +17,9 @@ const theme = createTheme({
     secondary: {
       main: '#dc004e',
     },
+    background: {
+      default: '#f0f4f8', // Light blue-gray background
+    },
   },
 });
 
@@ -86,48 +89,59 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-          <Box sx={{ flexBasis: { xs: '100%', md: '30%' }, flexGrow: 1 }}>
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                height: 240,
-              }}
-            >
-              <FileUpload onFileUpload={handleFileUpload} />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          width: '100vw',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          bgcolor: 'background.default',
+        }}
+      >
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '600px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 3,
+            p: 3,
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <FileUpload onFileUpload={handleFileUpload} />
+            <Box sx={{ mt: 2, width: '100%' }}>
               <DocumentList
                 documents={documents}
                 selectedDocument={selectedDocument}
                 onSelectDocument={handleDocumentSelect}
               />
-            </Paper>
-          </Box>
-          <Box sx={{ flexBasis: { xs: '100%', md: '65%' }, flexGrow: 1 }}>
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                height: 240,
-                mb: 2,
-              }}
-            >
+            </Box>
+            <Box sx={{ mt: 2, width: '100%' }}>
               <QueryForm
                 onQuerySubmit={handleQuerySubmit}
                 isDocumentSelected={!!selectedDocument}
               />
+            </Box>
+          </Paper>
+          {queryResult && (
+            <Paper elevation={3} sx={{ p: 3, width: '100%'}}>
+              <QueryResult result={queryResult} />
             </Paper>
-            {queryResult && (
-              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                <QueryResult result={queryResult} />
-              </Paper>
-            )}
-          </Box>
+          )}
         </Box>
-      </Container>
+      </Box>
       <Snackbar open={toastOpen} autoHideDuration={6000} onClose={handleToastClose}>
         <Alert onClose={handleToastClose} severity={toastSeverity} sx={{ width: '100%' }}>
           {toastMessage}

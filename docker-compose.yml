@@ -43,7 +43,7 @@ services:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - LLM_SERVICE_URL=http://llm-service:5000
+      - LLM_SERVICE_URL=http://llm-service:8000
       - MONGODB_DATABASE_NAME=smartexcelanalyzer
       - MONGODB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017
     depends_on:
