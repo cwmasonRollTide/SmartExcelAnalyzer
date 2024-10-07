@@ -188,7 +188,7 @@ async def process_query(query: Query) -> QueryResponse:
             {"$match": {"_id": query.document_id}},
             {"$addFields": {
                 "similarity": {
-                    "$dotProduct": ["$embedding", question_embedding]
+                    "$dotProduct": ["$embedding", question_embedding] ## Mongo is perfect for comparing Similarity of two vectors / embeddings across documents
                 }
             }},
             {"$sort": {"similarity": -1}},

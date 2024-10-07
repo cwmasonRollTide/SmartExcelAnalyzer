@@ -1,6 +1,22 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: smartexcelanalyzer
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - mongodata:/data/db
+
   llm-service:
     build:
       context: ./LLM
@@ -12,6 +28,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - model_cache:/root/.cache/huggingface
     environment:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
@@ -48,22 +66,6 @@ services:
       - BASE_API_URL=http://localhost:5001
     depends_on:
       - backend
-  
-  mongodb:
-    image: mongo:5.0
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: smartexcelanalyzer
-    ports:
-      - "27017:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    volumes:
-      - mongodata:/data/db
 
   # Uncomment the following section to use PostgreSQL instead of MongoDB
   # db:
@@ -82,4 +84,6 @@ services:
   #     - pgdata:/var/lib/postgresql/data
 
 volumes:
+  model_cache:
+    driver: local
   mongodata:
