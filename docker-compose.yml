@@ -56,7 +56,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://backend:5001
+      - VITE_BASE_API_URL=http://localhost:5001
     volumes:
       - ./Frontend:/app
       - /app/node_modules

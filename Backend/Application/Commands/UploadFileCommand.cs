@@ -4,6 +4,7 @@ using Application.Services;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Application.Commands;
 
@@ -40,6 +41,8 @@ public class UploadFileCommandHandler(
     private const string LogFailedToPrepareExcelFile = "Failed to prepare excel file {FileName} for LLM.";
     private const string LogFailedSavingVectorDb = "Failed to save file {Filename} to the vector database.";
     private const string LogSavedDocumentSuccess = "Success: Saved file {Filename} with id {DocumentId} to the vector database.";
+    private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
+    private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
     #endregion
 
     #region Dependencies
@@ -64,14 +67,20 @@ public class UploadFileCommandHandler(
     {
         _logger.LogInformation("CHANGES TAKE EFFECT");
         _logger.LogInformation(LogPreparingExcelFile, request.File!.FileName);
+        var stopwatch = Stopwatch.StartNew();
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
+        stopwatch.Stop();
+        _logger.LogInformation(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
         if (summarizedExcelData is null)
         {
             _logger.LogInformation(LogFailedToPrepareExcelFile, request.File.FileName);
             return null;
         }
         _logger.LogInformation(LogSavingDocument, request.File.FileName);
+        stopwatch.Restart();
         var documentId = await _vectorDbRepository.SaveDocumentAsync(summarizedExcelData, cancellationToken);
+        stopwatch.Stop();
+        _logger.LogInformation(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
         if (documentId is null)  
         {
             _logger.LogInformation(LogFailedSavingVectorDb, request.File.FileName);
