@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  smartexcelanalyzer:
+    driver: bridge
+
 services:
   mongodb:
     image: mongo:5.0
@@ -9,13 +13,15 @@ services:
       MONGO_INITDB_DATABASE: smartexcelanalyzer
     ports:
       - "27017:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
     volumes:
       - mongodata:/data/db
+    networks:
+      - smartexcelanalyzer
 
   llm-service:
     build:
@@ -24,17 +30,19 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn main:app --host 0.0.0.0 --port 8000
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
     volumes:
       - model_cache:/root/.cache/huggingface
     environment:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - DB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017/smartexcelanalyzer
+    networks:
+      - smartexcelanalyzer
 
   backend:
     build: 
@@ -51,28 +59,35 @@ services:
     depends_on:
       - llm-service
       - mongodb
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 120s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+    #   interval: 120s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - smartexcelanalyzer
 
   frontend:
     build:
       context: ./Frontend
       dockerfile: frontend.Dockerfile
+      args:
+        - BASE_API_URL=http://backend:5001
     ports:
-      - "3000:80"
+      - "3000:3000"
     environment:
-       - BASE_API_URL=http://backend:80
+       - VITE_BASE_API_URL=http://backend:5001
+    command: npm run dev
     depends_on:
       - backend
+    networks:
+      - smartexcelanalyzer
 
   # Uncomment the following section to use PostgreSQL instead of MongoDB
   # db:

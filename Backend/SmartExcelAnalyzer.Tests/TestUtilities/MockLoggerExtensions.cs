@@ -1,9 +1,11 @@
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace SmartExcelAnalyzer.Tests.TestUtilities;
 
+[ExcludeFromCodeCoverage]
 public static class MockLoggerExtensions
 {
     public static void VerifyLog<T>(this Mock<ILogger<T>> loggerMock, LogLevel logLevel, string message)

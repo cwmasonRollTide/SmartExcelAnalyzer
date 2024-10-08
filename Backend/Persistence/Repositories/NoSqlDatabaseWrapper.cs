@@ -7,30 +7,39 @@ using Persistence.Database;
 
 namespace Persistence.Repositories;
 
-public class NoSqlDatabaseWrapper(IMongoDatabase database, ILogger<NoSqlDatabaseWrapper> logger, ILLMRepository llmRepository) : IDatabaseWrapper
+public class NoSqlDatabaseWrapper(IMongoDatabase database, ILogger<NoSqlDatabaseWrapper> logger) : IDatabaseWrapper
 {
     private readonly IMongoDatabase _database = database;
     private readonly ILogger<NoSqlDatabaseWrapper> _logger = logger;
-    private readonly ILLMRepository _llmRepository = llmRepository;
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
 
     public async Task<string> StoreVectorsAsync(ConcurrentBag<ConcurrentDictionary<string, object>> rows, string? docId = null, CancellationToken cancellationToken = default)
     {
         var collection = _database.GetCollection<BsonDocument>("documents");
         var documentId = docId ?? ObjectId.GenerateNewId().ToString();
-        var documents = await Task.WhenAll(rows.Select(async row =>
-        {
-            var serializedRow = JsonSerializer.Serialize(row);
-            var embedding = await _llmRepository.ComputeEmbedding(serializedRow, cancellationToken);
-            return new BsonDocument
-            {
-                { "_id", documentId },
-                { "content", BsonDocument.Parse(serializedRow) },
-                { "embedding", new BsonArray(embedding) }
-            };
-        }));
+        const int batchSize = 1000;
+        var batches = rows
+            .Select((row, index) => new { Row = row, Index = index })
+            .GroupBy(x => x.Index / batchSize)
+            .Select(g => g.Select(x => x.Row).ToList())
+            .ToList();
 
-        await collection.InsertManyAsync(documents, cancellationToken: cancellationToken);
+        var tasks = batches.Select(async batch =>
+        {
+            var batchDocuments = batch.Select(row =>
+            {
+                var embeddingArray = (row["embedding"] as float[]) ?? [];
+                return new BsonDocument
+                {
+                    { "_id", documentId },
+                    { "content", BsonDocument.Parse(JsonSerializer.Serialize(row)) },
+                    { "embedding", new BsonArray(embeddingArray) }
+                };
+            }).ToList();
+
+            await collection.InsertManyAsync(batchDocuments, cancellationToken: cancellationToken);
+        });
+        await Task.WhenAll(tasks);
         return documentId;
     }
 

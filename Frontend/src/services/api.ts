@@ -1,7 +1,7 @@
 export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await fetch('/api/analysis/upload', {
+  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/analysis/upload`, {
     method: 'POST',
     body: formData,
   });
@@ -23,7 +23,7 @@ export interface QueryResponse extends Query {
 }
 
 export const submitQuery = async (query: Query): Promise<QueryResponse> => {
-  const response = await fetch('/api/analysis/query', {
+  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/analysis/query`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

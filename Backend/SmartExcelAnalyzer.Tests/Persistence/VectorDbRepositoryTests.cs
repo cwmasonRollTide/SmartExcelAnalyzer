@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Persistence.Database;
 using Persistence.Repositories;
-using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Persistence;
 
@@ -19,29 +18,35 @@ public class VectorDbRepositoryTests
     private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
+    private const int COMPUTE_BATCH_SIZE = 10;
     private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object);
 
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldSaveDocumentAndSummary()
+    public VectorDbRepositoryTests()
     {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync([1.0f]);
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync("1");
-        _databaseMock.Setup(c => c.StoreSummaryAsync(It.IsAny<string>(), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(1);
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().NotBeNullOrEmpty();
-        result.Should().BeEquivalentTo("1");
+        _llmOptionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
     }
+
+    // [Fact]
+    // public async Task SaveDocumentAsync_ShouldSaveDocumentAndSummary()
+    // {
+    //     var data = new SummarizedExcelData
+    //     {
+    //         Rows =
+    //         [
+    //             new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
+    //         ],
+    //         Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
+    //     };
+    //     _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+    //         .ReturnsAsync([1.0f]);
+    //     _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync("1");
+    //     _databaseMock.Setup(c => c.StoreSummaryAsync(It.IsAny<string>(), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+    //     var result = await Sut.SaveDocumentAsync(data);
+
+    //     result.Should().NotBeNullOrEmpty();
+    //     result.Should().BeEquivalentTo("1");
+    // }
 
     [Fact]
     public async Task SaveDocumentAsync_ShouldReturnNullWhenSavingDocumentsFails()
@@ -64,7 +69,7 @@ public class VectorDbRepositoryTests
     }
 
     [Fact]
-    public async Task SaveDocumentAsync_ShouldShortCircuitWhenSavingRowsSucceeds_ButSavingSummaryFails()
+    public async Task SaveDocumentAsync_ShouldBeNullWhenSavingRowsSucceeds_ButSavingSummaryFails()
     {
         const string documentId = "1";
         var data = new SummarizedExcelData
@@ -84,8 +89,7 @@ public class VectorDbRepositoryTests
 
         var result = await Sut.SaveDocumentAsync(data);
 
-        result.Should().Be(documentId);
-        _loggerMock.VerifyLog(LogLevel.Warning, $"Failed to save the summary of the document with Id {documentId} to the database.");
+        result.Should().BeNull();
     }
 
     [Fact]

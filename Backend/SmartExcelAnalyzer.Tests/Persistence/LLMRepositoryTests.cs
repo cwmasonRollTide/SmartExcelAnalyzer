@@ -12,11 +12,12 @@ public class LLMRepositoryTests
     private readonly Mock<IWebRepository<float[]?>> _computeServiceMock;
     private readonly Mock<IWebRepository<QueryAnswer>> _queryServiceMock;
     private readonly LLMRepository _repository;
+    private const int COMPUTE_BATCH_SIZE = 10;
 
     public LLMRepositoryTests()
     {
         _optionsMock = new Mock<IOptions<LLMServiceOptions>>();
-        _optionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com" });
+        _optionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
         _computeServiceMock = new Mock<IWebRepository<float[]?>>();
         _queryServiceMock = new Mock<IWebRepository<QueryAnswer>>();
         _repository = new LLMRepository(_optionsMock.Object, _computeServiceMock.Object, _queryServiceMock.Object);

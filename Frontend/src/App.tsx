@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
-import { startHealthCheck } from './utils/healthCheck';
+// import { startHealthCheck } from './utils/healthCheck';
 import { uploadFile, submitQuery, QueryResponse } from './services/api';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
@@ -36,10 +36,10 @@ function App() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
 
-  useEffect(() => {
-    const healthCheckInterval = startHealthCheck();
-    return () => clearInterval(healthCheckInterval);
-  }, []);
+  // useEffect(() => {
+  //   const healthCheckInterval = startHealthCheck();
+  //   return () => clearInterval(healthCheckInterval);
+  // }, []);
 
   const handleFileUpload = async (file: File) => {
     try {

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Cache;
 
@@ -9,6 +10,7 @@ public interface IEmbeddingCache
     void SetEmbedding(string text, float[] embedding);
 }
 
+[ExcludeFromCodeCoverage]
 public class MemoryCacheEmbeddingCache : IEmbeddingCache
 {
     private readonly IMemoryCache _cache;
