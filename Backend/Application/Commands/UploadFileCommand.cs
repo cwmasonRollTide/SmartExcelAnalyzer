@@ -62,6 +62,7 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("CHANGES TAKE EFFECT");
         _logger.LogInformation(LogPreparingExcelFile, request.File!.FileName);
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
         if (summarizedExcelData is null)

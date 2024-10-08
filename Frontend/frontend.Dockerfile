@@ -28,25 +28,42 @@
 # CMD ["npm", "run","dev"]
 
 # Use an official Node runtime as the base image
+# FROM node:20-alpine
+
+# # Set the working directory in the container
+# WORKDIR /app
+
+# # Copy package.json and package-lock.json
+# COPY package*.json ./
+
+# # Install dependencies
+# RUN npm install
+
+# # Copy the rest of the application code
+# COPY . .
+
+# # RUN echo '<html><head><title>React App</title></head><body><div id="root"></div></body></html>' > public/index.html
+
+# # Build the app
+# RUN npm run build
+
+# # Expose the port the app runs on
+# EXPOSE 3000
+
+# # Start the app
+# CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+
 FROM node:20-alpine
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the app
 RUN npm run build
 
-# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the app
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]

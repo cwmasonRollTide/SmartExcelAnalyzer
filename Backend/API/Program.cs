@@ -25,6 +25,10 @@ builder.Services.AddHttpClient("DefaultClient", client =>
 });
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 // Database
 // var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
@@ -96,6 +100,7 @@ if (app.Environment.IsDevelopment())
 // app.UseAuthorization();
 
 // Middleware
+app.UseCors();
 app.UseRouting();
 app.MapControllers();
 app.MapHealthChecks("/health");

@@ -1,7 +1,3 @@
-networks:
-  smartexcelanalyzer:
-    driver: bridge
-
 services:
   mongodb:
     image: mongo:5.0
@@ -13,13 +9,6 @@ services:
       - "27017:27017"
     volumes:
       - mongodata:/data/db
-    networks:
-      - smartexcelanalyzer
-    # healthcheck:
-    #   test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
 
   llm-service:
     build:
@@ -34,13 +23,6 @@ services:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - DB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017/smartexcelanalyzer
-    networks:
-      - smartexcelanalyzer
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 5
 
   backend:
     build: 
@@ -62,16 +44,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    networks:
-      - smartexcelanalyzer
     volumes:
       - ./Backend:/app
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-    #   interval: 120s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 40s
+      - /app/obj
+      - /app/bin
 
   frontend:
     build:
@@ -80,18 +56,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://localhost:5001
+      - VITE_BASE_API_URL=http://backend:5001
     volumes:
       - ./Frontend:/app
       - /app/node_modules
     depends_on:
       - backend
-    networks:
-      - smartexcelanalyzer
 
 volumes:
   model_cache:
-    driver: local
   mongodata:
 
 
@@ -111,3 +84,11 @@ volumes:
   #     start_period: 10s
   #   volumes:
   #     - pgdata:/var/lib/postgresql/data
+
+
+  # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+    #   interval: 120s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
