@@ -35,22 +35,26 @@ public class ExcelFileService : IExcelFileService
     /// <returns></returns>
     public async Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
-        var parallelOptions = new ParallelOptions { CancellationToken = cancellationToken };
-        var result = LoadExcelData(file);
-        var table = result.Tables[0];
-        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        var concurrentTable = new ConcurrentBag<DataRow>(table.AsEnumerable());
-        var addingRowsTasks = Task.Run(async () =>
+        var parallelOptions = new ParallelOptions
         {
-            await Parallel.ForEachAsync(concurrentTable, parallelOptions, (row, token) =>
-            {
-                rows.Add(new ConcurrentDictionary<string, object>(table.Columns.Cast<DataColumn>().ToDictionary(col => col.ColumnName, col => row[col] == DBNull.Value ? null! : row[col])));
-                return ValueTask.CompletedTask;
-            });
-        }, cancellationToken);
+            CancellationToken = cancellationToken,
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        };
+        var excelData = LoadExcelData(file);
+        var table = excelData.Tables[0]; // Assuming we're only processing the first sheet
+        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
+        var addingRowsTask = Parallel.ForEachAsync(table.AsEnumerable(), parallelOptions, (row, token) =>
+        {
+            rows.Add(new ConcurrentDictionary<string, object>(table.Columns.Cast<DataColumn>()
+                .ToDictionary(
+                    col => col.ColumnName,
+                    col => row[col] == DBNull.Value ? null! : row[col]
+                )
+            ));
+            return ValueTask.CompletedTask;
+        });
         var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
-        await addingRowsTasks;
-        await summaryTask;
+        await Task.WhenAll(addingRowsTask, summaryTask);
         return new SummarizedExcelData
         {
             Rows = [.. rows],
@@ -79,7 +83,7 @@ public class ExcelFileService : IExcelFileService
                     var columnNames = new List<string>();
                     for (int i = 0; i < rowReader.FieldCount; i++)
                     {
-                        columnNames.Add(rowReader.GetValue(i)?.ToString() ?? $"Column{i + 1}");
+                        columnNames.Add(rowReader.GetValue(i)?.ToString() ?? $"Column{i + 1}"); // If the column name is null, use a default name of Column#
                     }
                     columnNames.ToArray();
                 }
@@ -94,7 +98,7 @@ public class ExcelFileService : IExcelFileService
     /// <param name="table"></param>
     /// <param name="parallelOptions"></param>
     /// <returns></returns>
-    private static async Task<ConcurrentDictionary<string, object>> CalculateSummaryStatisticsAsync(DataTable table, ParallelOptions parallelOptions) 
+    private static async Task<ConcurrentDictionary<string, object>> CalculateSummaryStatisticsAsync(DataTable table, ParallelOptions parallelOptions)
     {
         var summary = new ExcelFileSummary
         {
@@ -102,14 +106,13 @@ public class ExcelFileService : IExcelFileService
             ColumnCount = table.Columns.Count,
             Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
         };
-        var stringColumns = GetStringColumns(table);
-        var numericColumns = GetNumericColumns(table);
-        await CalculateStringColumnHashes(table, stringColumns, summary, parallelOptions);
-        await CalculateNumericColumnStatistics(table, numericColumns, summary, parallelOptions);
+        var calculatinStringColumnHashes = CalculateStringColumnHashes(table, GetStringColumns(table), summary, parallelOptions);
+        var calculatingNumericColumnStats = CalculateNumericColumnStatistics(table, GetNumericColumns(table), summary, parallelOptions);
+        await Task.WhenAll(calculatinStringColumnHashes, calculatingNumericColumnStats);
         var result = new ConcurrentDictionary<string, object>();
         result["Summary"] = summary;
         return result;
-    }            
+    }
 
     /// <summary>
     /// Get the numeric columns from the given table
@@ -125,8 +128,8 @@ public class ExcelFileService : IExcelFileService
     /// <returns></returns>
     private static bool IsNumericColumn(DataColumn column, DataTable table)
     {
-        if (column.DataType == typeof(int) || column.DataType == typeof(double) || 
-            column.DataType == typeof(float) || column.DataType == typeof(decimal) || 
+        if (column.DataType == typeof(int) || column.DataType == typeof(double) ||
+            column.DataType == typeof(float) || column.DataType == typeof(decimal) ||
             column.DataType == typeof(long))
         {
             return true;
@@ -144,33 +147,27 @@ public class ExcelFileService : IExcelFileService
     /// <param name="numericColumns"></param>
     /// <param name="summary"></param>
     /// <param name="parallelOptions"></param>
-     private static async Task CalculateNumericColumnStatistics(
-        DataTable table, 
-        ConcurrentBag<DataColumn> numericColumns, 
-        ExcelFileSummary summary, 
+    private static async Task CalculateNumericColumnStatistics(
+        DataTable table,
+        ConcurrentBag<DataColumn> numericColumns,
+        ExcelFileSummary summary,
         ParallelOptions parallelOptions
-    )
-    {
-        await Parallel.ForEachAsync(numericColumns, parallelOptions, async (column, token) =>
+    ) =>
+        await Parallel.ForEachAsync(numericColumns, parallelOptions, (column, cancellationToken) =>
         {
-            await Task.Run(() =>
+            var columnName = column.ColumnName;
+            var values = table.AsEnumerable()
+                .Where(row => row[column] != DBNull.Value)
+                .Select(row => Convert.ToDouble(row[column]));
+            if (values.Any())
             {
-                var columnName = column.ColumnName;
-                var values = table.AsEnumerable()
-                    .Where(row => row[column] != DBNull.Value)
-                    .Select(row => Convert.ToDouble(row[column]))
-                    .ToList();
-                if (values.Count > 0)
-                {
-                    summary.Sums[columnName] = values.Sum();
-                    summary.Mins[columnName] = values.Min();
-                    summary.Maxs[columnName] = values.Max();
-                    summary.Averages[columnName] = values.Average();
-                }
-                return ValueTask.CompletedTask;
-            }, token);
+                summary.Sums[columnName] = values.Sum();
+                summary.Mins[columnName] = values.Min();
+                summary.Maxs[columnName] = values.Max();
+                summary.Averages[columnName] = values.Average();
+            }
+            return ValueTask.CompletedTask;
         });
-    }
 
     /// <summary>
     /// Get the string columns from the given table
@@ -181,33 +178,34 @@ public class ExcelFileService : IExcelFileService
     private static bool IsStringColumn(DataColumn column) => column.DataType == typeof(string);
 
     /// <summary>
-    /// Calculate the SHA256 hash of each string value in the given columns
-    /// Parallelizes the hashing of each string value in the given columns
+    /// Calculate the hash values of each string column's values
+    /// So for each column that is considered a string column, 
+    /// we are taking the whole column and calculating the hash of each value
     /// </summary>
     /// <param name="table"></param>
     /// <param name="stringColumns"></param>
     /// <param name="summary"></param>
     /// <param name="parallelOptions"></param>
     private static async Task CalculateStringColumnHashes(
-        DataTable table, 
-        ConcurrentBag<DataColumn> stringColumns, 
-        ExcelFileSummary summary, 
-        ParallelOptions parallelOptions)
-    {
-        await Parallel.ForEachAsync(stringColumns, parallelOptions, async (column, token) =>
+        DataTable table,
+        ConcurrentBag<DataColumn> stringColumns,
+        ExcelFileSummary summary,
+        ParallelOptions parallelOptions
+    ) =>
+        await Parallel.ForEachAsync(stringColumns, parallelOptions, (column, cancellationToken) =>
         {
-            await Task.Run(() => 
-            {
-                var hashedValues = new ConcurrentDictionary<string, string>();
-                table.AsEnumerable()
-                    .Select(row => row[column]?.ToString())
-                    .Where(value => !string.IsNullOrEmpty(value))
-                    .ToList()
-                    .ForEach(value => hashedValues[value!] = ComputeHash(value!));
-                summary.HashedStrings[column.ColumnName] = hashedValues;
-            }, token);
+            var hashedValues = table.AsEnumerable()
+                .Select(row => row[column]?.ToString())
+                .Where(value => !string.IsNullOrEmpty(value))
+                .GroupBy(value => value)
+                .ToDictionary(
+                    g => g.Key!,
+                    g => ComputeHash(g.Key!),
+                    StringComparer.OrdinalIgnoreCase
+                );
+            summary.HashedStrings[column.ColumnName] = new ConcurrentDictionary<string, string>(hashedValues);
+            return ValueTask.CompletedTask;
         });
-    }
 
     /// <summary>
     /// Compute the SHA256 hash of the given input

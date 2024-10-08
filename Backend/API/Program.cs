@@ -3,18 +3,14 @@ using API.Middleware;
 using Application.Queries;
 using Application.Services;
 using Application.Commands;
-using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Persistence.Database;
 using MongoDB.Driver;
 using Microsoft.OpenApi.Models;
 using API.Properties;
-using MediatR;
-using FluentValidation;
 using Persistence.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,10 +30,17 @@ builder.Services.AddHealthChecks();
 // var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
 // builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
-var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING") 
-    ?? builder.Configuration.GetConnectionString("MongoDB");
-var mongoDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME")
-    ?? builder.Configuration["MongoDB:DatabaseName"];
+var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING");
+var mongoDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME");
+
+if (string.IsNullOrEmpty(mongoConnectionString) || string.IsNullOrEmpty(mongoDatabaseName))
+{
+    mongoConnectionString = builder.Configuration.GetConnectionString("MongoDB");
+    mongoDatabaseName = builder.Configuration["MongoDB:DatabaseName"];
+    builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection("MongoDbOptions"));
+    builder.Services.AddOptions<DatabaseOptions>()
+        .Validate(options => !string.IsNullOrEmpty(options.ConnectionString), "MongoDB ConnectionString must be set.");
+}
 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
 builder.Services.AddScoped(sp =>
 {

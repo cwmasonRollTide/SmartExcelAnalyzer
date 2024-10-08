@@ -39,7 +39,7 @@ public class UploadFileCommandHandler(
     private const string LogSavingDocument = "Saving file {Filename} to the vector database.";
     private const string LogFailedToPrepareExcelFile = "Failed to prepare excel file {FileName} for LLM.";
     private const string LogFailedSavingVectorDb = "Failed to save file {Filename} to the vector database.";
-    private const string LogSavedDocumentSuccess = "Saving file {Filename} with id {DocumentId} to the vector database.";
+    private const string LogSavedDocumentSuccess = "Success: Saved file {Filename} with id {DocumentId} to the vector database.";
     #endregion
 
     #region Dependencies

@@ -17,28 +17,56 @@ public class NoSqlDatabaseWrapper(IMongoDatabase database, ILogger<NoSqlDatabase
     {
         var collection = _database.GetCollection<BsonDocument>("documents");
         var documentId = docId ?? ObjectId.GenerateNewId().ToString();
-        const int batchSize = 1000;
+        const int batchSize = 1000; // Consider making this configurable
+        const int maxConcurrentTasks = 4; // Limit concurrent tasks, adjust based on your system's capabilities
+
         var batches = rows
             .Select((row, index) => new { Row = row, Index = index })
             .GroupBy(x => x.Index / batchSize)
             .Select(g => g.Select(x => x.Row).ToList())
             .ToList();
 
+        using var semaphore = new SemaphoreSlim(maxConcurrentTasks);
         var tasks = batches.Select(async batch =>
         {
-            var batchDocuments = batch.Select(row =>
+            await semaphore.WaitAsync(cancellationToken);
+            try
             {
-                var embeddingArray = (row["embedding"] as float[]) ?? [];
-                return new BsonDocument
+                var batchDocuments = batch.Select(row =>
                 {
-                    { "_id", documentId },
-                    { "content", BsonDocument.Parse(JsonSerializer.Serialize(row)) },
-                    { "embedding", new BsonArray(embeddingArray) }
-                };
-            }).ToList();
+                    var embeddingArray = (row["embedding"] as float[]) ?? [];
+                    return new BsonDocument
+                    {
+                        { "_id", ObjectId.GenerateNewId() }, // Generate unique ID for each document
+                        { "documentId", documentId }, // Add a field to group documents
+                        { "content", BsonDocument.Parse(JsonSerializer.Serialize(row)) },
+                        { "embedding", new BsonArray(embeddingArray) }
+                    };
+                }).ToList();
 
-            await collection.InsertManyAsync(batchDocuments, cancellationToken: cancellationToken);
+                var retryCount = 0;
+                while (retryCount < 3) // Retry up to 3 times
+                {
+                    try
+                    {
+                        await collection.InsertManyAsync(batchDocuments, cancellationToken: cancellationToken);
+                        break;
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        _logger.LogWarning(ex, "Failed to insert batch. Retry attempt: {RetryCount}", retryCount + 1);
+                        retryCount++;
+                        if (retryCount == 3) throw; // Rethrow if all retries failed
+                        await Task.Delay(1000 * retryCount, cancellationToken); // Exponential backoff
+                    }
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         });
+
         await Task.WhenAll(tasks);
         return documentId;
     }
