@@ -1,7 +1,7 @@
 import os
 import json
+from typing import List
 import torch
-import asyncio
 from enum import Enum
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -41,6 +41,9 @@ model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
 
 client = MongoClient(DB_CONNECTION_STRING)
 db = client.get_default_database()
+
+tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
+embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL)
 
 @app.get("/health", response_model=dict)
 async def health():
@@ -115,8 +118,6 @@ async def compute_embedding(compute_embedding: ComputeEmbedding):
         list[ float ]: The computed embedding of the text. array of float values float[] in .NET
     """
     try:
-        tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
-        embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL)
         inputs = tokenizer(compute_embedding.text, return_tensors="pt", truncation=True, padding=True)
         with torch.no_grad():
             embeddings = embedding_model(**inputs).last_hidden_state.mean(dim=1)
@@ -124,15 +125,14 @@ async def compute_embedding(compute_embedding: ComputeEmbedding):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@app.post("/compute_batch_embedding", response_model=list[float])
+@app.post("/compute_batch_embedding", response_model=List[List[float]])
 async def compute_batch_embedding(compute_embedding: ComputeBatchEmbeddings):
-    """
-    Compute the embeddings of a list of texts using a pre-trained embedding model.
-    """
     try:
-        tasks = [compute_embedding(ComputeEmbedding(text=text)) for text in compute_embedding.texts]
-        result = await asyncio.gather(*tasks)
-        return result
+        inputs = tokenizer(compute_embedding.texts, padding=True, truncation=True, return_tensors="pt")
+        with torch.no_grad():
+            outputs = embedding_model(**inputs)
+        embeddings = outputs.last_hidden_state.mean(dim=1)
+        return embeddings.tolist()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

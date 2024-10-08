@@ -7,7 +7,6 @@ namespace Persistence.Repositories;
 public interface IWebRepository<T>
 {
     Task<T> PostAsync(string endpoint, object payload, CancellationToken cancellationToken = default);
-    Task<IEnumerable<T>> PostBatchAsync(string endpoint, IEnumerable<object> payloads, CancellationToken cancellationToken = default);
 }
 
 [ExcludeFromCodeCoverage]
@@ -23,15 +22,5 @@ public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebReposi
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadAsStringAsync(cancellationToken);
         return JsonConvert.DeserializeObject<T>(result)!;
-    }
-
-    public async Task<IEnumerable<T>> PostBatchAsync(string endpoint, IEnumerable<object> payloads, CancellationToken cancellationToken = default)
-    {
-        var client = _httpClientFactory.CreateClient("DefaultClient");
-        var content = new StringContent(JsonConvert.SerializeObject(payloads), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync(endpoint, content, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonConvert.DeserializeObject<IEnumerable<T>>(result)!;
     }
 }

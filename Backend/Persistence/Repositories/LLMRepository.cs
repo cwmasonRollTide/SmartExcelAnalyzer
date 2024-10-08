@@ -29,7 +29,12 @@ public interface ILLMRepository
 /// <param name="computeService">
 ///     Web repository for computing the embeddings of text - specifically the /compute_embedding endpoint
 /// </param>
-public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<float[]?> computeService, IWebRepository<QueryAnswer> queryService) : ILLMRepository
+public class LLMRepository(
+    IOptions<LLMServiceOptions> options, 
+    IWebRepository<float[]?> computeService, 
+    IWebRepository<IEnumerable<float[]?>> batchComputeService, 
+    IWebRepository<QueryAnswer> queryService
+) : ILLMRepository
 {
     #region Service URLs
     private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
@@ -51,6 +56,10 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<f
     /// Web repository for calling the compute function of the LLM model
     /// </summary>
     private readonly IWebRepository<float[]?> _computeService = computeService;
+    /// <summary>
+    /// Web repository for calling the batch compute function of the LLM model
+    /// </summary>
+    private readonly IWebRepository<IEnumerable<float[]?>> _batchComputeService = batchComputeService;
     #endregion
 
     #region Public Methods
@@ -94,8 +103,8 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<f
     /// <param name="texts"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) =>
-        await _computeService.PostBatchAsync(COMPUTE_BATCH_URL, texts.Cast<object>(), cancellationToken);
+    public async Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) => 
+        await _batchComputeService.PostAsync(COMPUTE_BATCH_URL, new { texts = texts.ToList() }, cancellationToken);
 
     #endregion
 }

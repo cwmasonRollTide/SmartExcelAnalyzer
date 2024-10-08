@@ -121,8 +121,8 @@ public class VectorRepository(
     /// <returns></returns>
     private async Task<string> ProcessRowsInBatches(ConcurrentBag<ConcurrentDictionary<string, object>> rows, CancellationToken cancellationToken)
     {
+        var channel = Channel.CreateUnbounded<(IEnumerable<float[]> Embeddings, ConcurrentBag<ConcurrentDictionary<string, object>> Batch)>();
         var batches = CreateBatches(rows);
-        var channel = Channel.CreateUnbounded<(ConcurrentBag<ConcurrentDictionary<string, object>> Batch, IEnumerable<float[]> Embeddings)>();
         var producerTask = ProduceEmbeddings(batches, channel, cancellationToken);
         var consumerTask = ConsumeAndStoreEmbeddings(channel, cancellationToken);
         await Task.WhenAll(producerTask, consumerTask);
@@ -151,7 +151,10 @@ public class VectorRepository(
     /// <returns></returns>
     private async Task ProduceEmbeddings(
         ConcurrentBag<ConcurrentBag<ConcurrentDictionary<string, object>>> batches, 
-        Channel<(ConcurrentBag<ConcurrentDictionary<string, object>> Batch, IEnumerable<float[]> Embeddings)> channel, 
+        Channel<(
+            IEnumerable<float[]> Embeddings,
+            ConcurrentBag<ConcurrentDictionary<string, object>> Batch
+        )> channel, 
         CancellationToken cancellationToken = default
     )
     {
@@ -168,23 +171,25 @@ public class VectorRepository(
                 _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
                 return;
             }
-            await channel.Writer.WriteAsync((batch, embeddings)!, cancellationToken);
+            await channel.Writer.WriteAsync((embeddings, batch)!, cancellationToken);
         });
-
         await Task.WhenAll(tasks);
         channel.Writer.Complete();
     }
 
     private async Task<string> ConsumeAndStoreEmbeddings(
-        Channel<(ConcurrentBag<ConcurrentDictionary<string, object>> Batch, IEnumerable<float[]> Embeddings)> channel, 
+        Channel<(
+            IEnumerable<float[]> Embeddings,
+            ConcurrentBag<ConcurrentDictionary<string, object>> Batch
+        )> channel, 
         CancellationToken cancellationToken = default
     )
     {
         string documentId = null!;
         var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        await foreach (var (batch, embeddings) in channel.Reader.ReadAllAsync(cancellationToken))
+        await foreach (var (embeddings, batch) in channel.Reader.ReadAllAsync(cancellationToken))
         {
-            ProcessBatch(batch, embeddings, batchesToStore, cancellationToken);
+            ProcessBatch(embeddings, batch, batchesToStore, cancellationToken);
             if (batchesToStore.Count >= BatchSize * 5)
             {
                 documentId = await StoreBatch(batchesToStore, documentId, cancellationToken);
@@ -196,8 +201,8 @@ public class VectorRepository(
     }
 
     private void ProcessBatch(
+        IEnumerable<float[]> embeddings,
         ConcurrentBag<ConcurrentDictionary<string, object>> batch, 
-        IEnumerable<float[]> embeddings, 
         ConcurrentBag<ConcurrentDictionary<string, object>> batchesToStore,
         CancellationToken cancellationToken = default
     )
