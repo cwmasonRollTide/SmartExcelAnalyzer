@@ -3,6 +3,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ARG BASE_API_URL
+ENV VITE_BASE_API_URL=$BASE_API_URL
 RUN npm run build
 
 FROM nginx:stable-alpine

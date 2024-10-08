@@ -18,7 +18,11 @@ const QueryForm: React.FC<QueryFormProps> = ({ onQuerySubmit, isDocumentSelected
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+    <Box
+      sx={{ mt: 2 }}
+      component="form" 
+      onSubmit={handleSubmit} 
+    >
       <TextField
         fullWidth
         label="Ask a question about the selected document"

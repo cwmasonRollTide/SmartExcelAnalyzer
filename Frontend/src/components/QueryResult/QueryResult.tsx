@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import { QueryResponse } from '../../services/api';
-import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { 
+  Typography, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper 
+} from '@mui/material';
 
 interface QueryResultProps {
   result: QueryResponse | null;
@@ -21,7 +30,7 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
         Relevant Data:
       </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table sx={{ minWidth: 650 }} aria-label="relevant-rows">
           <TableHead>
             <TableRow>
               {Object.keys(result.relevantRows[0] || {}).map((key) => (

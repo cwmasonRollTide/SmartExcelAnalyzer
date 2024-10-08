@@ -44,6 +44,7 @@ services:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
       - LLM_SERVICE_URL=http://llm-service:8000
       - MONGODB_DATABASE_NAME=smartexcelanalyzer
       - MONGODB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017
@@ -56,6 +57,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     build:
@@ -64,7 +70,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      - BASE_API_URL=http://localhost:5001
+       - BASE_API_URL=http://backend:80
     depends_on:
       - backend
 

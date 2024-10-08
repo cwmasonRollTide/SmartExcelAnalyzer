@@ -2,7 +2,7 @@
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="XPlat Code Coverage">
+      <DataCollector friendlyName="Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
           <Exclude>[*]Program.cs</Exclude>

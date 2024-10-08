@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const HEALTH_CHECK_INTERVAL = 60000; // 1 minute
+const HEALTH_CHECK_INTERVAL = 60000;
 
 export function startHealthCheck() {
   const checkHealth = async () => {

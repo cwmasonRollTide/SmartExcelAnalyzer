@@ -18,9 +18,18 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onSelectDocument,
 }) => {
   return (
-    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+    <List 
+      sx={{ 
+        width: '100%', 
+        maxWidth: 360, 
+        bgcolor: 'background.paper' 
+      }}
+    >
       {documents.map((document) => (
-        <ListItem key={document.id} disablePadding>
+        <ListItem
+          disablePadding
+          key={document.id} 
+        >
           <ListItemButton
             selected={selectedDocument?.id === document.id}
             onClick={() => onSelectDocument(document)}

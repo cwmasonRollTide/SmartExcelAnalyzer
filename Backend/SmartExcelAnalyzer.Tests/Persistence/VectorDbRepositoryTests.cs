@@ -1,9 +1,11 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using Domain.Persistence;
+using Domain.Persistence.Configuration;
 using Domain.Persistence.DTOs;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Persistence.Database;
 using Persistence.Repositories;
@@ -15,8 +17,9 @@ public class VectorDbRepositoryTests
 {
     private readonly Mock<IDatabaseWrapper> _databaseMock = new();
     private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
-    private readonly Mock<ILogger<VectorDbRepository>> _loggerMock = new();
-    private VectorDbRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object);
+    private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
+    private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object);
 
     [Fact]
     public async Task SaveDocumentAsync_ShouldSaveDocumentAndSummary()
@@ -31,7 +34,7 @@ public class VectorDbRepositoryTests
         };
         _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([1.0f]);
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<CancellationToken>())).ReturnsAsync("1");
+        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync("1");
         _databaseMock.Setup(c => c.StoreSummaryAsync(It.IsAny<string>(), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var result = await Sut.SaveDocumentAsync(data);
@@ -53,7 +56,7 @@ public class VectorDbRepositoryTests
         };
         _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([1.0f]);
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<CancellationToken>())).ReturnsAsync((string)null!);
+        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((string)null!);
 
         var result = await Sut.SaveDocumentAsync(data);
 
@@ -74,7 +77,7 @@ public class VectorDbRepositoryTests
         };
         _llmRepositoryMock.Setup(l => l.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([1.0f]);
-        _databaseMock.SetupSequence(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<CancellationToken>()))
+        _databaseMock.SetupSequence(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(documentId);
 
         _databaseMock.Setup(c => c.StoreSummaryAsync(It.Is<string>(y => y == documentId), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(-1);

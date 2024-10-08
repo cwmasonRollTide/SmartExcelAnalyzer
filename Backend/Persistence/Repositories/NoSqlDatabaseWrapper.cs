@@ -14,10 +14,10 @@ public class NoSqlDatabaseWrapper(IMongoDatabase database, ILogger<NoSqlDatabase
     private readonly ILLMRepository _llmRepository = llmRepository;
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
 
-    public async Task<string> StoreVectorsAsync(ConcurrentBag<ConcurrentDictionary<string, object>> rows, CancellationToken cancellationToken = default)
+    public async Task<string> StoreVectorsAsync(ConcurrentBag<ConcurrentDictionary<string, object>> rows, string? docId = null, CancellationToken cancellationToken = default)
     {
         var collection = _database.GetCollection<BsonDocument>("documents");
-        var documentId = ObjectId.GenerateNewId().ToString();
+        var documentId = docId ?? ObjectId.GenerateNewId().ToString();
         var documents = await Task.WhenAll(rows.Select(async row =>
         {
             var serializedRow = JsonSerializer.Serialize(row);

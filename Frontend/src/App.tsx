@@ -142,8 +142,16 @@ function App() {
           )}
         </Box>
       </Box>
-      <Snackbar open={toastOpen} autoHideDuration={6000} onClose={handleToastClose}>
-        <Alert onClose={handleToastClose} severity={toastSeverity} sx={{ width: '100%' }}>
+      <Snackbar 
+        open={toastOpen} 
+        autoHideDuration={6000} 
+        onClose={handleToastClose}
+      >
+        <Alert 
+          onClose={handleToastClose} 
+          severity={toastSeverity} 
+          sx={{ width: '100%' }}
+        >
           {toastMessage}
         </Alert>
       </Snackbar>

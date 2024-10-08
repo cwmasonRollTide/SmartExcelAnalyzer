@@ -26,7 +26,7 @@ class ComputeEmbedding(BaseModel):
     text: str
 
 class ComputeBatchEmbeddings(BaseModel):
-    text: list[str]
+    texts: list[str]
 
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
@@ -130,7 +130,7 @@ async def compute_batch_embedding(compute_embedding: ComputeBatchEmbeddings):
     Compute the embeddings of a list of texts using a pre-trained embedding model.
     """
     try:
-        tasks = [compute_embedding(ComputeEmbedding(text=text)) for text in compute_embedding.text]
+        tasks = [compute_embedding(ComputeEmbedding(text=text)) for text in compute_embedding.texts]
         result = await asyncio.gather(*tasks)
         return result
     except Exception as e:

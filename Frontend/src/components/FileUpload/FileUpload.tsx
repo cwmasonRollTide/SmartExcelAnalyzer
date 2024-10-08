@@ -37,10 +37,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
   return (
     <Box
+      onDrop={handleDrop}
+      onDragOver={handleDrag}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
-      onDragOver={handleDrag}
-      onDrop={handleDrop}
       sx={{
         border: '2px dashed',
         borderColor: dragActive ? 'primary.main' : 'grey.300',

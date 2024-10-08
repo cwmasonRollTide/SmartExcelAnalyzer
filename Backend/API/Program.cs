@@ -17,12 +17,11 @@ using MediatR;
 using FluentValidation;
 using Persistence.Cache;
 
-// [assembly: ExcludeFromCodeCoverage]
-
 var builder = WebApplication.CreateBuilder(args);
-
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
+builder.Logging.ClearProviders();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+builder.Logging.AddConsole();
 builder.Services.AddLogging();
 builder.Services.AddHttpClient("DefaultClient", client => 
 { 
@@ -46,7 +45,7 @@ builder.Services.AddScoped(sp =>
     return client.GetDatabase(mongoDatabaseName);
 });
 builder.Services.AddScoped<IDatabaseWrapper, NoSqlDatabaseWrapper>();
-builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
+builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
 builder.Services.AddMemoryCache(options =>
 {
     options.SizeLimit = 1_000_000;
@@ -71,8 +70,6 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Su
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommand>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SubmitQueryValidator>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<UploadFileCommandValidator>());
-// builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<SubmitQueryValidator>());
-// builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<UploadFileCommandValidator>());
 
 // Services
 builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
@@ -81,7 +78,7 @@ builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));
 // Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smart Excel File Analyzer API", Version = "v1" });
     c.OperationFilter<SwaggerFileOperationFilter>();
 });
 
