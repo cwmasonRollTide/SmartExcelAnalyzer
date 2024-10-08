@@ -23,6 +23,7 @@ services:
       dockerfile: llm.Dockerfile
     ports:
       - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -61,7 +62,7 @@ services:
       context: ./Frontend
       dockerfile: frontend.Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - BASE_API_URL=http://localhost:5001
     depends_on:

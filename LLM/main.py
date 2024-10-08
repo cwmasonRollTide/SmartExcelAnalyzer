@@ -1,6 +1,7 @@
 import os
 import json
 import torch
+import asyncio
 from enum import Enum
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -23,6 +24,9 @@ class QueryResponse(Query):
 
 class ComputeEmbedding(BaseModel):
     text: str
+
+class ComputeBatchEmbeddings(BaseModel):
+    text: list[str]
 
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
@@ -119,8 +123,16 @@ async def compute_embedding(compute_embedding: ComputeEmbedding):
         return embeddings.numpy().tolist()[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-if __name__ == "__main__":
-    import uvicorn
-
-uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+@app.post("/compute_batch_embedding", response_model=list[float])
+async def compute_batch_embedding(compute_embedding: ComputeBatchEmbeddings):
+    """
+    Compute the embeddings of a list of texts using a pre-trained embedding model.
+    """
+    try:
+        tasks = [compute_embedding(ComputeEmbedding(text=text)) for text in compute_embedding.text]
+        result = await asyncio.gather(*tasks)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    

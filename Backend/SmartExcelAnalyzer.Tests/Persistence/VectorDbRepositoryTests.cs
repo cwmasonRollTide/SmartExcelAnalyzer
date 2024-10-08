@@ -5,6 +5,7 @@ using Domain.Persistence.DTOs;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Persistence.Database;
 using Persistence.Repositories;
 using SmartExcelAnalyzer.Tests.TestUtilities;
 
@@ -15,7 +16,7 @@ public class VectorDbRepositoryTests
     private readonly Mock<IDatabaseWrapper> _databaseMock = new();
     private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
     private readonly Mock<ILogger<VectorDbRepository>> _loggerMock = new();
-    private VectorDbRepository Sut => new(_databaseMock.Object, _loggerMock.Object);
+    private VectorDbRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object);
 
     [Fact]
     public async Task SaveDocumentAsync_ShouldSaveDocumentAndSummary()

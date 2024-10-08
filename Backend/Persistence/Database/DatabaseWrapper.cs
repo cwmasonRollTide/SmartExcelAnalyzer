@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Persistence.Repositories;
+namespace Persistence.Database;
 
 public interface IDatabaseWrapper
 {

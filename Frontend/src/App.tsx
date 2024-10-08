@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import { Container, Paper, Snackbar, Alert, Box } from '@mui/material';
+import { Paper, Snackbar, Alert, Box } from '@mui/material';
 import { startHealthCheck } from './utils/healthCheck';
 import { uploadFile, submitQuery, QueryResponse } from './services/api';
 import DocumentList from './components/DocumentList/DocumentList';

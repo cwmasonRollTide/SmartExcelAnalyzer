@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using Persistence.Database;
 
 namespace Persistence.Repositories;
 

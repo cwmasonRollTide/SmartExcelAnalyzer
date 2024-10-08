@@ -8,6 +8,7 @@ public interface ILLMRepository
 {
     Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default);
     Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default);
+    Task<IEnumerable<float[]?>> ComputeEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -33,6 +34,7 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<f
     #region Service URLs
     private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
     private string COMPUTE_URL => _llmOptions.LLM_SERVICE_URL + "/compute_embedding";
+    private string COMPUTE_BATCH_URL => _llmOptions.LLM_SERVICE_URL + "/compute_batch_embedding";
     #endregion
 
     #region Dependencies
@@ -83,6 +85,17 @@ public class LLMRepository(IOptions<LLMServiceOptions> options, IWebRepository<f
     /// </returns>
     public async Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default) => 
         await _computeService.PostAsync(COMPUTE_URL, new { text }, cancellationToken);
+
+    /// <summary>
+    /// Compute the embeddings of a batch of texts
+    /// Calls the /compute_embedding endpoint of the LLM service with many
+    /// texts at once to reduce repetitive calls, batch up calls
+    /// </summary>
+    /// <param name="texts"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<float[]?>> ComputeEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) =>
+        await _computeService.PostBatchAsync(COMPUTE_BATCH_URL, texts.Select(text => new { text }), cancellationToken);
 
     #endregion
 }

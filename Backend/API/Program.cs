@@ -11,6 +11,11 @@ using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Persistence.Database;
 using MongoDB.Driver;
+using Microsoft.OpenApi.Models;
+using API.Properties;
+using MediatR;
+using FluentValidation;
+using Persistence.Cache;
 
 // [assembly: ExcludeFromCodeCoverage]
 
@@ -19,14 +24,16 @@ var builder = WebApplication.CreateBuilder(args);
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 builder.Services.AddLogging();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("DefaultClient", client => 
+{ 
+    client.Timeout = TimeSpan.FromMinutes(5);
+});
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 
 // Database
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
+// var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
+// builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING") 
     ?? builder.Configuration.GetConnectionString("MongoDB");
@@ -39,12 +46,22 @@ builder.Services.AddScoped(sp =>
     return client.GetDatabase(mongoDatabaseName);
 });
 builder.Services.AddScoped<IDatabaseWrapper, NoSqlDatabaseWrapper>();
+builder.Services.AddScoped<IVectorDbRepository, VectorDbRepository>();
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1_000_000;
+});
+builder.Services.AddSingleton<IEmbeddingCache, MemoryCacheEmbeddingCache>();
 
 // LLM Service Options
 var llmServiceUrl = Environment.GetEnvironmentVariable("LLM_SERVICE_URL");
-if (!string.IsNullOrEmpty(llmServiceUrl)) builder.Services.Configure<LLMServiceOptions>(options => options.LLM_SERVICE_URL = llmServiceUrl);
-else builder.Services.ConfigureOptions(builder.Configuration.GetSection("LLMServiceOptions"));
+if (!string.IsNullOrEmpty(llmServiceUrl))
+    builder.Services.Configure<LLMServiceOptions>(options => options.LLM_SERVICE_URL = llmServiceUrl);
+else
+    builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
 builder.Services.AddScoped<ILLMRepository, LLMRepository>();
+builder.Services.AddOptions<LLMServiceOptions>()
+    .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
 
 // MediatR
 builder.Services.AddFluentValidationAutoValidation();
@@ -59,13 +76,15 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Up
 
 // Services
 builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
-
-// Repositories
-builder.Services.AddScoped<IWebRepository<float[]?>, WebRepository<float[]?>>();
-builder.Services.AddScoped<IWebRepository<QueryAnswer>, WebRepository<QueryAnswer>>();
+builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));
 
 // Swagger
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    c.OperationFilter<SwaggerFileOperationFilter>();
+});
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

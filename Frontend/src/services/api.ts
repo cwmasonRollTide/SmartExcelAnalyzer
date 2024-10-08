@@ -1,9 +1,7 @@
-const API_URL = import.meta.env.DEV ? 'http://localhost:5001' : '';
-
 export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await fetch(`${API_URL}/analysis/upload`, {
+  const response = await fetch('/api/analysis/upload', {
     method: 'POST',
     body: formData,
   });
@@ -25,7 +23,7 @@ export interface QueryResponse extends Query {
 }
 
 export const submitQuery = async (query: Query): Promise<QueryResponse> => {
-  const response = await fetch(`${API_URL}/analysis/query`, {
+  const response = await fetch('/api/analysis/query', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
