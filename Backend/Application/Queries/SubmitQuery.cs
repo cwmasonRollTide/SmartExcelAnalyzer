@@ -81,7 +81,7 @@ public class SubmitQueryHandler(
     public async Task<QueryAnswer?> Handle(SubmitQuery request, CancellationToken cancellationToken = default) 
     {
         _logger.LogInformation(LogQueryingLLM, request.Query, request.DocumentId);
-        var result = await _llmRepository.QueryLLM(request.Query, request.DocumentId, cancellationToken);
+        var result = await _llmRepository.QueryLLM(document_id: request.DocumentId, question: request.Query, cancellationToken);
         if (result is null)
         {
             _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);

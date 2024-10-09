@@ -14,16 +14,20 @@ namespace SmartExcelAnalyzer.Tests.Persistence;
 
 public class VectorDbRepositoryTests
 {
+    private const int SAVE_BATCH_SIZE = 10;
+    private const int COMPUTE_BATCH_SIZE = 10;
+
     private readonly Mock<IDatabaseWrapper> _databaseMock = new();
     private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
-    private const int COMPUTE_BATCH_SIZE = 10;
-    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object);
+    private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
 
     public VectorDbRepositoryTests()
     {
         _llmOptionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
+        _databaseOptionsMock.Setup(o => o.Value).Returns(new DatabaseOptions { SAVE_BATCH_SIZE = SAVE_BATCH_SIZE });
     }
 
     // [Fact]

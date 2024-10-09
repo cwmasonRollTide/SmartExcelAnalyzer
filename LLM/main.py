@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from typing import List
 import torch
 from enum import Enum
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 from transformers import pipeline
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
 
 class EnvironmentVariables(str, Enum):
@@ -30,13 +32,15 @@ class ComputeBatchEmbeddings(BaseModel):
 
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
-default_db_connection_string = "mongodb://admin:password@localhost:27017/smartexcelanalyzer"
+default_db_connection_string = "mongodb://admin:password@mongodb:27017/smartexcelanalyzer"
 
 EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 DB_CONNECTION_STRING = os.getenv(EnvironmentVariables.DB_CONNECTION_STRING.value, default_db_connection_string)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
 
 app = FastAPI()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
 
 client = MongoClient(DB_CONNECTION_STRING)
@@ -103,6 +107,7 @@ async def process_query(query: Query) -> QueryResponse:
             "relevantRows": relevant_rows
         }
     except Exception as e:
+        logger.error(f"Error processing query: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/compute_embedding", response_model=list[float])
@@ -123,6 +128,7 @@ async def compute_embedding(compute_embedding: ComputeEmbedding):
             embeddings = embedding_model(**inputs).last_hidden_state.mean(dim=1)
         return embeddings.numpy().tolist()[0]
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.post("/compute_batch_embedding", response_model=List[List[float]])
@@ -135,4 +141,11 @@ async def compute_batch_embedding(compute_embedding: ComputeBatchEmbeddings):
         return embeddings.tolist()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+async def general_exception_handler(request, exc):
+    logger.error(f"An error occurred: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"message": "An internal error occurred", "detail": str(exc)}
+    )
     

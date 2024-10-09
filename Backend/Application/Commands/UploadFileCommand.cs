@@ -71,21 +71,21 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(LogPreparingExcelFile, request.File!.FileName);
+        _logger.LogTrace(LogPreparingExcelFile, request.File!.FileName);
         var stopwatch = Stopwatch.StartNew();
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
         stopwatch.Stop();
-        _logger.LogInformation(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
+        _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
         if (summarizedExcelData is null)
         {
             _logger.LogInformation(LogFailedToPrepareExcelFile, request.File.FileName);
             return null;
         }
-        _logger.LogInformation(LogSavingDocument, request.File.FileName);
+        _logger.LogTrace(LogSavingDocument, request.File.FileName);
         stopwatch.Restart();
         var documentId = await _vectorDbRepository.SaveDocumentAsync(summarizedExcelData, cancellationToken);
         stopwatch.Stop();
-        _logger.LogInformation(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
+        _logger.LogTrace(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
         if (documentId is null)  
         {
             _logger.LogInformation(LogFailedSavingVectorDb, request.File.FileName);

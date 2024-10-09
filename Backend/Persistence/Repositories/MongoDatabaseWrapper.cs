@@ -49,38 +49,40 @@ public class MongoDatabaseWrapper(
     public async Task<string> StoreVectorsAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
         string? docId = default,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         var collection = _database.GetCollection<BsonDocument>("documents");
         var documentId = docId ?? ObjectId.GenerateNewId().ToString();
-        var channel = Channel.CreateUnbounded<IEnumerable<ConcurrentDictionary<string, object>>>();
-        var producerTask = ProduceBatchesAsync(rows, channel, cancellationToken);
-        var consumerTask = ConsumeAndStoreBatchesAsync(channel, collection, documentId, cancellationToken);
+        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(20) { FullMode = BoundedChannelFullMode.Wait });
+
+        var producerTask = ProduceBatchesAsync(rows, batchChannel.Writer, cancellationToken);
+        var consumerTask = ConsumeAndStoreBatchesAsync(batchChannel.Reader, collection, documentId, cancellationToken);
+
         await Task.WhenAll(producerTask, consumerTask);
         return documentId;
     }
 
     private async Task ProduceBatchesAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
-        Channel<IEnumerable<ConcurrentDictionary<string, object>>> channel,
+        ChannelWriter<IEnumerable<ConcurrentDictionary<string, object>>> writer,
         CancellationToken cancellationToken)
     {
         try
         {
             await foreach (var batch in CreateBatchesAsync(rows, cancellationToken))
-                await channel.Writer.WriteAsync(batch, cancellationToken);
+            {
+                await writer.WriteAsync(batch, cancellationToken);
+            }
         }
         finally
         {
-            channel.Writer.Complete();
+            writer.Complete();
         }
     }
 
     private async IAsyncEnumerable<IEnumerable<ConcurrentDictionary<string, object>>> CreateBatchesAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
-    )
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var batch = new List<ConcurrentDictionary<string, object>>(BatchSize);
         foreach (var row in rows)
@@ -102,14 +104,14 @@ public class MongoDatabaseWrapper(
     }
 
     private async Task ConsumeAndStoreBatchesAsync(
-        Channel<IEnumerable<ConcurrentDictionary<string, object>>> channel,
+        ChannelReader<IEnumerable<ConcurrentDictionary<string, object>>> reader,
         IMongoCollection<BsonDocument> collection,
         string documentId,
         CancellationToken cancellationToken)
     {
         var tasks = new List<Task>();
-        var semaphore = new SemaphoreSlim(MaxConcurrentTasks);
-        await foreach (var batch in channel.Reader.ReadAllAsync(cancellationToken))
+        var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
+        await foreach (var batch in reader.ReadAllAsync(cancellationToken))
         {
             await semaphore.WaitAsync(cancellationToken);
             tasks.Add(Task.Run(async () =>
@@ -131,23 +133,13 @@ public class MongoDatabaseWrapper(
         IEnumerable<ConcurrentDictionary<string, object>> batch,
         IMongoCollection<BsonDocument> collection,
         string documentId,
-        CancellationToken cancellationToken)
-    {
-        var batchUpdate = CreateBatchUpdate(batch, documentId);
-        await UpdateBatchWithRetryAsync(collection, batchUpdate, cancellationToken);
-    }
+        CancellationToken cancellationToken
+    ) =>
+        await UpdateBatchWithRetryAsync(collection, CreateBatchUpdate(batch, documentId), cancellationToken);
 
-    /// <summary>
-    /// CreateBatchDocuments creates the documents for the batch to be inserted into the collection.
-    /// Converts the embedding array into a BsonArray for MongoDB.
-    /// </summary>
-    /// <param name="batch"></param>
-    /// <param name="documentId"></param>
-    /// <returns></returns>
     private static (FilterDefinition<BsonDocument> Filter, UpdateDefinition<BsonDocument> Update) CreateBatchUpdate(
         IEnumerable<ConcurrentDictionary<string, object>> batch,
-        string documentId
-    )
+        string documentId)
     {
         var filter = Builders<BsonDocument>.Filter.Eq("_id", documentId);
         var updateBuilder = Builders<BsonDocument>.Update;
@@ -160,19 +152,10 @@ public class MongoDatabaseWrapper(
         return (filter, update);
     }
 
-    /// <summary>
-    /// UpdateBatchWithRetryAsync inserts a batch of documents into the collection with retries.
-    /// </summary>
-    /// <param name="collection"></param>
-    /// <param name="batchDocuments"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
     private async Task UpdateBatchWithRetryAsync(
         IMongoCollection<BsonDocument> collection,
         (FilterDefinition<BsonDocument> Filter, UpdateDefinition<BsonDocument> Update) batchUpdate,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         var retryCount = 0;
         while (retryCount < MaxRetries)
@@ -189,14 +172,14 @@ public class MongoDatabaseWrapper(
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                await HandleInsertErrorAsync(ex, retryCount);
+                await HandleUpsertErrorAsync(ex, retryCount);
                 retryCount++;
             }
         }
         throw new Exception($"Failed to update batch after {MaxRetries} attempts.");
     }
 
-    private async Task HandleInsertErrorAsync(Exception ex, int retryCount)
+    private async Task HandleUpsertErrorAsync(Exception ex, int retryCount)
     {
         _logger.LogWarning(ex, "Failed to insert batch. Retry attempt: {RetryCount}", retryCount + 1);
         await Task.Delay(1000 * (retryCount + 1)); // Exponential backoff

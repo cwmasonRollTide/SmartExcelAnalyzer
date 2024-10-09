@@ -19,6 +19,7 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     volumes:
       - model_cache:/root/.cache/huggingface
+      - ./LLM:/app
     environment:
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
@@ -31,11 +32,20 @@ services:
     ports:
       - "5001:80"
     environment:
+      # ASP.NET Core settings
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - LLM_SERVICE_URL=http://llm-service:8000
-      - MONGODB_DATABASE_NAME=smartexcelanalyzer
-      - MONGODB_CONNECTION_STRING=mongodb://admin:password@mongodb:27017
+      
+      # LLMServiceOptions
+      - LLMServiceOptions__COMPUTE_BATCH_SIZE=500
+      - LLMServiceOptions__LLM_SERVICE_URL=http://llm-service:8000
+      
+      # DatabaseOptions
+      - DatabaseOptions__SAVE_BATCH_SIZE=500
+      - DatabaseOptions__MAX_CONNECTION_COUNT=400
+      - DatabaseOptions__MAX_RETRY_COUNT=3
+      - DatabaseOptions__ConnectionString=mongodb://admin:password@mongodb:27017
+      - DatabaseOptions__DatabaseName=smartexcelanalyzer
     depends_on:
       - llm-service
       - mongodb

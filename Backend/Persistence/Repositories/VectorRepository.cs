@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
-using System.Runtime.CompilerServices;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Persistence.Repositories;
 
@@ -29,7 +27,8 @@ public class VectorRepository(
     IDatabaseWrapper databaseWrapper,
     ILogger<VectorRepository> logger,
     ILLMRepository llmRepository,
-    IOptions<LLMServiceOptions> llmOptions
+    IOptions<LLMServiceOptions> llmOptions,
+    IOptions<DatabaseOptions> databaseOptions
 ) : IVectorDbRepository
 {
     #region Logging Message Constants
@@ -54,6 +53,7 @@ public class VectorRepository(
     private readonly IDatabaseWrapper _database = databaseWrapper;
     private readonly ILLMRepository _llmRepository = llmRepository;
     private readonly int ComputeEmbeddingBatchSize = llmOptions.Value.COMPUTE_BATCH_SIZE;
+    private readonly int MaxConcurrentTasks = databaseOptions.Value.MAX_CONNECTION_COUNT;
     #endregion
 
     #region Public Methods
@@ -123,95 +123,107 @@ public class VectorRepository(
     /// <returns></returns>
     private async Task<string> SaveDocumentDataAsync(ConcurrentBag<ConcurrentDictionary<string, object>> rows, CancellationToken cancellationToken)
     {
-        var channel = Channel.CreateUnbounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>();
-        var producerTask = ProduceBatchesAndEmbeddings(rows, channel, cancellationToken);
-        var consumerTask = ConsumeAndStoreEmbeddings(channel, cancellationToken);
-        await Task.WhenAll(producerTask, consumerTask);
-        return consumerTask.Result;
+        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Environment.ProcessorCount)
+        {
+            FullMode = BoundedChannelFullMode.Wait
+        });
+        var embeddingChannel = Channel.CreateBounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>(new BoundedChannelOptions(Environment.ProcessorCount)
+        {
+            FullMode = BoundedChannelFullMode.Wait
+        });
+        var createBatchesTask = CreateBatchesAsync(rows, batchChannel.Writer, cancellationToken);
+        var computeEmbeddingsTask = ComputeEmbeddingsAsync(batchChannel.Reader, embeddingChannel.Writer, cancellationToken);
+        var storeEmbeddingsTask = StoreEmbeddingsAsync(embeddingChannel.Reader, cancellationToken);
+        await createBatchesTask;
+        await computeEmbeddingsTask;
+        return await storeEmbeddingsTask;
     }
 
-    private async Task ProduceBatchesAndEmbeddings(
+    private async Task CreateBatchesAsync(
         ConcurrentBag<ConcurrentDictionary<string, object>> rows,
-        Channel<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)> channel,
-        CancellationToken cancellationToken)
+        ChannelWriter<IEnumerable<ConcurrentDictionary<string, object>>> writer,
+        CancellationToken cancellationToken
+    )
     {
-        var options = new JsonSerializerOptions { WriteIndented = false };
         try
         {
-            await foreach (var batch in CreateBatchesAsync(rows, cancellationToken))
+            var batch = new ConcurrentBag<ConcurrentDictionary<string, object>>();
+            await Parallel.ForEachAsync(rows, cancellationToken, async (row, ct) =>
             {
-                _logger.LogInformation(LOG_START_COMPUTE, batch.Count());
-                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                var embeddings = await _llmRepository.ComputeBatchEmbeddings(batch.Select(row => JsonSerializer.Serialize(row, options)), cancellationToken);
-                stopwatch.Stop();
-                _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
-                if (embeddings is null)
+                ct.ThrowIfCancellationRequested();
+                batch.Add(row);
+                if (batch.Count.Equals(ComputeEmbeddingBatchSize))
                 {
-                    _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
-                    continue;
+                    var batchToWrite = new ConcurrentBag<ConcurrentDictionary<string, object>>(batch);
+                    batch.Clear();
+                    await writer.WriteAsync(batchToWrite, cancellationToken);
                 }
-                await channel.Writer.WriteAsync((embeddings, batch)!, cancellationToken);
+            });
+
+            if (!batch.IsEmpty)
+            {
+                await writer.WriteAsync(batch, cancellationToken);
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating batches");
         }
         finally
         {
-            channel.Writer.Complete();
+            writer.Complete();
         }
     }
 
-    private async IAsyncEnumerable<IEnumerable<ConcurrentDictionary<string, object>>> CreateBatchesAsync(
-        IEnumerable<ConcurrentDictionary<string, object>> rows,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    private async Task ComputeEmbeddingsAsync(
+        ChannelReader<IEnumerable<ConcurrentDictionary<string, object>>> reader,
+        ChannelWriter<(IEnumerable<float[]>, IEnumerable<ConcurrentDictionary<string, object>>)> writer,
+        CancellationToken cancellationToken
     )
     {
-        var batch = new List<ConcurrentDictionary<string, object>>(ComputeEmbeddingBatchSize);
-        foreach (var row in rows)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            batch.Add(row);
-            if (batch.Count.Equals(ComputeEmbeddingBatchSize))
+            var serializerOptions =  new JsonSerializerOptions { WriteIndented = false };
+            await foreach (var batch in reader.ReadAllAsync(cancellationToken))
             {
-                await Task.Yield();
-                yield return batch;
-                batch = new List<ConcurrentDictionary<string, object>>(ComputeEmbeddingBatchSize);
+                _logger.LogInformation(LOG_START_COMPUTE, batch.Count());
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                var embeddings = await _llmRepository.ComputeBatchEmbeddings(batch.Select(row => JsonSerializer.Serialize(row, serializerOptions)), cancellationToken);
+                stopwatch.Stop();
+                _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
+                if (embeddings is not null)
+                {
+                    await writer.WriteAsync((embeddings, batch)!, cancellationToken);
+                }
+                else
+                {
+                    _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
+                }
             }
         }
-        if (!batch.IsNullOrEmpty())
+        catch (Exception ex)
         {
-            await Task.Yield();
-            yield return batch;
+            _logger.LogError(ex, "Error computing embeddings");
+        }
+        finally
+        {
+            writer.Complete();
         }
     }
 
-    private async Task<string> ConsumeAndStoreEmbeddings(
-        Channel<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)> channel,
-        CancellationToken cancellationToken = default)
+    private async Task<string> StoreEmbeddingsAsync(
+        ChannelReader<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)> reader,
+        CancellationToken cancellationToken)
     {
         string documentId = null!;
-        var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        var semaphore = new SemaphoreSlim(Environment.ProcessorCount); // Limit concurrent DB operations
-        await foreach (var (embeddings, batch) in channel.Reader.ReadAllAsync(cancellationToken))
-        {
-            await ProcessBatch(embeddings, batch, batchesToStore, cancellationToken);
-            if (batchesToStore.Count >= ComputeEmbeddingBatchSize * 5)
-            {
-                await semaphore.WaitAsync(cancellationToken);
-                try
-                {
-                    documentId = await SaveBatchOfRowEmbeddings(batchesToStore, documentId, cancellationToken);
-                    batchesToStore = [];
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }
-        }
-        if (!batchesToStore.IsEmpty)
+        var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
+        await foreach (var (embeddings, batch) in reader.ReadAllAsync(cancellationToken))
         {
             await semaphore.WaitAsync(cancellationToken);
             try
             {
+                var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
+                await ProcessBatchAsync(embeddings, batch, batchesToStore, cancellationToken);
                 documentId = await SaveBatchOfRowEmbeddings(batchesToStore, documentId, cancellationToken);
             }
             finally
@@ -222,34 +234,34 @@ public class VectorRepository(
         return documentId;
     }
 
-    private async Task ProcessBatch(
+    private async Task ProcessBatchAsync(
         IEnumerable<float[]> embeddings,
         IEnumerable<ConcurrentDictionary<string, object>> batch,
         ConcurrentBag<ConcurrentDictionary<string, object>> batchesToStore,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken)
     {
-        var batchArray = batch.ToArray();
-        var embeddingsArray = embeddings.ToArray();
-        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = cancellationToken };
-        await Parallel.ForEachAsync(Enumerable.Range(0, batchArray.Length), parallelOptions, (index, ct) =>
+        var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
+        await Parallel.ForEachAsync(pairs, new ParallelOptions 
+        { 
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        }, 
+        async (pair, ct) =>
         {
-            var row = batchArray[index];
-            var embedding = embeddingsArray[index];
+            cancellationToken.ThrowIfCancellationRequested();
+            await Task.Yield();
+            var (row, embedding) = pair;
             if (embedding != null)
                 row["embedding"] = embedding;
             else
-                _logger.LogWarning(LOG_NULL_EMBEDDING, index);
+                _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
             batchesToStore.Add(row);
-            return ValueTask.CompletedTask;
         });
     }
 
-    private async Task<string> SaveBatchOfRowEmbeddings(
+    private async ValueTask<string> SaveBatchOfRowEmbeddings(
         ConcurrentBag<ConcurrentDictionary<string, object>> batchOfRowsToSave, 
         string documentId,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         var batchDocumentId = await _database.StoreVectorsAsync(batchOfRowsToSave, documentId, cancellationToken);
         if (batchDocumentId is null)
