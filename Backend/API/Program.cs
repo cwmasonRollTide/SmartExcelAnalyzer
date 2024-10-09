@@ -15,6 +15,7 @@ using Persistence.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+builder.Configuration.AddEnvironmentVariables();
 builder.Logging.ClearProviders();
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Logging.AddConsole();
@@ -51,7 +52,7 @@ builder.Services.AddScoped(sp =>
     var client = sp.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
-builder.Services.AddScoped<IDatabaseWrapper, NoSqlDatabaseWrapper>();
+builder.Services.AddScoped<IDatabaseWrapper, MongoDatabaseWrapper>();
 builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
 builder.Services.AddMemoryCache(options =>
 {

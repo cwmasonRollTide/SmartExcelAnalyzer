@@ -3,6 +3,7 @@ using FluentValidation;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Queries;
 
@@ -22,7 +23,9 @@ public class SubmitQueryValidator : AbstractValidator<SubmitQuery>
 
 public class SubmitQuery : IRequest<QueryAnswer?>
 {
+    [Required]
     public required string Query { get; set; }
+    [Required]
     public required string DocumentId { get; set; }
     public int? RelevantRowsCount { get; set; } = null;
 }
@@ -84,7 +87,7 @@ public class SubmitQueryHandler(
             _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
             return null;
         }
-        if (request.RelevantRowsCount.HasValue)
+        if (request.RelevantRowsCount.HasValue) // We want more than ten rows of the data used to answer the query
         {
             _logger.LogInformation(LogComputingEmbedding, request.Query);
             var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);

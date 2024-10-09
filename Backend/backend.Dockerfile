@@ -25,13 +25,14 @@ COPY . .
 
 # Expose ports
 EXPOSE 80
-EXPOSE 443
-EXPOSE 5000
-EXPOSE 5001
+# EXPOSE 443
+# EXPOSE 5000
+# EXPOSE 5001
 
 # Set the entrypoint to find the project, restore, and run
-ENTRYPOINT ["/bin/sh", "-c", "\
-    PROJECT_PATH=$(find . -name 'API.csproj') && \
-    dotnet restore $PROJECT_PATH && \
-    dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80 \
-"]
+# ENTRYPOINT ["/bin/sh", "-c", "\
+#     PROJECT_PATH=$(find . -name 'API.csproj') && \
+#     dotnet restore $PROJECT_PATH && \
+#     dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80 \
+# "]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "API/API.csproj", "--urls", "http://+:80"]

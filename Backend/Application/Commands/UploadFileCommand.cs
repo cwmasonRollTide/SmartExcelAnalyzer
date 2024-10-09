@@ -8,12 +8,18 @@ using System.Diagnostics;
 
 namespace Application.Commands;
 
+/// <summary>
+/// Validates the uploadfilecommand request
+/// Ensures that the file is not null and has a length greater than 0
+/// Also must be smaller than 15MB
+/// </summary>
 public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
 {
     public UploadFileCommandValidator()
     {
         RuleFor(x => x.File).NotNull().WithMessage("File is required.");
         RuleFor(x => x.File).Must(file => file is not null && file.Length > 0).WithMessage("File is empty.");
+        RuleFor(x => x.File).Must(file => file is not null && file.Length < 15 * 1024 * 1024).WithMessage("File size must be less than 15 MB.");
     }
 }
 
@@ -65,7 +71,6 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("CHANGES TAKE EFFECT");
         _logger.LogInformation(LogPreparingExcelFile, request.File!.FileName);
         var stopwatch = Stopwatch.StartNew();
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
