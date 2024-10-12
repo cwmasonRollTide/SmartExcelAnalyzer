@@ -1,6 +1,7 @@
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
 using Domain.Persistence.Configuration;
+using Persistence.Repositories.API;
 
 namespace Persistence.Repositories;
 
@@ -30,16 +31,17 @@ public interface ILLMRepository
 ///     Web repository for computing the embeddings of text - specifically the /compute_embedding endpoint
 /// </param>
 public class LLMRepository(
-    IOptions<LLMServiceOptions> options, 
+    IOptions<LLMServiceOptions> options,
+    ILLMServiceLoadBalancer loadBalancer,
     IWebRepository<float[]?> computeService, 
     IWebRepository<IEnumerable<float[]?>> batchComputeService, 
     IWebRepository<QueryAnswer> queryService
 ) : ILLMRepository
 {
     #region Service URLs
-    private string QUERY_URL => _llmOptions.LLM_SERVICE_URL + "/query";
-    private string COMPUTE_URL => _llmOptions.LLM_SERVICE_URL + "/compute_embedding";
-    private string COMPUTE_BATCH_URL => _llmOptions.LLM_SERVICE_URL + "/compute_batch_embedding";
+    private string QUERY_URL => _loadBalancer.GetNextServiceUrl() + "/query";
+    private string COMPUTE_URL => _loadBalancer.GetNextServiceUrl() + "/compute_embedding";
+    private string COMPUTE_BATCH_URL => _loadBalancer.GetNextServiceUrl() + "/compute_batch_embedding";
     #endregion
 
     #region Dependencies
@@ -48,6 +50,10 @@ public class LLMRepository(
     /// Contains the URL of the LLM service
     /// </summary>
     private readonly LLMServiceOptions _llmOptions = options.Value;
+    /// <summary>
+    /// Load balancer for the LLM service URLs 
+    /// </summary>
+    private readonly ILLMServiceLoadBalancer _loadBalancer = loadBalancer;
     /// <summary>
     /// Web repository for querying the LLM model
     /// </summary>

@@ -4,24 +4,23 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Persistence.Repositories;
+using Persistence.Repositories.API;
 
 namespace SmartExcelAnalyzer.Tests.Persistence;
+
 public class LLMRepositoryTests
 {
-    private readonly Mock<IOptions<LLMServiceOptions>> _optionsMock;
-    private readonly Mock<IWebRepository<float[]?>> _computeServiceMock;
+    private readonly Mock<IOptions<LLMServiceOptions>> _optionsMock = new();
+    private readonly Mock<ILLMServiceLoadBalancer> _loadBalancerMock = new();
+    private readonly Mock<IWebRepository<float[]?>> _computeServiceMock = new();
+    private readonly Mock<IWebRepository<QueryAnswer>> _queryServiceMock = new();
     private readonly Mock<IWebRepository<IEnumerable<float[]?>>> _batchComputeServiceMock = new();
-    private readonly Mock<IWebRepository<QueryAnswer>> _queryServiceMock;
-    private readonly LLMRepository _repository;
+    private LLMRepository Sut => new(_optionsMock.Object, _loadBalancerMock.Object, _computeServiceMock.Object, _batchComputeServiceMock.Object, _queryServiceMock.Object);
     private const int COMPUTE_BATCH_SIZE = 10;
 
     public LLMRepositoryTests()
     {
-        _optionsMock = new Mock<IOptions<LLMServiceOptions>>();
         _optionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
-        _computeServiceMock = new Mock<IWebRepository<float[]?>>();
-        _queryServiceMock = new Mock<IWebRepository<QueryAnswer>>();
-        _repository = new LLMRepository(_optionsMock.Object, _computeServiceMock.Object, _batchComputeServiceMock.Object, _queryServiceMock.Object);
     }
 
     [Fact]
@@ -33,7 +32,7 @@ public class LLMRepositoryTests
         _queryServiceMock.Setup(q => q.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedAnswer);
 
-        var result = await _repository.QueryLLM(documentId, question);
+        var result = await Sut.QueryLLM(documentId, question);
 
         result.Should().BeEquivalentTo(expectedAnswer);
         _queryServiceMock.Verify(q => q.PostAsync(
@@ -54,7 +53,7 @@ public class LLMRepositoryTests
         _computeServiceMock.Setup(c => c.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedEmbedding);
 
-        var result = await _repository.ComputeEmbedding(text);
+        var result = await Sut.ComputeEmbedding(text);
 
         result.Should().BeEquivalentTo(expectedEmbedding);
         _computeServiceMock.Verify(c => c.PostAsync(

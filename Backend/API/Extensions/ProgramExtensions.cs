@@ -1,14 +1,16 @@
+using Qdrant.Client;
+using API.Properties;
 using API.Middleware;
+using Persistence.Cache;
 using Application.Queries;
 using Application.Services;
+using Persistence.Database;
 using Persistence.Repositories;
+using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using Domain.Persistence.Configuration;
-using Persistence.Database;
-using MongoDB.Driver;
-using Microsoft.OpenApi.Models;
-using API.Properties;
-using Persistence.Cache;
+using Microsoft.Extensions.Options;
+using Persistence.Repositories.API;
 
 namespace API.Extensions;
 
@@ -49,7 +51,10 @@ public static class ConfigurationExtensions
         {
             options.AddDefaultPolicy(builder => 
             {
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
             });
         });
         return builder;
@@ -59,30 +64,29 @@ public static class ConfigurationExtensions
     {
         builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection("DatabaseOptions"));
         builder.Services.AddOptions<DatabaseOptions>()
-            .Validate(options => !string.IsNullOrEmpty(options.ConnectionString), "MongoDB ConnectionString must be set.");
+            .Validate(options => !string.IsNullOrEmpty(options.ConnectionString), "Qdrant Connection String must be set.");
         
         var databaseOptions = builder.Configuration.GetSection("DatabaseOptions").Get<DatabaseOptions>();
-        builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(databaseOptions!.ConnectionString));
-        builder.Services.AddScoped(sp =>
+        builder.Services.AddSingleton(sp =>
         {
-            var client = sp.GetRequiredService<IMongoClient>();
-            return client.GetDatabase(databaseOptions!.DatabaseName);
+            var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            return new QdrantClient(options.ConnectionString);
         });
-        builder.Services.AddScoped<IDatabaseWrapper, MongoDatabaseWrapper>();
+        builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
-        builder.Services.AddMemoryCache(options =>
-        {
-            options.SizeLimit = 1_000_000;
-        });
-        builder.Services.AddSingleton<IEmbeddingCache, MemoryCacheEmbeddingCache>();
+        // builder.Services.AddMemoryCache(options =>
+        // {
+        //     options.SizeLimit = 1_000_000;
+        // });
+        // builder.Services.AddSingleton<IEmbeddingCache, MemoryCacheEmbeddingCache>();
         return builder;
     }
 
     public static WebApplicationBuilder ConfigureLLMService(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMServiceLoadBalancer>();
         builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
-        builder.Services.AddOptions<LLMServiceOptions>()
-            .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
+        builder.Services.AddOptions<LLMServiceOptions>().Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
         builder.Services.AddScoped<ILLMRepository, LLMRepository>();
         return builder;
     }

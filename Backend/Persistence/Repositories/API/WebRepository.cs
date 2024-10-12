@@ -2,7 +2,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Persistence.Repositories;
+namespace Persistence.Repositories.API;
 
 public interface IWebRepository<T>
 {
@@ -13,7 +13,11 @@ public interface IWebRepository<T>
 public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-    public async Task<T> PostAsync(string endpoint, object payload, CancellationToken cancellationToken = default)
+    public async Task<T> PostAsync(
+        string endpoint, 
+        object payload, 
+        CancellationToken cancellationToken = default
+    )
     {
         var client = _httpClientFactory.CreateClient("DefaultClient");
         var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");

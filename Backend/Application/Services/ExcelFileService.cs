@@ -174,8 +174,10 @@ public class ExcelFileService : IExcelFileService
     /// </summary>
     /// <param name="table"></param>
     /// <returns></returns>
-    private static ConcurrentBag<DataColumn> GetStringColumns(DataTable table) => new(table.Columns.Cast<DataColumn>().Where(IsStringColumn));
-    private static bool IsStringColumn(DataColumn column) => column.DataType == typeof(string);
+    private static ConcurrentBag<DataColumn> GetStringColumns(DataTable table) => 
+        new(table.Columns.Cast<DataColumn>().Where(IsStringColumn));
+    private static bool IsStringColumn(DataColumn column) => 
+        column.DataType == typeof(string);
 
     /// <summary>
     /// Calculate the hash values of each string column's values
