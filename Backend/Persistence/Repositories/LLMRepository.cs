@@ -1,6 +1,4 @@
 using Domain.Persistence.DTOs;
-using Microsoft.Extensions.Options;
-using Domain.Persistence.Configuration;
 using Persistence.Repositories.API;
 
 namespace Persistence.Repositories;
@@ -31,29 +29,19 @@ public interface ILLMRepository
 ///     Web repository for computing the embeddings of text - specifically the /compute_embedding endpoint
 /// </param>
 public class LLMRepository(
-    IOptions<LLMServiceOptions> options,
-    ILLMServiceLoadBalancer loadBalancer,
+    ILLMServiceLoadBalancer llmServiceLoadBalancer,
     IWebRepository<float[]?> computeService, 
     IWebRepository<IEnumerable<float[]?>> batchComputeService, 
     IWebRepository<QueryAnswer> queryService
 ) : ILLMRepository
 {
     #region Service URLs
-    private string QUERY_URL => _loadBalancer.GetNextServiceUrl() + "/query";
-    private string COMPUTE_URL => _loadBalancer.GetNextServiceUrl() + "/compute_embedding";
-    private string COMPUTE_BATCH_URL => _loadBalancer.GetNextServiceUrl() + "/compute_batch_embedding";
+    private string QUERY_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/query";
+    private string COMPUTE_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/compute_embedding";
+    private string COMPUTE_BATCH_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/compute_batch_embedding";
     #endregion
 
     #region Dependencies
-    /// <summary>
-    /// Options for the LLM service
-    /// Contains the URL of the LLM service
-    /// </summary>
-    private readonly LLMServiceOptions _llmOptions = options.Value;
-    /// <summary>
-    /// Load balancer for the LLM service URLs 
-    /// </summary>
-    private readonly ILLMServiceLoadBalancer _loadBalancer = loadBalancer;
     /// <summary>
     /// Web repository for querying the LLM model
     /// </summary>
@@ -62,6 +50,10 @@ public class LLMRepository(
     /// Web repository for calling the compute function of the LLM model
     /// </summary>
     private readonly IWebRepository<float[]?> _computeService = computeService;
+        /// <summary>
+    /// Load balancer for the LLM service URLs 
+    /// </summary>
+    private readonly ILLMServiceLoadBalancer _llmServiceLoadBalancer = llmServiceLoadBalancer;
     /// <summary>
     /// Web repository for calling the batch compute function of the LLM model
     /// </summary>
@@ -111,6 +103,5 @@ public class LLMRepository(
     /// <returns></returns>
     public async Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) => 
         await _batchComputeService.PostAsync(COMPUTE_BATCH_URL, new { texts = texts.ToList() }, cancellationToken);
-
     #endregion
 }

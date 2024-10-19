@@ -86,7 +86,9 @@ public static class ConfigurationExtensions
     {
         builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMServiceLoadBalancer>();
         builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
-        builder.Services.AddOptions<LLMServiceOptions>().Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
+        builder.Services.AddOptions<LLMServiceOptions>()
+            .Validate(options => options.LLM_SERVICE_URLS.Count > 0, "LLM_SERVICE_URLS must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
         builder.Services.AddScoped<ILLMRepository, LLMRepository>();
         return builder;
     }

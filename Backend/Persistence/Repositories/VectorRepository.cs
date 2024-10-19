@@ -52,8 +52,8 @@ public class VectorRepository(
     private readonly ILogger<VectorRepository> _logger = logger;
     private readonly IDatabaseWrapper _database = databaseWrapper;
     private readonly ILLMRepository _llmRepository = llmRepository;
-    private readonly int ComputeEmbeddingBatchSize = llmOptions.Value.COMPUTE_BATCH_SIZE;
-    private readonly int MaxConcurrentTasks = databaseOptions.Value.MAX_CONNECTION_COUNT;
+    private readonly int _computeEmbeddingBatchSize = llmOptions.Value.COMPUTE_BATCH_SIZE;
+    private readonly int _maxConcurrentTasks = databaseOptions.Value.MAX_CONNECTION_COUNT;
     #endregion
 
     #region Public Methods
@@ -152,7 +152,7 @@ public class VectorRepository(
             {
                 ct.ThrowIfCancellationRequested();
                 batch.Add(row);
-                if (batch.Count.Equals(ComputeEmbeddingBatchSize))
+                if (batch.Count.Equals(_computeEmbeddingBatchSize))
                 {
                     var batchToWrite = new ConcurrentBag<ConcurrentDictionary<string, object>>(batch);
                     batch.Clear();
@@ -243,7 +243,7 @@ public class VectorRepository(
         var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
         await Parallel.ForEachAsync(pairs, new ParallelOptions 
         { 
-            MaxDegreeOfParallelism = Environment.ProcessorCount
+            MaxDegreeOfParallelism = _maxConcurrentTasks
         }, 
         async (pair, ct) =>
         {

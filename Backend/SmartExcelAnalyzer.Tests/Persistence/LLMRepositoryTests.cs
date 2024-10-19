@@ -15,7 +15,7 @@ public class LLMRepositoryTests
     private readonly Mock<IWebRepository<float[]?>> _computeServiceMock = new();
     private readonly Mock<IWebRepository<QueryAnswer>> _queryServiceMock = new();
     private readonly Mock<IWebRepository<IEnumerable<float[]?>>> _batchComputeServiceMock = new();
-    private LLMRepository Sut => new(_optionsMock.Object, _loadBalancerMock.Object, _computeServiceMock.Object, _batchComputeServiceMock.Object, _queryServiceMock.Object);
+    private LLMRepository Sut => new(_loadBalancerMock.Object, _computeServiceMock.Object, _batchComputeServiceMock.Object, _queryServiceMock.Object);
     private const int COMPUTE_BATCH_SIZE = 10;
 
     public LLMRepositoryTests()

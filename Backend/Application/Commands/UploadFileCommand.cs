@@ -42,13 +42,13 @@ public class UploadFileCommandHandler(
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants
+    private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
+    private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
     private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
     private const string LogSavingDocument = "Saving file {Filename} to the vector database.";
     private const string LogFailedToPrepareExcelFile = "Failed to prepare excel file {FileName} for LLM.";
     private const string LogFailedSavingVectorDb = "Failed to save file {Filename} to the vector database.";
     private const string LogSavedDocumentSuccess = "Success: Saved file {Filename} with id {DocumentId} to the vector database.";
-    private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
-    private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
     #endregion
 
     #region Dependencies

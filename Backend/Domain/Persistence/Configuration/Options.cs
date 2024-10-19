@@ -18,5 +18,8 @@ public class DatabaseOptions
     public int MAX_CONNECTION_COUNT { get; set; } = 400;
     public string DatabaseName { get; set; } = string.Empty;
     public string CollectionName { get; set; } = string.Empty;
+    public string CollectionNameTwo { get; set; } = string.Empty;
     public string ConnectionString { get; set; } = string.Empty;
+    public string HOST { get; set; } = string.Empty;
+    public int PORT { get; set; } = 80;
 }

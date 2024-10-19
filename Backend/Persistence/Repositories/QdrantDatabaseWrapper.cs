@@ -17,15 +17,15 @@ public class QdrantDatabaseWrapper(
 {
     #region Dependencies
     private readonly ILogger<QdrantDatabaseWrapper> _logger = logger;
-    private readonly QdrantClient _client = new("qdrant", 6333);
+    private readonly QdrantClient _client = new(options.Value.HOST, options.Value.PORT);
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     #endregion
 
     #region Fields
     private int _batchSize => options.Value.SAVE_BATCH_SIZE;
     private string _collectionName => options.Value.CollectionName;
+    private string _summaryCollectionName => options.Value.CollectionNameTwo;
     private int _maxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
-    private string _summaryCollectionName => "summaries";//options.Value.CollectionNameTwo;
     #endregion
 
     #region Public Methods

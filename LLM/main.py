@@ -1,22 +1,22 @@
 import os
 import json
-import logging
-from typing import List
 import torch
+import logging
 from enum import Enum
+from typing import List
 from pydantic import BaseModel
-from qdrant_client import QdrantClient
-from qdrant_client.http import models
 from transformers import pipeline
+from qdrant_client.http import models
+from qdrant_client import QdrantClient
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
 
 class EnvironmentVariables(str, Enum):
-    TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
-    EMBEDDING_MODEL = "EMBEDDING_MODEL"
     QDRANT_HOST = "QDRANT_HOST"
     QDRANT_PORT = "QDRANT_PORT"
+    EMBEDDING_MODEL = "EMBEDDING_MODEL"
+    TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
 
 class Query(BaseModel):
     document_id: str
@@ -32,25 +32,23 @@ class ComputeEmbedding(BaseModel):
 class ComputeBatchEmbeddings(BaseModel):
     texts: list[str]
 
+default_qdrant_port = 6333
+default_qdrant_host = "localhost"
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
-default_qdrant_host = "localhost"
-default_qdrant_port = 6333
 
-EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 QDRANT_HOST = os.getenv(EnvironmentVariables.QDRANT_HOST.value, default_qdrant_host)
 QDRANT_PORT = int(os.getenv(EnvironmentVariables.QDRANT_PORT.value, default_qdrant_port))
+EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
-
-qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-
 tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
 embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL)
+model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
+qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 @app.get("/health", response_model=dict)
 async def health():
