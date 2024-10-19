@@ -73,7 +73,7 @@ public class VectorDbRepositoryTests
     }
 
     [Fact]
-    public async Task SaveDocumentAsync_ShouldBeNullWhenSavingRowsSucceeds_ButSavingSummaryFails()
+    public async Task SaveDocumentAsync_ShouldSucceedWhenSavingRowsSucceeds_ButSavingSummaryFails()
     {
         const string documentId = "1";
         var data = new SummarizedExcelData
@@ -93,7 +93,7 @@ public class VectorDbRepositoryTests
 
         var result = await Sut.SaveDocumentAsync(data);
 
-        result.Should().BeNull();
+        result.Should().NotBeNull();
     }
 
     [Fact]

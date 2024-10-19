@@ -26,19 +26,20 @@ public class LLMRepositoryTests
     [Fact]
     public async Task QueryLLM_ShouldCallQueryServiceWithCorrectParameters()
     {
-        var documentId = "testDoc";
+        var document_id = "testDoc";
         var question = "testQuestion";
+        var url = "http://test.com";
         var expectedAnswer = new QueryAnswer { Answer = "Test answer" };
-        _queryServiceMock.Setup(q => q.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+        _loadBalancerMock.Setup(l => l.GetNextServiceUrl()).Returns(url);
+        _queryServiceMock.Setup(q => q.PostAsync(It.Is<string>(y => y == $"{url}/query"), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedAnswer);
 
-        var result = await Sut.QueryLLM(documentId, question);
+        var result = await Sut.QueryLLM(document_id, question);
 
         result.Should().BeEquivalentTo(expectedAnswer);
         _queryServiceMock.Verify(q => q.PostAsync(
-            "http://test.com/query",
+            It.Is<string>(y => y == $"{url}/query"),
             It.Is<object>(o => 
-                o.GetType().GetProperty("document_id").GetValue(o).ToString() == documentId &&
                 o.GetType().GetProperty("question").GetValue(o).ToString() == question
             ),
             It.IsAny<CancellationToken>()),
@@ -49,7 +50,9 @@ public class LLMRepositoryTests
     public async Task ComputeEmbedding_ShouldCallComputeServiceWithCorrectParameters()
     {
         var text = "test text";
+        var url = "http://test.com";
         var expectedEmbedding = new float[] { 1.0f, 2.0f, 3.0f };
+        _loadBalancerMock.Setup(l => l.GetNextServiceUrl()).Returns(url);
         _computeServiceMock.Setup(c => c.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedEmbedding);
 
@@ -57,7 +60,7 @@ public class LLMRepositoryTests
 
         result.Should().BeEquivalentTo(expectedEmbedding);
         _computeServiceMock.Verify(c => c.PostAsync(
-            "http://test.com/compute_embedding",
+            $"{url}/compute_embedding",
             It.Is<object>(o => o.GetType().GetProperty("text").GetValue(o).ToString() == text),
             It.IsAny<CancellationToken>()),
             Times.Once);

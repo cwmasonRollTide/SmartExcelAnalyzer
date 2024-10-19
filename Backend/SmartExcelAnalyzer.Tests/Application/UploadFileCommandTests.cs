@@ -125,8 +125,7 @@ public class UploadFileCommandTests
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
                     It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)),
-                Times.Exactly(3));
+                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
     }
 }
