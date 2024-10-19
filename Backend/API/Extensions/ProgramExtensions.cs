@@ -7,7 +7,6 @@ using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Options;
 using Persistence.Repositories.API;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
@@ -64,14 +63,18 @@ public static class ConfigurationExtensions
     public static WebApplicationBuilder ConfigureDatabase(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection("DatabaseOptions"));
-        builder.Services.AddOptions<DatabaseOptions>()
-            .Validate(options => !string.IsNullOrEmpty(options.ConnectionString), "Qdrant Connection String must be set.");
-        
         var databaseOptions = builder.Configuration.GetSection("DatabaseOptions").Get<DatabaseOptions>();
         builder.Services.AddSingleton(sp =>
         {
-            var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            return new QdrantClient(options.ConnectionString);
+            if (string.IsNullOrEmpty(databaseOptions?.HOST)) throw new(nameof(databaseOptions.HOST));
+            return new QdrantClient(databaseOptions.HOST, databaseOptions.PORT);
+        });
+        builder.Services.AddHttpClient("QdrantClient").ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(10),
+            KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+            KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+            EnableMultipleHttp2Connections = true
         });
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();

@@ -11,6 +11,7 @@
           <ExcludeByFile>**/Program.cs</ExcludeByFile>
           <ExcludeByFile>**/Program.cs</ExcludeByFile>
           <ExcludeByFile>**_\\src/**/*.cs</ExcludeByFile>
+          <Exclude>Program.cs</Exclude>
           <Exclude>[*]Tests.cs</Exclude>
           <ExcludeByFile>**/*Tests.cs</ExcludeByFile>
           <Exclude>_\src</Exclude>
