@@ -1,19 +1,20 @@
 using Qdrant.Client;
 using API.Properties;
 using API.Middleware;
-using Persistence.Cache;
 using Application.Queries;
 using Application.Services;
 using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
-using Domain.Persistence.Configuration;
 using Microsoft.Extensions.Options;
 using Persistence.Repositories.API;
+using System.Diagnostics.CodeAnalysis;
+using Domain.Persistence.Configuration;
 
 namespace API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class ConfigurationExtensions
 {
     public static WebApplicationBuilder ConfigureEnvironmentVariables(this WebApplicationBuilder? builder)

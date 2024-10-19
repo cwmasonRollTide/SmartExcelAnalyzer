@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Domain.Persistence.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories;
 
@@ -20,6 +21,8 @@ namespace Persistence.Repositories;
 /// <param name="database"></param>
 /// <param name="options"></param>
 /// <param name="logger"></param>
+[Obsolete("This class is not used in the current implementation. It is kept for reference purposes.")]
+[ExcludeFromCodeCoverage]
 public class MongoDatabaseWrapper(
     IMongoDatabase database,
     IOptions<DatabaseOptions> options,

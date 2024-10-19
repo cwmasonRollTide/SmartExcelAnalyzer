@@ -133,7 +133,11 @@ services:
       - DatabaseOptions__MAX_CONNECTION_COUNT=200
       - DatabaseOptions__MAX_RETRY_COUNT=3
       - DatabaseOptions__ConnectionString=http://qdrant:6333
-      - DatabaseOptions__DatabaseName=documents
+      - DatabaseOptions__DatabaseName=smartexcelanalyzer
+      - DatabaseOptions__CollectionName=documents
+      - DatabaseOptions__CollectionNameTwo=summaries
+      - DatabaseOptions__HOST=qdrant
+      - DatabaseOptions__PORT=6333
     depends_on:
       - llm-service-0
       - llm-service-1

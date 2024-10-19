@@ -1,10 +1,11 @@
 using System.Text;
 using API.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-builder.ConfigureEnvironmentVariables()
+WebApplication
+       .CreateBuilder(args)
+       .ConfigureEnvironmentVariables()
        .ConfigureLogging()
        .ConfigureHttpClient()
        .ConfigureApiAccess()
@@ -12,8 +13,7 @@ builder.ConfigureEnvironmentVariables()
        .ConfigureLLMService()
        .ConfigureMediatR()
        .ConfigureServices()
-       .ConfigureSwagger();
-
-var app = builder.Build();
-app.ConfigureMiddleware();
-app.Run();
+       .ConfigureSwagger()
+       .Build()
+       .ConfigureMiddleware()
+       .Run();
