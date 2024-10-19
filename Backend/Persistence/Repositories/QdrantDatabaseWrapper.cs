@@ -137,13 +137,8 @@ public class QdrantDatabaseWrapper(
         CancellationToken cancellationToken
     )
     {
-        var parallelOptions = new ParallelOptions
-        {
-            MaxDegreeOfParallelism = _maxDegreeOfParallelism,
-            CancellationToken = cancellationToken
-        };
         var points = new ConcurrentBag<PointStruct>();
-        await Parallel.ForEachAsync(rows, parallelOptions, 
+        await Parallel.ForEachAsync(rows, CreateParallelOptions(cancellationToken), 
             (row, ct) =>
             {
                 var point = CreateRow(row, documentId);
@@ -184,5 +179,12 @@ public class QdrantDatabaseWrapper(
             }
         }
     }
+
+    private ParallelOptions CreateParallelOptions(CancellationToken cancellationToken) => 
+        new()
+        {
+            CancellationToken = cancellationToken,
+            MaxDegreeOfParallelism = _maxDegreeOfParallelism
+        };
     #endregion
 }

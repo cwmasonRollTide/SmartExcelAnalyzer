@@ -50,14 +50,13 @@ public class SubmitQueryHandler(
 ) : IRequestHandler<SubmitQuery, QueryAnswer?>
 {
     #region Log Message Constants
-    private const string LogQueryingLLM = "Querying LLM for query {Query} and documentId {DocumentId}.";
     private const string LogComputingEmbedding = "Computing embedding for query {Query}.";
-    private const string LogQueryingVectorDb = "Querying VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
-    private const string LogFailedToQueryLLM = "Failed to query LLM for query {Query} and documentId {DocumentId}.";
-    private const string LogFailedToComputeEmbedding = "Failed to compute embedding for query {Query}.";
-    private const string LogFailedToQueryVectorDb = "Failed to query VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
-    private const string LogRelevantRowsCount = "Returning {RelevantRowsCount} relevant rows.";
     private const string LogQueryLLMSuccess = "Query {Query} was successful. Answer: {Answer}";
+    private const string LogFailedToComputeEmbedding = "Failed to compute embedding for query {Query}.";
+    private const string LogQueryingLLM = "Querying LLM for query {Query} and documentId {DocumentId}.";
+    private const string LogFailedToQueryLLM = "Failed to query LLM for query {Query} and documentId {DocumentId}.";
+    private const string LogQueryingVectorDb = "Querying VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
+    private const string LogFailedToQueryVectorDb = "Failed to query VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
     #endregion
 
     #region Dependencies

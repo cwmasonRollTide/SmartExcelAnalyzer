@@ -1,10 +1,10 @@
 using MediatR;
 using FluentValidation;
+using System.Diagnostics;
 using Application.Services;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace Application.Commands;
 

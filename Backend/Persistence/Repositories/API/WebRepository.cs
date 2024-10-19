@@ -1,6 +1,5 @@
 using System.Text;
 using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories.API;
 
