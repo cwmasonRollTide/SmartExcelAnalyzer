@@ -12,7 +12,12 @@ namespace Persistence.Repositories;
 public interface IVectorDbRepository
 {
     Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default);
-    Task<SummarizedExcelData> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default);
+    Task<SummarizedExcelData> QueryVectorData(
+        string documentId, 
+        float[] queryVector, 
+        int topRelevantCount = 10, 
+        CancellationToken cancellationToken = default
+    );
 }
 
 /// <summary>
@@ -160,10 +165,7 @@ public class VectorRepository(
                 }
             });
 
-            if (!batch.IsEmpty)
-            {
-                await writer.WriteAsync(batch, cancellationToken);
-            }
+            if (!batch.IsEmpty) await writer.WriteAsync(batch, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -212,7 +214,10 @@ public class VectorRepository(
     }
 
     private async Task<string> StoreEmbeddingsAsync(
-        ChannelReader<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)> reader,
+        ChannelReader<(
+            IEnumerable<float[]> Embeddings, 
+            IEnumerable<ConcurrentDictionary<string, object>> Batch
+        )> reader,
         CancellationToken cancellationToken)
     {
         string documentId = null!;

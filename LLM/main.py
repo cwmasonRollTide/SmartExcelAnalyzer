@@ -37,13 +37,14 @@ default_qdrant_port = 6333
 default_qdrant_host = "localhost"
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
-default_api_key = ""
 
 QDRANT_HOST = os.getenv(EnvironmentVariables.QDRANT_HOST.value, default_qdrant_host)
 QDRANT_PORT = int(os.getenv(EnvironmentVariables.QDRANT_PORT.value, default_qdrant_port))
-QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY, default_api_key)
 EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
+QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY.value)
+if not QDRANT_API_KEY:
+    raise ValueError("QDRANT_API_KEY is not set in the environment variables")
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)

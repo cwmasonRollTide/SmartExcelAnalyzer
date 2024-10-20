@@ -7,8 +7,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using Domain.Persistence.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 
@@ -32,7 +32,6 @@ public class MongoDatabaseWrapper(
     #region Database Options
     private int MaxRetries => _options.Value.MAX_RETRY_COUNT;
     private int BatchSize => _options.Value.SAVE_BATCH_SIZE;
-    private int MaxConcurrentTasks => _options.Value.MAX_CONNECTION_COUNT;
     #endregion
 
     #region Dependencies

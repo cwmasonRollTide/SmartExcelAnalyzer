@@ -1,4 +1,3 @@
-using Qdrant.Client;
 using System.Text.Json;
 using Qdrant.Client.Grpc;
 using Persistence.Database;
@@ -10,20 +9,51 @@ using static Qdrant.Client.Grpc.Conditions;
 
 namespace Persistence.Repositories;
 
+public interface IQdrantClient
+{
+    Task<UpdateResult> UpsertAsync(
+        string collectionName, 
+        IReadOnlyList<PointStruct> points, 
+        bool wait = true, 
+        WriteOrderingType? ordering = null, 
+        ShardKeySelector? shardKeySelector = null, 
+        CancellationToken cancellationToken = default
+    );
+
+    Task<IReadOnlyList<ScoredPoint>> SearchAsync(
+        string collectionName, 
+        ReadOnlyMemory<float> vector, 
+        Filter? filter = null, 
+        SearchParams? searchParams = null, 
+        ulong limit = 10, 
+        ulong offset = 0, 
+        WithPayloadSelector? payloadSelector = null, 
+        WithVectorsSelector? vectorsSelector = null, 
+        float? scoreThreshold = null, 
+        string? vectorName = null, 
+        ReadConsistency? readConsistency = null, 
+        ShardKeySelector? shardKeySelector = null, 
+        ReadOnlyMemory<uint>? sparseIndices = null, 
+        TimeSpan? timeout = null, 
+        CancellationToken cancellationToken = default
+    );
+}
+
 public class QdrantDatabaseWrapper(
-    QdrantClient client,
+    IQdrantClient client,
     IOptions<DatabaseOptions> options, 
     ILogger<QdrantDatabaseWrapper> logger
 ) : IDatabaseWrapper
 {
     #region Dependencies
-    private readonly QdrantClient _client = client;
+    private readonly IQdrantClient _client = client;
     private readonly ILogger<QdrantDatabaseWrapper> _logger = logger;
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     #endregion
 
     #region Fields
-    private int _batchSize => options.Value.SAVE_BATCH_SIZE;
+    private readonly float[] _dummyVector = new float[1];
+    private int BatchSize => options.Value.SAVE_BATCH_SIZE;
     private string CollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
     private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
@@ -56,7 +86,7 @@ public class QdrantDatabaseWrapper(
     /// <param name="documentId"></param>
     /// <param name="summary"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <returns>Greater than 0 if success</returns>
     public async Task<int?> StoreSummaryAsync(
         string documentId, 
         ConcurrentDictionary<string, object> summary, 
@@ -65,15 +95,15 @@ public class QdrantDatabaseWrapper(
     {
         try
         {
-            var point = new PointStruct
-            {
-                Id = new PointId(),
-                Vectors = new float[1] 
-            };
-            point.Payload["is_summary"] = new Value { BoolValue = true };
-            point.Payload["document_id"] = new Value { StringValue = documentId };
-            point.Payload["content"] = new Value { StringValue = JsonSerializer.Serialize(summary, _serializerOptions) };
-            await _client.UpsertAsync(collectionName: SummaryCollectionName, points: [point], cancellationToken: cancellationToken);
+            var summaryData = new PointStruct { Id = new PointId(), Vectors = _dummyVector };
+            summaryData.Payload["is_summary"] = new Value { BoolValue = true };
+            summaryData.Payload["document_id"] = new Value { StringValue = documentId };
+            summaryData.Payload["content"] = new Value { StringValue = JsonSerializer.Serialize(summary, _serializerOptions) };
+            await _client.UpsertAsync(
+                points: [summaryData],
+                collectionName: SummaryCollectionName,
+                cancellationToken: cancellationToken
+            );
             return summary.Count;
         }
         catch (Exception ex)
@@ -105,7 +135,11 @@ public class QdrantDatabaseWrapper(
             filter: MatchKeyword("document_id", documentId),
             cancellationToken: cancellationToken
         );
-        return searchResult.Select(point => JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(point.Payload["content"].StringValue, _serializerOptions)!);
+        return searchResult?.Select(point => 
+        {
+            var content = point.Payload["content"]?.StringValue;
+            return content != null ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions)! : new ConcurrentDictionary<string, object>();
+        }) ?? [];
     }
 
     /// <summary>
@@ -117,13 +151,13 @@ public class QdrantDatabaseWrapper(
     public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(string documentId, CancellationToken cancellationToken = default)
     {
         var searchResult = await _client.SearchAsync(
-            limit: 1,
             vector: new float[1],
+            limit: 1,
             collectionName: SummaryCollectionName,
             filter: MatchKeyword("document_id", documentId),
             cancellationToken: cancellationToken
-        );
-        var summary = searchResult.FirstOrDefault();
+        );        
+        var summary = searchResult?.FirstOrDefault();
         if (summary == null || !summary.Payload.TryGetValue("content", out Value? value))
         {
             return new ConcurrentDictionary<string, object>();
@@ -162,7 +196,7 @@ public class QdrantDatabaseWrapper(
     private async Task InsertRowsInBatchesAsync(IEnumerable<PointStruct> points, CancellationToken cancellationToken)
     {
         int totalInserted = 0;
-        foreach (var batch in points.Chunk(_batchSize))
+        foreach (var batch in points.Chunk(BatchSize))
         {
             try
             {

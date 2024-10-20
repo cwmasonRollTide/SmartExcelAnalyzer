@@ -9,7 +9,6 @@
           <ExcludeByFile>**/*Program.cs</ExcludeByFile>
           <ExcludeByFile>./Program.cs</ExcludeByFile>
           <ExcludeByFile>**/Program.cs</ExcludeByFile>
-          <ExcludeByFile>**/API/Program.cs</ExcludeByFile>
           <ExcludeByFile>**_\\src/**/*.cs</ExcludeByFile>
           <Exclude>[*]Tests.cs</Exclude>
           <ExcludeByFile>**/*Tests.cs</ExcludeByFile>

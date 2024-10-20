@@ -7,12 +7,13 @@ using Microsoft.Extensions.Logging;
 using Persistence.Repositories;
 using System.Collections.Concurrent;
 
-namespace Application.Tests.Queries;
+namespace SmartExcelAnalyzer.Tests.Application;
+
 public class SubmitQueryTests
 {
     public class SubmitQueryValidatorTests
     {
-        private SubmitQueryValidator _validator = new();
+        private readonly SubmitQueryValidator _validator = new();
 
         [Fact]
         public void Validate_WhenQueryIsNull_ShouldHaveValidationError()
@@ -78,21 +79,10 @@ public class SubmitQueryTests
 
     public class SubmitQueryHandlerTests
     {
-        private readonly SubmitQueryHandler _handler;
-        private readonly Mock<ILLMRepository> _llmRepositoryMock;
-        private readonly Mock<IVectorDbRepository> _vectorDbRepositoryMock;
-        private readonly Mock<ILogger<SubmitQueryHandler>> _loggerMock;
-
-        public SubmitQueryHandlerTests()
-        {
-            _llmRepositoryMock = new Mock<ILLMRepository>();
-            _vectorDbRepositoryMock = new Mock<IVectorDbRepository>();
-            _loggerMock = new Mock<ILogger<SubmitQueryHandler>>();
-            _handler = new SubmitQueryHandler(
-                _llmRepositoryMock.Object,
-                _loggerMock.Object,
-                _vectorDbRepositoryMock.Object);
-        }
+        private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
+        private readonly Mock<ILogger<SubmitQueryHandler>> _loggerMock = new();
+        private readonly Mock<IVectorDbRepository> _vectorDbRepositoryMock = new();
+        private SubmitQueryHandler Sut => new(_llmRepositoryMock.Object, _loggerMock.Object, _vectorDbRepositoryMock.Object);
 
         [Fact]
         public async Task Handle_WhenLLMQueryFails_ShouldReturnNull()
@@ -101,7 +91,7 @@ public class SubmitQueryTests
             _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((QueryAnswer)null!);
 
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().BeNull();
             _loggerMock.Verify(
@@ -110,7 +100,7 @@ public class SubmitQueryTests
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to query LLM")),
                     It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
                 Times.Once);
         }
 
@@ -122,7 +112,7 @@ public class SubmitQueryTests
             _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedAnswer);
 
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().NotBeNull();
             result!.Answer.Should().Be(expectedAnswer.Answer);
@@ -138,7 +128,7 @@ public class SubmitQueryTests
             _llmRepositoryMock.Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((float[]?)null);
 
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().BeNull();
             _loggerMock.Verify(
@@ -147,7 +137,7 @@ public class SubmitQueryTests
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to compute embedding")),
                     It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
                 Times.Once);
         }
 
@@ -162,7 +152,7 @@ public class SubmitQueryTests
             _vectorDbRepositoryMock.Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((SummarizedExcelData)null!);
 
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().BeNull();
             _loggerMock.Verify(
@@ -171,7 +161,7 @@ public class SubmitQueryTests
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to query VectorDb")),
                     It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
                 Times.Once);
         }
 
@@ -186,11 +176,11 @@ public class SubmitQueryTests
             _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedAnswer);
             _llmRepositoryMock.Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new float[] { 1.0f, 2.0f, 3.0f });
+                .ReturnsAsync([1.0f, 2.0f, 3.0f]);
             _vectorDbRepositoryMock.Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SummarizedExcelData { Rows = expectedRelevantRows });
 
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().NotBeNull();
             result!.Answer.Should().Be(expectedAnswer.Answer);

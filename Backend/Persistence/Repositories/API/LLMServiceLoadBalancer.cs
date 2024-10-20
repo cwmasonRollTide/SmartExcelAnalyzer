@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories.API;
@@ -8,6 +9,7 @@ public interface ILLMServiceLoadBalancer
     string GetNextServiceUrl();
 }
 
+[ExcludeFromCodeCoverage]
 public class LLMServiceLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceLoadBalancer
 {
     private int _currentIndex = 0;

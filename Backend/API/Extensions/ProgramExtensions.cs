@@ -10,9 +10,6 @@ using FluentValidation.AspNetCore;
 using Persistence.Repositories.API;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Grpc.Net.Client;
-using Microsoft.Extensions.Options;
 
 namespace API.Extensions;
 
@@ -22,26 +19,26 @@ public static class ConfigurationExtensions
     public static WebApplicationBuilder ConfigureEnvironmentVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
-        builder!.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
         builder.Configuration.AddEnvironmentVariables();
+        builder!.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
         return builder;
     }
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
-        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         builder.Logging.AddConsole();
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         builder.Services.AddLogging();
         return builder;
     }
 
     public static WebApplicationBuilder ConfigureHttpClient(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient("DefaultClient", client => 
-        { 
-            client.Timeout = TimeSpan.FromMinutes(20);
+        builder.Services.AddHttpClient("DefaultClient", client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(30);
         });
         return builder;
     }
@@ -50,16 +47,7 @@ public static class ConfigurationExtensions
     {
         builder.Services.AddControllers();
         builder.Services.AddHealthChecks();
-        builder.Services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(builder => 
-            {
-                builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
-            });
-        });
+        builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
         return builder;
     }
 
@@ -69,23 +57,16 @@ public static class ConfigurationExtensions
         builder.Services.Configure<DatabaseOptions>(databaseOptions);
         builder.Services
             .AddOptions<DatabaseOptions>()
-            .Validate(options => !string.IsNullOrEmpty(options.HOST), "Qdrant Host String must be set.")
             .Validate(options => options.PORT > 0, "Qdrant Port must be set.")
             .Validate(options => options.SAVE_BATCH_SIZE > 0, "Qdrant Save Batch Size must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.QDRANT_API_KEY), "Qdrant API Key must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.HOST), "Qdrant Host String must be set.")
             .Validate(options => options.MAX_CONNECTION_COUNT > 0, "Qdrant Max Connection Count must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), "Qdrant Database Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), "Qdrant Database Name must be set.");
+            .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
         var options = databaseOptions.Get<DatabaseOptions>();
-        builder.Services.AddSingleton(sp =>
-            new QdrantClient(
-                host: options!.HOST,
-                port: options!.PORT,
-                apiKey: options!.ApiKey,
-                https: options!.UseHttps,
-                grpcTimeout: TimeSpan.FromMinutes(5)
-            )
-        );
+        builder.Services.AddSingleton(sp => (IQdrantClient)new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
         return builder;
@@ -104,8 +85,9 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureMediatR(this WebApplicationBuilder builder)
     {
-        builder.Services.AddFluentValidationAutoValidation();
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SubmitQuery).Assembly));
+        builder.Services
+            .AddFluentValidationAutoValidation()
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SubmitQuery).Assembly));
         return builder;
     }
 
@@ -128,17 +110,11 @@ public static class ConfigurationExtensions
 
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            app.UseDeveloperExceptionPage();
-        }
-        app.UseCors();
-        app.UseRouting();
+        if (app.Environment.IsDevelopment()) app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
+
+        app.UseCors().UseRouting().UseMiddleware<ExceptionMiddleware>();
         app.MapControllers();
         app.MapHealthChecks("/health");
-        app.UseMiddleware<ExceptionMiddleware>();
         return app;
     }
 }
