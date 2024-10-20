@@ -1,43 +1,56 @@
-using Domain.Persistence.DTOs;
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Primitives;
 
 namespace SmartExcelAnalyzer.Tests.TestUtilities;
 
 public static class TestDataGenerator
 {
-    public static SummarizedExcelData GenerateSummarizedExcelData(int rowCount, List<string> headers)
+    public static IFormFile GenerateExcelFile(int rowCount, List<string> headers, string fileName = "test.xlsx")
     {
-        var summarizedData = new SummarizedExcelData
+        var allHeaders = new List<string>(headers);
+        if (!allHeaders.Contains("embedding"))
         {
-            Summary = new ConcurrentDictionary<string, object>
-            {
-                ["RowCount"] = rowCount,
-                ["ColumnCount"] = headers.Count,
-                ["Columns"] = headers
-            },
-            Rows = []
-        };
-
-        var data = GenerateLargeDataSet(rowCount, headers).ToList();
-        foreach (var row in data)
-        {
-            summarizedData.Rows.Add(new ConcurrentDictionary<string, object>(row));
+            allHeaders.Add("embedding");
         }
 
-        summarizedData.Summary["Min"] = data!.Min(row => row["id"])!;
-        summarizedData.Summary["Max"] = data!.Max(row => row["id"])!;
-        summarizedData.Summary["Average"] = data.Average(row => 
-        {
-            var idString = row["id"]?.ToString()!.Split("_")[1];
-            return int.TryParse(idString, out var id) ? id : 0;
-        });
-        summarizedData.Summary["Sum"] = data.Sum(row => 
-        {
-            var idString = row["id"]?.ToString()!.Split("_")[1];
-            return int.TryParse(idString, out var id) ? id : 0;
-        });
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Sheet1");
 
-        return summarizedData;
+        // Add headers
+        for (int i = 0; i < allHeaders.Count; i++)
+        {
+            worksheet.Cell(1, i + 1).Value = allHeaders[i];
+        }
+
+        // Add data
+        var data = GenerateLargeDataSet(rowCount, allHeaders).ToList();
+        for (int row = 0; row < data.Count; row++)
+        {
+            for (int col = 0; col < allHeaders.Count; col++)
+            {
+                var value = data[row][allHeaders[col]];
+                if (value is float[] floatArray)
+                {
+                    worksheet.Cell(row + 2, col + 1).Value = string.Join(",", floatArray);
+                }
+                else
+                {
+                    worksheet.Cell(row + 2, col + 1).Value = value?.ToString() ?? string.Empty;
+                }
+            }
+        }
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        var content = stream.ToArray();
+        var file = new FormFile(new MemoryStream(content), 0, content.Length, "data", fileName)
+        {
+            Headers = new HeaderDictionary(headers.ToDictionary(h => h, h => new StringValues(h))),
+            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        };
+        return file;
     }
 
     public static IEnumerable<ConcurrentDictionary<string, object>> GenerateLargeDataSet(int count, List<string> headers)
@@ -50,7 +63,8 @@ public static class TestDataGenerator
                 row[header] = header.ToLower() switch
                 {
                     "id" => $"id_{i + 1}",
-                    "data" => $"data_{i + 1}",
+                    "document_id" => $"document_id_{i + 1}",
+                    "content" => $"content_{i + 1}",
                     "embedding" => Enumerable.Range(0, 10).Select(_ => (float)Random.Shared.NextDouble()).ToArray(),
                     _ => $"{header}_{i + 1}",
                 };

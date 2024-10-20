@@ -2,6 +2,7 @@ using MediatR;
 using FluentValidation;
 using System.Diagnostics;
 using Application.Services;
+using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -71,27 +72,37 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        _logger.LogTrace(LogPreparingExcelFile, request.File!.FileName);
+        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, cancellationToken);
+        if (summarizedExcelData is null) return null;
+        return await SaveToVectorDatabaseAsync(summarizedExcelData, request.File!.FileName, cancellationToken);
+    }
+
+    private async Task<SummarizedExcelData?> PrepareExcelFileAsync(IFormFile file, CancellationToken cancellationToken)
+    {
+        _logger.LogTrace(LogPreparingExcelFile, file.FileName);
         var stopwatch = Stopwatch.StartNew();
-        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file: request.File, cancellationToken);
+        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file, cancellationToken);
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
-        if (summarizedExcelData is null)
-        {
-            _logger.LogInformation(LogFailedToPrepareExcelFile, request.File.FileName);
-            return null;
-        }
-        _logger.LogTrace(LogSavingDocument, request.File.FileName);
-        stopwatch.Restart();
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(summarizedExcelData, cancellationToken);
+
+        if (summarizedExcelData is null) _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
+
+        return summarizedExcelData;
+    }
+
+    private async Task<string?> SaveToVectorDatabaseAsync(SummarizedExcelData data, string fileName, CancellationToken cancellationToken)
+    {
+        _logger.LogTrace(LogSavingDocument, fileName);
+        var stopwatch = Stopwatch.StartNew();
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(data, cancellationToken);
         stopwatch.Stop();
         _logger.LogTrace(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
-        if (documentId is null)  
-        {
-            _logger.LogInformation(LogFailedSavingVectorDb, request.File.FileName);
-            return null;
-        }
-        _logger.LogInformation(LogSavedDocumentSuccess, request.File.FileName, documentId);
+
+        if (documentId is null)
+            _logger.LogInformation(LogFailedSavingVectorDb, fileName);
+        else
+            _logger.LogInformation(LogSavedDocumentSuccess, fileName, documentId);
+
         return documentId;
     }
     #endregion

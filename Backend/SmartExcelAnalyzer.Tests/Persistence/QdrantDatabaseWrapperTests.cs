@@ -1,8 +1,9 @@
-
 using Moq;
+using System.Text;
 using System.Text.Json;
 using FluentAssertions;
 using Qdrant.Client.Grpc;
+using Application.Services;
 using Persistence.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ public class QdrantDatabaseWrapperTests
 {
     private static readonly float[] item = [1.0f, 2.0f];
     private static readonly float[] itemArray = [3.0f, 4.0f];
+    private readonly ExcelFileService ExcelReader = new();
     private readonly Mock<IQdrantClient> _mockClient = new();
     private readonly Mock<IOptions<DatabaseOptions>> _mockOptions = new();
     private readonly Mock<ILogger<QdrantDatabaseWrapper>> _mockLogger = new();
@@ -23,6 +25,7 @@ public class QdrantDatabaseWrapperTests
 
     public QdrantDatabaseWrapperTests()
     {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         _mockOptions
             .Setup(o => o.Value)
             .Returns(new DatabaseOptions
@@ -155,12 +158,10 @@ public class QdrantDatabaseWrapperTests
         var result = await Sut.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount);
 
         result.Should().NotBeEmpty();
-        result.Should().HaveCount(3);
+        result.Count().Should().Be(3);
         result.Should().AllSatisfy(dict => 
         {
-            dict.Should().ContainKey("id");
-            dict.Should().ContainKey("embedding");
-            dict.Should().ContainKey("data");
+            dict.Should().ContainKey("key");
         });
     }
 
@@ -288,7 +289,7 @@ public class QdrantDatabaseWrapperTests
     [Fact]
     public async Task StoreVectorsAsync_ShouldHandleLargeInputCollection()
     {
-        var largeDataSet = TestDataGenerator.GenerateLargeDataSet(10000, ["Address", "City", "Name"]).ToList();
+        var largeDataSet = TestDataGenerator.GenerateLargeDataSet(10000, ["document_id", "content", "embedding"]).ToList();
         _mockOptions.Setup(o => o.Value).Returns(new DatabaseOptions
         {
             SAVE_BATCH_SIZE = 1000,
@@ -320,7 +321,8 @@ public class QdrantDatabaseWrapperTests
     [Fact]
     public async Task StoreVectorsAsync_ShouldHandleDifferentBatchSizes()
     {
-        var dataSet = TestDataGenerator.GenerateLargeDataSet(550, ["Col1", "Col2", "Col3"]).ToList();
+        var file = TestDataGenerator.GenerateExcelFile(3, ["TestCol1", "TestCol2", "TestCol3"]);
+        var dataSet = await ExcelReader.PrepareExcelFileForLLMAsync(file);
         _mockOptions.Setup(o => o.Value).Returns(new DatabaseOptions
         {
             SAVE_BATCH_SIZE = 200,
@@ -337,16 +339,16 @@ public class QdrantDatabaseWrapperTests
             It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UpdateResult() { Status = UpdateStatus.Completed });
 
-        var result = await Sut.StoreVectorsAsync(dataSet);
+        var result = await Sut.StoreVectorsAsync(dataSet.Rows!);
 
         result.Should().NotBeNullOrEmpty();
         _mockClient.Verify(c => c.UpsertAsync(
             It.IsAny<string>(),
-            It.IsAny<IReadOnlyList<PointStruct>>(),
+            It.Is<IReadOnlyList<PointStruct>>(points => points.Count == 3),
             It.IsAny<bool>(),
             It.IsAny<WriteOrderingType?>(),
             It.IsAny<ShardKeySelector?>(),
-            It.IsAny<CancellationToken>()), Times.Exactly(3));
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

@@ -52,7 +52,7 @@ public class QdrantDatabaseWrapper(
     #endregion
 
     #region Fields
-    private readonly float[] _dummyVector = new float[1];
+    private readonly Vectors _dummyVector = new(new float[] { 0.0f });
     private int BatchSize => options.Value.SAVE_BATCH_SIZE;
     private string CollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
@@ -123,14 +123,14 @@ public class QdrantDatabaseWrapper(
     /// <returns></returns>
     public async Task<IEnumerable<ConcurrentDictionary<string, object>>> GetRelevantDocumentsAsync(
         string documentId, 
-        float[] queryVector, 
+        float[] queryVector,
         int topRelevantCount, 
         CancellationToken cancellationToken = default
     )
     {
         var searchResult = await _client.SearchAsync(
             collectionName: CollectionName,
-            vector: queryVector,
+            vector: queryVector.AsMemory(),
             filter: MatchKeyword("document_id", documentId),
             limit: (ulong)topRelevantCount,
             cancellationToken: cancellationToken
@@ -161,12 +161,12 @@ public class QdrantDatabaseWrapper(
             filter: MatchKeyword("document_id", documentId),
             limit: 1,
             cancellationToken: cancellationToken
-        );        
-        var summary = searchResult?.FirstOrDefault();
-        if (summary == null || !summary.Payload.TryGetValue("content", out Value? value))
-        {
-            return new ConcurrentDictionary<string, object>();
-        }
+        );
+        if (searchResult is null || searchResult.Count == 0) return new ConcurrentDictionary<string, object>();
+
+        var summary = searchResult[0];
+        if (!summary!.Payload.TryGetValue("content", out Value? value)) return new ConcurrentDictionary<string, object>();
+
         return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(value.StringValue, _serializerOptions)!;
     }
     #endregion
@@ -192,7 +192,11 @@ public class QdrantDatabaseWrapper(
 
     private PointStruct CreateRow(ConcurrentDictionary<string, object> row, string documentId)
     {
-        var point = new PointStruct { Id = new PointId(), Vectors = row["embedding"] as float[] ?? [] };
+        var point = new PointStruct 
+        { 
+            Id = new PointId(), 
+            Vectors = row.TryGetValue("embedding", out var embedding) ? (embedding as Vectors) ?? Array.Empty<float>() : Array.Empty<float>()
+        };
         point.Payload.Add("document_id", new Value { StringValue = documentId });
         point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions)});
         return point;

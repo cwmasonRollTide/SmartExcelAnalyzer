@@ -79,38 +79,57 @@ public class SubmitQueryHandler(
     /// </returns>
     public async Task<QueryAnswer?> Handle(SubmitQuery request, CancellationToken cancellationToken = default) 
     {
+        var result = await QueryLLMAsync(request, cancellationToken);
+        if (result is null) return null;
+
+        if (ShouldEnrichResponse(request.RelevantRowsCount)) 
+            await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
+
+        _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
+        return result;
+    }
+
+    private static bool ShouldEnrichResponse(int? relevantRowsCount) =>
+        relevantRowsCount.HasValue && relevantRowsCount > 10;
+
+    private async Task<QueryAnswer?> QueryLLMAsync(SubmitQuery request, CancellationToken cancellationToken)
+    {
         _logger.LogInformation(LogQueryingLLM, request.Query, request.DocumentId);
         var result = await _llmRepository.QueryLLM(document_id: request.DocumentId, question: request.Query, cancellationToken);
         if (result is null)
-        {
             _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
-            return null;
-        }
-        if (request.RelevantRowsCount.HasValue) // We want more than ten rows of the data used to answer the query
-        {
-            _logger.LogInformation(LogComputingEmbedding, request.Query);
-            var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);
-            if (embedding is null)
-            {
-                _logger.LogWarning(LogFailedToComputeEmbedding, request.Query);
-                return null;
-            }
-            _logger.LogInformation(LogQueryingVectorDb, request.Query, request.DocumentId);
-            var vectorResponse = await _vectorDbRepository.QueryVectorData(
-                queryVector: embedding!, 
-                documentId: request.DocumentId, 
-                cancellationToken: cancellationToken,
-                topRelevantCount: (int)request.RelevantRowsCount!
-            );
-            if (vectorResponse is null)
-            {
-                _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
-                return null;
-            }
-            result.RelevantRows = vectorResponse.Rows!;
-        }
-        _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;
+    }
+
+    private async Task EnrichWithRelevantRowsAsync(SubmitQuery request, QueryAnswer result, CancellationToken cancellationToken)
+    {
+        var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
+        if (embedding is null) return;
+
+        var vectorResponse = await QueryVectorDbAsync(request, embedding, cancellationToken);
+        if (vectorResponse is not null)
+            result.RelevantRows = vectorResponse.Rows!;
+    }
+
+    private async Task<float[]?> ComputeEmbeddingAsync(SubmitQuery request, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation(LogComputingEmbedding, request.Query);
+        var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);
+        if (embedding is null) _logger.LogWarning(LogFailedToComputeEmbedding, request.Query);
+        return embedding;
+    }
+
+    private async Task<SummarizedExcelData?> QueryVectorDbAsync(SubmitQuery request, float[] embedding, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation(LogQueryingVectorDb, request.Query, request.DocumentId);
+        var vectorResponse = await _vectorDbRepository.QueryVectorData(
+            queryVector: embedding,
+            documentId: request.DocumentId,
+            cancellationToken: cancellationToken,
+            topRelevantCount: (int)request.RelevantRowsCount!
+        );
+        if (vectorResponse is null) _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
+        return vectorResponse;
     }
     #endregion
 }

@@ -279,8 +279,7 @@ public class VectorRepository(
             return documentId;
         }
         documentId ??= batchDocumentId;
-        if (documentId != batchDocumentId)
-            _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
+        if (documentId != batchDocumentId) _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
 
         return documentId;
     }
