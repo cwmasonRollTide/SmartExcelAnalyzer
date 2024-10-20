@@ -5,6 +5,8 @@ services:
       - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
       interval: 120s
@@ -27,6 +29,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 120s
@@ -49,6 +52,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
 
   llm-service-2:
     build:
@@ -65,6 +69,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
 
   llm-service-3:
     build:
@@ -81,6 +86,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
 
   llm-service-4:
     build:
@@ -97,6 +103,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
 
   llm-service-5:
     build:
@@ -113,6 +120,7 @@ services:
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
 
   backend:
     build: 
@@ -138,6 +146,8 @@ services:
       - DatabaseOptions__CollectionNameTwo=summaries
       - DatabaseOptions__HOST=qdrant
       - DatabaseOptions__PORT=6333
+      - DatabaseOptions__UseHttps=false
+      - DatabaseOptions__ApiKey=${QDRANT_API_KEY}
     depends_on:
       - llm-service-0
       - llm-service-1

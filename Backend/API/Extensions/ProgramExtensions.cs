@@ -10,6 +10,9 @@ using FluentValidation.AspNetCore;
 using Persistence.Repositories.API;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
 
 namespace API.Extensions;
 
@@ -62,27 +65,29 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureDatabase(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection("DatabaseOptions"));
-        var databaseOptions = builder.Configuration.GetSection("DatabaseOptions").Get<DatabaseOptions>();
+        var databaseOptions = builder.Configuration.GetSection("DatabaseOptions");
+        builder.Services.Configure<DatabaseOptions>(databaseOptions);
+        builder.Services
+            .AddOptions<DatabaseOptions>()
+            .Validate(options => !string.IsNullOrEmpty(options.HOST), "Qdrant Host String must be set.")
+            .Validate(options => options.PORT > 0, "Qdrant Port must be set.")
+            .Validate(options => options.SAVE_BATCH_SIZE > 0, "Qdrant Save Batch Size must be set.")
+            .Validate(options => options.MAX_CONNECTION_COUNT > 0, "Qdrant Max Connection Count must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), "Qdrant Database Name must be set.");
+        var options = databaseOptions.Get<DatabaseOptions>();
         builder.Services.AddSingleton(sp =>
-        {
-            if (string.IsNullOrEmpty(databaseOptions?.HOST)) throw new(nameof(databaseOptions.HOST));
-            return new QdrantClient(databaseOptions.HOST, databaseOptions.PORT);
-        });
-        builder.Services.AddHttpClient("QdrantClient").ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-        {
-            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(10),
-            KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-            KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-            EnableMultipleHttp2Connections = true
-        });
+            new QdrantClient(
+                host: options!.HOST,
+                port: options!.PORT,
+                apiKey: options!.ApiKey,
+                https: options!.UseHttps,
+                grpcTimeout: TimeSpan.FromMinutes(5)
+            )
+        );
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
-        // builder.Services.AddMemoryCache(options =>
-        // {
-        //     options.SizeLimit = 1_000_000;
-        // });
-        // builder.Services.AddSingleton<IEmbeddingCache, MemoryCacheEmbeddingCache>();
         return builder;
     }
 

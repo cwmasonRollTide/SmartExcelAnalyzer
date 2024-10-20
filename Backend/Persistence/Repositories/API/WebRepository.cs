@@ -1,5 +1,6 @@
 using System.Text;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories.API;
 
@@ -8,6 +9,7 @@ public interface IWebRepository<T>
     Task<T> PostAsync(string endpoint, object payload, CancellationToken cancellationToken = default);
 }
 
+[ExcludeFromCodeCoverage]
 public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;

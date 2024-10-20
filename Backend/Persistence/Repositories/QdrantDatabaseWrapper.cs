@@ -11,21 +11,22 @@ using static Qdrant.Client.Grpc.Conditions;
 namespace Persistence.Repositories;
 
 public class QdrantDatabaseWrapper(
+    QdrantClient client,
     IOptions<DatabaseOptions> options, 
     ILogger<QdrantDatabaseWrapper> logger
 ) : IDatabaseWrapper
 {
     #region Dependencies
+    private readonly QdrantClient _client = client;
     private readonly ILogger<QdrantDatabaseWrapper> _logger = logger;
-    private readonly QdrantClient _client = new(options.Value.HOST, options.Value.PORT);
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     #endregion
 
     #region Fields
     private int _batchSize => options.Value.SAVE_BATCH_SIZE;
-    private string _collectionName => options.Value.CollectionName;
-    private string _summaryCollectionName => options.Value.CollectionNameTwo;
-    private int _maxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
+    private string CollectionName => options.Value.CollectionName;
+    private string SummaryCollectionName => options.Value.CollectionNameTwo;
+    private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
     #endregion
 
     #region Public Methods
@@ -50,6 +51,7 @@ public class QdrantDatabaseWrapper(
 
     /// <summary>
     /// StoreSummaryAsync stores the summary of the document in the database.
+    /// Dummy vector - Qdrant requires a vector
     /// </summary>
     /// <param name="documentId"></param>
     /// <param name="summary"></param>
@@ -66,12 +68,12 @@ public class QdrantDatabaseWrapper(
             var point = new PointStruct
             {
                 Id = new PointId(),
-                Vectors = new float[1] // Dummy vector - Qdrant requires a vector
+                Vectors = new float[1] 
             };
+            point.Payload["is_summary"] = new Value { BoolValue = true };
             point.Payload["document_id"] = new Value { StringValue = documentId };
             point.Payload["content"] = new Value { StringValue = JsonSerializer.Serialize(summary, _serializerOptions) };
-            point.Payload["is_summary"] = new Value { BoolValue = true };
-            await _client.UpsertAsync(collectionName: _summaryCollectionName, points: [point], cancellationToken: cancellationToken);
+            await _client.UpsertAsync(collectionName: SummaryCollectionName, points: [point], cancellationToken: cancellationToken);
             return summary.Count;
         }
         catch (Exception ex)
@@ -99,7 +101,7 @@ public class QdrantDatabaseWrapper(
         var searchResult = await _client.SearchAsync(
             vector: queryVector,
             limit: (uint)topRelevantCount,
-            collectionName: _collectionName,
+            collectionName: CollectionName,
             filter: MatchKeyword("document_id", documentId),
             cancellationToken: cancellationToken
         );
@@ -117,7 +119,7 @@ public class QdrantDatabaseWrapper(
         var searchResult = await _client.SearchAsync(
             limit: 1,
             vector: new float[1],
-            collectionName: _summaryCollectionName,
+            collectionName: SummaryCollectionName,
             filter: MatchKeyword("document_id", documentId),
             cancellationToken: cancellationToken
         );
@@ -166,7 +168,7 @@ public class QdrantDatabaseWrapper(
             {
                 await _client.UpsertAsync(
                     points: batch,
-                    collectionName: _collectionName, 
+                    collectionName: CollectionName, 
                     cancellationToken: cancellationToken
                 );
                 totalInserted += batch.Length;
@@ -184,7 +186,7 @@ public class QdrantDatabaseWrapper(
         new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = _maxDegreeOfParallelism
+            MaxDegreeOfParallelism = MaxDegreeOfParallelism
         };
     #endregion
 }

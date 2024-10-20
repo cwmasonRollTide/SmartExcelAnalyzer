@@ -15,6 +15,7 @@ from transformers import AutoTokenizer, AutoModel
 class EnvironmentVariables(str, Enum):
     QDRANT_HOST = "QDRANT_HOST"
     QDRANT_PORT = "QDRANT_PORT"
+    QDRANT_API_KEY = "QDRANT_API_KEY"
     EMBEDDING_MODEL = "EMBEDDING_MODEL"
     TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
 
@@ -36,9 +37,11 @@ default_qdrant_port = 6333
 default_qdrant_host = "localhost"
 default_text_generation_model = "facebook/bart-large-cnn"
 default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
+default_api_key = ""
 
 QDRANT_HOST = os.getenv(EnvironmentVariables.QDRANT_HOST.value, default_qdrant_host)
 QDRANT_PORT = int(os.getenv(EnvironmentVariables.QDRANT_PORT.value, default_qdrant_port))
+QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY, default_api_key)
 EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
 
@@ -48,7 +51,7 @@ logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
 embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL)
 model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
-qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, api_key=QDRANT_API_KEY)
 
 @app.get("/health", response_model=dict)
 async def health():
