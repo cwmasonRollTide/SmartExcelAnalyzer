@@ -22,6 +22,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./Backend
+        dockerfile: backend.Dockerfile
         push: true
         tags: fivemowner/smart-excel-analyzer-backend:latest
 
@@ -29,6 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./Frontend
+        dockerfile: frontend.Dockerfile
         push: true
         tags: fivemowner/smart-excel-analyzer-frontend:latest
 
@@ -36,5 +38,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./LLM
+        dockerfile: llm.Dockerfile
         push: true
         tags: fivemowner/smart-excel-analyzer-llm:latest
