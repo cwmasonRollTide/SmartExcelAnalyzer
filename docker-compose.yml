@@ -38,10 +38,6 @@ services:
 
   llm-service:
     <<: *llm-service
-    deploy:
-      replicas: 6
-    environment:
-      - PORT=8000
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest

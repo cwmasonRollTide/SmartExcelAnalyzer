@@ -1,6 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace API.Controllers;
 
