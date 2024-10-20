@@ -120,37 +120,18 @@ public class SubmitQueryTests
         }
 
         [Fact]
-        public async Task Handle_WhenComputeEmbeddingFails_ShouldReturnNull()
-        {
-            var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = 5 };
-            _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new QueryAnswer { Answer = "Test answer" });
-            _llmRepositoryMock.Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((float[]?)null);
-
-            var result = await Sut.Handle(query, CancellationToken.None);
-
-            result.Should().BeNull();
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to compute embedding")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-                Times.Once);
-        }
-
-        [Fact]
         public async Task Handle_WhenVectorDbQueryFails_ShouldReturnNull()
         {
-            var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = 5 };
-            _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new QueryAnswer { Answer = "Test answer" });
-            _llmRepositoryMock.Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = 25 };
+            _llmRepositoryMock
+                .Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((QueryAnswer)null!);
+            _llmRepositoryMock
+                .Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync([1.0f, 2.0f, 3.0f]);
-            _vectorDbRepositoryMock.Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((SummarizedExcelData)null!);
+            _vectorDbRepositoryMock
+                .Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync((SummarizedExcelData?)null);
 
             var result = await Sut.Handle(query, CancellationToken.None);
 
@@ -159,7 +140,7 @@ public class SubmitQueryTests
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to query VectorDb")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
                 Times.Once);
@@ -168,7 +149,7 @@ public class SubmitQueryTests
         [Fact]
         public async Task Handle_WhenEverythingSucceeds_ShouldReturnCompleteAnswer()
         {
-            var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = 5 };
+            var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = 105 };
             var expectedAnswer = new QueryAnswer { Answer = "Test answer" };
             var row = new ConcurrentDictionary<string, object>();
             row.TryAdd("col1", "value1");

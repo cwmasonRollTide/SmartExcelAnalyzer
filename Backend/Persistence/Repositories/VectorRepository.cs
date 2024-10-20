@@ -187,9 +187,9 @@ public class VectorRepository(
         CancellationToken cancellationToken
     )
     {
+        var serializerOptions =  new JsonSerializerOptions { WriteIndented = false };
         try
         {
-            var serializerOptions =  new JsonSerializerOptions { WriteIndented = false };
             await foreach (var batch in reader.ReadAllAsync(cancellationToken))
             {
                 _logger.LogInformation(LOG_START_COMPUTE, batch.Count());
@@ -198,13 +198,9 @@ public class VectorRepository(
                 stopwatch.Stop();
                 _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
                 if (embeddings is not null)
-                {
                     await writer.WriteAsync((embeddings, batch)!, cancellationToken);
-                }
                 else
-                {
                     _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
-                }
             }
         }
         catch (Exception ex)
