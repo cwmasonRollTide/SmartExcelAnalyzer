@@ -1,41 +1,11 @@
 services:
-  qdrant:
+  llm-service:
     volumes:
-      - qdrant_data:/qdrant/storage
-      - ./qdrant_config.yml:/qdrant/config/production.yml
-    env_file:
-      - .env
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
+    ports:
+      - "8000-8005:8000"
 
-  llm-service-0:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-
-  llm-service-1:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-    
-  llm-service-2:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-    
-  llm-service-3:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-    
-  llm-service-4:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-    
-  llm-service-5:
-    volumes:
-      - ./LLM:/app
-      - model_cache:/root/.cache/huggingface
-    
   backend:
     volumes:
       - ./Backend:/app
@@ -44,8 +14,6 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
-    env_file:
-      - .env
 
   frontend:
     volumes:
