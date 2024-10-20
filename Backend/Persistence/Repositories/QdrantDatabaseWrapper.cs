@@ -136,7 +136,7 @@ public class QdrantDatabaseWrapper(
             cancellationToken: cancellationToken
         );
 
-        return searchResult.Select(point => 
+        return searchResult?.Select(point => 
         {
             if (point.Payload.TryGetValue("content", out var contentValue) && contentValue.StringValue != null)
             {
@@ -144,7 +144,7 @@ public class QdrantDatabaseWrapper(
                     ?? new ConcurrentDictionary<string, object>();
             }
             return new ConcurrentDictionary<string, object>();
-        });
+        }) ?? [];
     }
 
     /// <summary>

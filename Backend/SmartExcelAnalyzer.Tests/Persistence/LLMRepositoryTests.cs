@@ -1,5 +1,6 @@
 using Domain.Persistence.Configuration;
 using Domain.Persistence.DTOs;
+using Domain.Utilities;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -17,6 +18,7 @@ public class LLMRepositoryTests
     private readonly Mock<IWebRepository<IEnumerable<float[]?>>> _batchComputeServiceMock = new();
     private LLMRepository Sut => new(_loadBalancerMock.Object, _computeServiceMock.Object, _batchComputeServiceMock.Object, _queryServiceMock.Object);
     private const int COMPUTE_BATCH_SIZE = 10;
+    private static readonly float[] item = new float[] { 3.0f, 4.0f };
 
     public LLMRepositoryTests()
     {
@@ -30,7 +32,7 @@ public class LLMRepositoryTests
         var question = "testQuestion";
         var url = "http://test.com";
         var expectedAnswer = new QueryAnswer { Answer = "Test answer" };
-        _loadBalancerMock.Setup(l => l.GetNextServiceUrl()).Returns(url);
+        _loadBalancerMock.Setup(l => l.GetServiceUrl()).Returns(url);
         _queryServiceMock.Setup(q => q.PostAsync(It.Is<string>(y => y == $"{url}/query"), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedAnswer);
 
@@ -52,7 +54,7 @@ public class LLMRepositoryTests
         var text = "test text";
         var url = "http://test.com";
         var expectedEmbedding = new float[] { 1.0f, 2.0f, 3.0f };
-        _loadBalancerMock.Setup(l => l.GetNextServiceUrl()).Returns(url);
+        _loadBalancerMock.Setup(l => l.GetServiceUrl()).Returns(url);
         _computeServiceMock.Setup(c => c.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedEmbedding);
 
@@ -62,6 +64,65 @@ public class LLMRepositoryTests
         _computeServiceMock.Verify(c => c.PostAsync(
             $"{url}/compute_embedding",
             It.Is<object>(o => o.GetType().GetProperty("text").GetValue(o).ToString() == text),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ComputeBatchEmbeddings_ShouldCallBatchComputeServiceWithCorrectParameters()
+    {
+        var texts = new List<string> { "text1", "text2" };
+        var url = "http://test.com";
+        var expectedEmbeddings = new List<float[]> { new float[] { 1.0f, 2.0f }, item };
+        _loadBalancerMock.Setup(l => l.GetServiceUrl()).Returns(url);
+        _batchComputeServiceMock.Setup(b => b.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedEmbeddings);
+
+        var result = await Sut.ComputeBatchEmbeddings(texts);
+
+        result.Should().BeEquivalentTo(expectedEmbeddings);
+        _batchComputeServiceMock.Verify(b => b.PostAsync(
+            $"{url}/compute_batch_embedding",
+            It.IsAny<object>(),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ComputeBatchEmbeddings_ShouldHandleEmptyList()
+    {
+        var texts = new List<string>();
+        var url = "http://test.com";
+        var expectedEmbeddings = new List<float[]>();
+        _loadBalancerMock.Setup(l => l.GetServiceUrl()).Returns(url);
+        _batchComputeServiceMock.Setup(b => b.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedEmbeddings);
+
+        var result = await Sut.ComputeBatchEmbeddings(texts);
+
+        result.Should().BeEquivalentTo(expectedEmbeddings);
+        _batchComputeServiceMock.Verify(b => b.PostAsync(
+            $"{url}/compute_batch_embedding",
+            It.IsAny<object>(),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ComputeBatchEmbeddings_ShouldHandleNullResponse()
+    {
+        var texts = new List<string> { "text1", "text2" };
+        var url = "http://test.com";
+        _loadBalancerMock.Setup(l => l.GetServiceUrl()).Returns(url);
+        _batchComputeServiceMock.Setup(b => b.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IEnumerable<float[]?>?)null!);
+
+        var result = await Sut.ComputeBatchEmbeddings(texts);
+
+        result.Should().BeNull();
+        _batchComputeServiceMock.Verify(b => b.PostAsync(
+            $"{url}/compute_batch_embedding",
+            It.IsAny<object>(),
             It.IsAny<CancellationToken>()),
             Times.Once);
     }

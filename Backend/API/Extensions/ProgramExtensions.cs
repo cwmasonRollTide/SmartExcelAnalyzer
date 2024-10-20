@@ -74,7 +74,7 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureLLMService(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMServiceLoadBalancer>();
+        builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMLoadBalancer>();
         builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
         builder.Services.AddOptions<LLMServiceOptions>()
             .Validate(options => options.LLM_SERVICE_URLS.Count > 0, "LLM_SERVICE_URLS must be set.")

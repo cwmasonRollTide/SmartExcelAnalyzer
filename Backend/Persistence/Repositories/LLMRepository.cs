@@ -1,5 +1,8 @@
 using Domain.Persistence.DTOs;
+using Microsoft.Extensions.Options;
 using Persistence.Repositories.API;
+using System.Diagnostics.CodeAnalysis;
+using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 
@@ -36,9 +39,9 @@ public class LLMRepository(
 ) : ILLMRepository
 {
     #region Service URLs
-    private string QUERY_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/query";
-    private string COMPUTE_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/compute_embedding";
-    private string COMPUTE_BATCH_URL => _llmServiceLoadBalancer.GetNextServiceUrl() + "/compute_batch_embedding";
+    private string QUERY_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/query";
+    private string COMPUTE_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/compute_embedding";
+    private string COMPUTE_BATCH_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/compute_batch_embedding";
     #endregion
 
     #region Dependencies
@@ -104,4 +107,30 @@ public class LLMRepository(
     public async Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) => 
         await _batchComputeService.PostAsync(COMPUTE_BATCH_URL, new { texts = texts.ToList() }, cancellationToken);
     #endregion
+}
+
+public interface ILLMServiceLoadBalancer
+{
+    string GetServiceUrl();
+}
+
+[ExcludeFromCodeCoverage]
+public class LLMLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceLoadBalancer
+{
+    private int _currentIndex = 0;
+    private readonly object _lock = new();
+    private readonly List<string> _serviceUrls = options.Value.LLM_SERVICE_URLS;
+
+    /// <summary>
+    /// Get the next service URL in the list of service URLs
+    /// </summary>
+    /// <returns></returns>
+    public string GetServiceUrl()
+    {
+        lock (_lock)
+        {
+            if (_currentIndex >= _serviceUrls.Count) _currentIndex = 0;
+            return _serviceUrls[_currentIndex++];
+        }
+    }
 }

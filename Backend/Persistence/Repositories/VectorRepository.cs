@@ -11,7 +11,11 @@ namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default);
+    Task<string> SaveDocumentAsync(
+        SummarizedExcelData vectorSpreadsheetData, 
+        CancellationToken cancellationToken = default
+    );
+
     Task<SummarizedExcelData> QueryVectorData(
         string documentId, 
         float[] queryVector, 
@@ -128,11 +132,11 @@ public class VectorRepository(
     /// <returns></returns>
     private async Task<string> SaveDocumentDataAsync(ConcurrentBag<ConcurrentDictionary<string, object>> rows, CancellationToken cancellationToken)
     {
-        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Environment.ProcessorCount)
+        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Environment.ProcessorCount - 4)
         {
             FullMode = BoundedChannelFullMode.Wait
         });
-        var embeddingChannel = Channel.CreateBounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>(new BoundedChannelOptions(Environment.ProcessorCount)
+        var embeddingChannel = Channel.CreateBounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>(new BoundedChannelOptions(Environment.ProcessorCount - 4)
         {
             FullMode = BoundedChannelFullMode.Wait
         });
