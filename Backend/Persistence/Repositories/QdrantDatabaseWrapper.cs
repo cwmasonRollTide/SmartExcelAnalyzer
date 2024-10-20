@@ -129,17 +129,22 @@ public class QdrantDatabaseWrapper(
     )
     {
         var searchResult = await _client.SearchAsync(
-            vector: queryVector,
-            limit: (uint)topRelevantCount,
             collectionName: CollectionName,
+            vector: queryVector,
             filter: MatchKeyword("document_id", documentId),
+            limit: (ulong)topRelevantCount,
             cancellationToken: cancellationToken
         );
-        return searchResult?.Select(point => 
+
+        return searchResult.Select(point => 
         {
-            var content = point.Payload["content"]?.StringValue;
-            return content != null ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions)! : new ConcurrentDictionary<string, object>();
-        }) ?? [];
+            if (point.Payload.TryGetValue("content", out var contentValue) && contentValue.StringValue != null)
+            {
+                return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(contentValue.StringValue, _serializerOptions) 
+                    ?? new ConcurrentDictionary<string, object>();
+            }
+            return new ConcurrentDictionary<string, object>();
+        });
     }
 
     /// <summary>
@@ -151,10 +156,10 @@ public class QdrantDatabaseWrapper(
     public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(string documentId, CancellationToken cancellationToken = default)
     {
         var searchResult = await _client.SearchAsync(
-            vector: new float[1],
-            limit: 1,
             collectionName: SummaryCollectionName,
+            vector: new float[1],
             filter: MatchKeyword("document_id", documentId),
+            limit: 1,
             cancellationToken: cancellationToken
         );        
         var summary = searchResult?.FirstOrDefault();

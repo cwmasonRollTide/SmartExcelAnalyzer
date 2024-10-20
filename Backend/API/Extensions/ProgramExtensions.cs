@@ -28,8 +28,8 @@ public static class ConfigurationExtensions
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+        builder.Logging.AddConsole();
         builder.Services.AddLogging();
         return builder;
     }

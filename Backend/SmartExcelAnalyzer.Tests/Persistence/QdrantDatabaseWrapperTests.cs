@@ -126,60 +126,81 @@ public class QdrantDatabaseWrapperTests
         var documentId = "testDocId";
         var queryVector = new float[] { 1.0f, 2.0f };
         var topRelevantCount = 5;
-        var point = new ScoredPoint { Id = new PointId(), Vectors = queryVector };
         var excelData = TestDataGenerator.GenerateLargeDataSet(3).ToList();
-        point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(excelData) });
-        var mockSearchResult = new List<ScoredPoint>{point};
+        var mockSearchResult = excelData.Select(data => new ScoredPoint 
+        { 
+            Id = new PointId(), 
+            Vectors = queryVector,
+            Payload = { ["content"] = new Value { StringValue = JsonSerializer.Serialize(data) } }
+        }).ToList();
 
         _mockClient
             .Setup(c => 
                 c.SearchAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<ReadOnlyMemory<float>>(),
-                    It.IsAny<Filter>(),
-                    It.IsAny<SearchParams?>(),
-                    It.IsAny<ulong>(),
-                    It.IsAny<ulong>(),
-                    It.IsAny<WithPayloadSelector>(),
-                    It.IsAny<WithVectorsSelector>(),
-                    It.IsAny<float?>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<ReadConsistency>(),
-                    It.IsAny<ShardKeySelector>(),
-                    It.IsAny<ReadOnlyMemory<uint>>(),
-                    It.IsAny<TimeSpan?>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), 
+                    It.IsAny<ReadOnlyMemory<float>>(), 
+                    It.IsAny<Filter?>(), 
+                    It.IsAny<SearchParams?>(), 
+                    It.IsAny<ulong>(), 
+                    It.IsAny<ulong>(), 
+                    It.IsAny<WithPayloadSelector?>(), 
+                    It.IsAny<WithVectorsSelector?>(), 
+                    It.IsAny<float?>(), 
+                    It.IsAny<string?>(), 
+                    It.IsAny<ReadConsistency?>(), 
+                    It.IsAny<ShardKeySelector?>(), 
+                    It.IsAny<ReadOnlyMemory<uint>?>(), 
+                    It.IsAny<TimeSpan?>(), 
+                    It.IsAny<CancellationToken>())) 
             .ReturnsAsync(mockSearchResult);
 
         var result = await Sut.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount);
 
         result.Should().NotBeEmpty();
+        result.Should().HaveCount(3);
+        result.Should().AllSatisfy(dict => 
+        {
+            dict.Should().ContainKey("id");
+            dict.Should().ContainKey("embedding");
+            dict.Should().ContainKey("data");
+        });
     }
 
     [Fact]
     public async Task GetSummaryAsync_ShouldReturnSummary()
     {
         var documentId = "testDocId";
-        var point = new ScoredPoint { Id = new PointId(), Vectors = new float[1] };
-        point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(new ConcurrentDictionary<string, object> { ["key"] = "value" }) });
-        var mockSearchResult = new List<ScoredPoint>{point};
+        var SummaryCollectionName = "testSummaryCollection";
+        var summaryContent = new ConcurrentDictionary<string, object> { ["key"] = "\"value\"" };
+        var point = new ScoredPoint 
+        { 
+            Id = new PointId(), 
+            Vectors = new float[1],
+            Payload = { ["content"] = new Value { StringValue = JsonSerializer.Serialize(summaryContent) }, ["document_id"] = new Value { StringValue = documentId } }
 
+        };
+        var mockSearchResult = new List<ScoredPoint> { point };
+
+        _mockOptions.Setup(o => o.Value).Returns(new DatabaseOptions
+        {
+            CollectionNameTwo = SummaryCollectionName
+        });
         _mockClient
             .Setup(c => 
                 c.SearchAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<ReadOnlyMemory<float>>(),
-                    It.IsAny<Filter>(),
+                    It.Is<string>(s => s == SummaryCollectionName),
+                    It.Is<ReadOnlyMemory<float>>(v => v.Length == 1),
+                    It.Is<Filter?>(f => f != null && f.ToString().Contains(documentId)),
                     It.IsAny<SearchParams?>(),
                     It.IsAny<ulong>(),
                     It.IsAny<ulong>(),
-                    It.IsAny<WithPayloadSelector>(),
+                    It.IsAny<WithPayloadSelector?>(),
                     It.IsAny<WithVectorsSelector?>(),
                     It.IsAny<float?>(),
                     It.IsAny<string?>(),
-                    It.IsAny<ReadConsistency>(),
-                    It.IsAny<ShardKeySelector>(),
-                    It.IsAny<ReadOnlyMemory<uint>>(),
+                    It.IsAny<ReadConsistency?>(),
+                    It.IsAny<ShardKeySelector?>(),
+                    It.IsAny<ReadOnlyMemory<uint>?>(),
                     It.IsAny<TimeSpan?>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(mockSearchResult);
