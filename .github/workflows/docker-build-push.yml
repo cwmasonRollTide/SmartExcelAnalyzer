@@ -1,0 +1,40 @@
+name: Build and Push Smart Excel Analyzer Docker Images
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: "${{ secrets.DOCKERHUB_USERNAME }}"
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Backend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./Backend
+        push: true
+        tags: fivemowner/smart-excel-analyzer-backend:latest
+
+    - name: Build and push Frontend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./Frontend
+        push: true
+        tags: fivemowner/smart-excel-analyzer-frontend:latest
+
+    - name: Build and push LLM Service
+      uses: docker/build-push-action@v2
+      with:
+        context: ./LLM
+        push: true
+        tags: fivemowner/smart-excel-analyzer-llm:latest

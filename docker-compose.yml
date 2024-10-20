@@ -5,9 +5,7 @@ x-healthcheck: &default-healthcheck
   start_period: 40s
 
 x-llm-service: &llm-service
-  build:
-    context: ./LLM
-    dockerfile: llm.Dockerfile
+  image: fivemowner/smart-excel-analyzer-llm:latest
   env_file:
     - .env
   environment:
@@ -46,9 +44,7 @@ services:
       - PORT=8000
 
   backend:
-    build: 
-      context: ./Backend
-      dockerfile: backend.Dockerfile
+    image: fivemowner/smart-excel-analyzer-backend:latest
     ports:
       - "5001:80"
     healthcheck:
@@ -61,9 +57,7 @@ services:
       - .env
 
   frontend:
-    build:
-      context: ./Frontend
-      dockerfile: frontend.Dockerfile
+    image: fivemowner/smart-excel-analyzer-frontend:latest
     ports:
       - "3000:3000"
     depends_on:

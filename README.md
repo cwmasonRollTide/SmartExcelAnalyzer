@@ -9,10 +9,11 @@
 6. [Usage](#usage)
 7. [API Documentation](#api-documentation)
 8. [Development](#development)
-9. [Testing](#testing)
-10. [Deployment](#deployment)
-11. [License](#license)
-12. [Contact](#contact)
+9. [Docker](#docker)
+10. [Testing](#testing)
+11. [Deployment](#deployment)
+12. [License](#license)
+13. [Contact](#contact)
 
 ## Introduction
 
@@ -116,6 +117,12 @@ To set up the development environment:
    - Create a virtual environment: `python -m venv venv`
    - Activate the virtual environment and install dependencies: `pip install -r requirements.txt`
 
+## Docker
+- All of our docker images will be published to this docker hub container registry:
+  * https://hub.docker.com/repository/docker/fivemowner/smartexcelanalyzer
+- This process is kicked off in the ```~/.github/workflows/docker-build-push.yml``` file
+  * [In this Github Action](.github/workflows/docker-build-push.yml)
+  
 ## Testing
 
 - Backend tests: Run `dotnet test` in the root directory.
