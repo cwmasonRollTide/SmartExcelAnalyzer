@@ -13,7 +13,6 @@ public class BaseControllerTests
         var controller = new BaseController(mockMediator.Object);
 
         Assert.NotNull(controller);
-        controller.
     }
 
 }
