@@ -2,10 +2,11 @@ using Moq;
 using MediatR;
 using API.Controllers;
 using Application.Queries;
-using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using System.Text;
+using Application.Commands;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 
@@ -29,81 +30,36 @@ public class AnalysisControllerTests
     }
 
     [Fact]
-    public async Task SubmitQuery_ReturnsBadRequest_WhenResultIsNull()
-    {
-        var query = new SubmitQuery { Query = "invalid query", DocumentId = "doc1" };
-        _mediatorMock.Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((QueryAnswer)null!);
-
-        var result = await Sut.SubmitQuery(query);
-
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("Invalid query or unable to process the request.", badRequestResult.Value);
-    }
-
-    [Fact]
-    public async Task SubmitQuery_ReturnsInternalServerError_WhenExceptionOccurs()
+    public async Task SubmitQuery_ReturnsBadRequest_WhenQueryIsInvalid()
     {
         var query = new SubmitQuery { Query = "test query", DocumentId = "doc1" };
         _mediatorMock.Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
+            .ThrowsAsync(new ArgumentException("test exception"));
 
-        var result = await Sut.SubmitQuery(query);
-
-        var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
-        Assert.Equal("An error occurred while processing your request.", statusCodeResult.Value);
+        await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.SubmitQuery(query));
     }
 
     [Fact]
-    public async Task UploadFile_ReturnsBadRequest_WhenFileIsNull()
+    public async Task UploadFile_ReturnsOkResult_WhenFileIsValid()
     {
-        var result = await Sut.UploadFile(null!);
-
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("No file uploaded.", badRequestResult.Value);
-    }
-
-    [Fact]
-    public async Task UploadFile_ReturnsBadRequest_WhenFileIsEmpty()
-    {
-        var fileMock = new Mock<IFormFile>();
-        fileMock.Setup(f => f.Length).Returns(0);
-
-        var result = await Sut.UploadFile(fileMock.Object);
-
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("No file uploaded.", badRequestResult.Value);
-    }
-
-    [Fact]
-    public async Task UploadFile_ReturnsBadRequest_WhenUploadFails()
-    {
-        var fileMock = new Mock<IFormFile>();
-        fileMock.Setup(f => f.Length).Returns(1);
+        var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
+        var expectedResult = "doc1";
         _mediatorMock.Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string)null!);
+            .ReturnsAsync(expectedResult);
 
-        var result = await Sut.UploadFile(fileMock.Object);
+        var result = await Sut.UploadFile(file);
 
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("File upload failed.", badRequestResult.Value);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(expectedResult, okResult.Value);
     }
 
     [Fact]
-    public async Task UploadFile_ReturnsInternalServerError_WhenExceptionOccurs()
+    public async Task UploadFile_ReturnsBadRequest_WhenFileIsInvalid()
     {
-        var fileMock = new Mock<IFormFile>();
-        fileMock.Setup(f => f.Length).Returns(1);
+        var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
         _mediatorMock.Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
+            .ThrowsAsync(new ArgumentException("test exception"));
 
-        var result = await Sut.UploadFile(fileMock.Object);
-
-        var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
-        Assert.Equal("An error occurred while uploading the file.", statusCodeResult.Value);
+        await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.UploadFile(file));
     }
-
-    
 }

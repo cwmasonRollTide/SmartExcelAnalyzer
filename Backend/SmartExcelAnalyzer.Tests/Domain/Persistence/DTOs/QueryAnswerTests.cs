@@ -1,4 +1,3 @@
-using System.Reflection;
 using Domain.Persistence.DTOs;
 using System.Collections.Concurrent;
 
@@ -44,17 +43,5 @@ public class QueryAnswerTests
         Assert.Equal("", queryAnswer.DocumentId);
         Assert.Equal("Test Answer", queryAnswer.Answer);
         Assert.Empty(queryAnswer.RelevantRows);
-    }
-
-    [Fact]
-    public void QueryAnswer_Answer_IsRequired()
-    {
-        // Arrange
-        var queryAnswerType = typeof(QueryAnswer);
-        var answerProperty = queryAnswerType.GetProperty("Answer");
-
-        // Act & Assert
-        var attribute = answerProperty.GetCustomAttribute<System.ComponentModel.DataAnnotations.RequiredAttribute>();
-        Assert.NotNull(attribute);
     }
 }

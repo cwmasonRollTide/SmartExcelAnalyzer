@@ -1,10 +1,10 @@
-using Xunit;
 using Moq;
 using Moq.Protected;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using Persistence.Repositories.API;
+using Newtonsoft.Json.Linq;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Repositories.API;
 
@@ -48,8 +48,9 @@ public class WebRepositoryTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(expectedResponse.Id, ((dynamic)result).Id);
-        Assert.Equal(expectedResponse.Name, ((dynamic)result).Name);
+        var resultAsJToken = result as JObject;
+        Assert.Equal(expectedResponse.Id, resultAsJToken!["Id"]!.Value<int>());
+        Assert.Equal(expectedResponse.Name, resultAsJToken!["Name"]!.Value<string>());
     }
 
     [Fact]
@@ -104,6 +105,5 @@ public class WebRepositoryTests
         // Act
         await repository.PostAsync("https://api.example.com/endpoint", payload);
 
-        // Assert is handled in the callback
     }
 }

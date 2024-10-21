@@ -111,9 +111,7 @@ public class ExcelFileService : IExcelFileService
                     var fieldCount = rowReader.FieldCount;
                     var columnNames = new string[fieldCount];
                     for (int i = 0; i < fieldCount; i++)
-                    {
                         columnNames[i] = rowReader.GetValue(i)?.ToString() ?? $"Column{i + 1}";
-                    }
                 }
             }
         }));

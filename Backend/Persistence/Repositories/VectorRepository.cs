@@ -32,6 +32,7 @@ public interface IVectorDbRepository
 /// <param name="logger"></param>
 /// <param name="llmRepository"></param>
 /// <param name="llmOptions"></param>
+/// <param name="databaseOptions"></param>
 public class VectorRepository(
     IDatabaseWrapper databaseWrapper,
     ILogger<VectorRepository> logger,
@@ -41,17 +42,28 @@ public class VectorRepository(
 ) : IVectorDbRepository
 {
     #region Logging Message Constants
-    private const string LOG_NULL_EMBEDDING = "Embedding at index {Index} is null.";
+    private const string LOG_NULL_INPUT_DATA = "Input data is null.";
+    private const string LOG_ERROR_CREATING_BATCHES = "Error creating batches";
+    private const string LOG_NULL_DOCUMENT_ID = "Document ID is null or empty.";
+    private const string LOG_ERROR_STORING_EMBEDDINGS = "Error storing embeddings";
+    private const string LOG_EMPTY_QUERY_VECTOR = "Query vector is empty or null.";
+    private const string LOG_NULL_EMBEDDING = "Embedding at index {Index} is null.";    
+    private const string LOG_ERROR_COMPUTING_EMBEDDINGS = "Error computing embeddings";
     private const string LOG_START_SAVE = "Starting to save document to the database.";
+    private const string LOG_BATCH_CREATION_CANCELLED = "Batch creation was cancelled.";
     private const string LOG_FAIL_SAVE_BATCH = "Failed to save vectors to the database.";
+    private const string LOG_STORING_EMBEDDINGS_CANCELLED = "Storing embeddings was cancelled.";
     private const string LOG_SUCCESS_SAVE = "Saved document with id {DocumentId} to the database.";
     private const string LOG_START_COMPUTE = "Computing embeddings for document with {Count} rows.";
+    private const string LOG_ERROR_SAVING_DOCUMENT = "An error occurred while saving the document.";
+    private const string LOG_EMBEDDING_COMPUTATION_CANCELLED = "Embedding computation was cancelled.";
     private const string LOG_FAIL_SAVE_VECTORS = "Failed to save vectors of the document to the database.";
     private const string LOG_COMPUTE_EMBEDDINGS = "Computed {Count} embeddings in {ElapsedMilliseconds}ms";
     private const string LOG_START_QUERY = "Querying the VectorDb for the most relevant rows for document {DocumentId}.";
     private const string LOG_FAIL_SAVE_SUMMARY = "Failed to save the summary of the document with Id {Id} to the database.";
     private const string LOG_FAIL_QUERY_SUMMARY = "Failed to query the summary of the document with Id {Id} from the database.";
     private const string LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT = "Failed to save vectors to the database for document {DocumentId}.";
+    private const string LOG_ERROR_QUERYING_VECTOR_DATA = "An error occurred while querying vector data for document {DocumentId}";
     private const string LOG_FAIL_QUERY_ROWS = "Failed to query the relevant rows of the document with Id {Id} from the database.";
     private const string LOG_INCONSISTENT_IDS = "Inconsistent document IDs across batches. Document Id {DocumentId} is not equal to batch document Id {BatchDocumentId}.";
     private const string LOG_SUCCESS_QUERY = "Querying the VectorDb for the most relevant rows for document {DocumentId} was successful. Found {RelevantRowsCount} relevant rows.";
@@ -75,17 +87,34 @@ public class VectorRepository(
     /// <returns></returns>
     public async Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(LOG_START_SAVE);
-        var documentId = await SaveDocumentDataAsync(vectorSpreadsheetData.Rows!, cancellationToken);
-        if (documentId is null)
+        if (vectorSpreadsheetData == null)
         {
-            _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
+            _logger.LogWarning(LOG_NULL_INPUT_DATA);
             return null!;
         }
-        var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary!, cancellationToken);
-        if (summarySuccess < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
-        _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
-        return documentId;
+
+        _logger.LogInformation(LOG_START_SAVE);
+        try
+        {
+            var documentId = await SaveDocumentDataAsync(vectorSpreadsheetData.Rows ?? [], cancellationToken);
+            if (documentId is null)
+            {
+                _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
+                return null!;
+            }
+            if (vectorSpreadsheetData.Summary != null)
+            {
+                var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary, cancellationToken);
+                if (summarySuccess < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
+            }
+            _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
+            return documentId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, LOG_ERROR_SAVING_DOCUMENT);
+            return null!;
+        }
     }
 
     /// <summary>
@@ -99,26 +128,46 @@ public class VectorRepository(
     /// <returns></returns>
     public async Task<SummarizedExcelData> QueryVectorData(string documentId, float[] queryVector, int topRelevantCount = 10, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrEmpty(documentId))
+        {
+            _logger.LogWarning(LOG_NULL_DOCUMENT_ID);
+            return null!;
+        }
+
+        if (queryVector == null || queryVector.Length == 0)
+        {
+            _logger.LogWarning(LOG_EMPTY_QUERY_VECTOR);
+            return null!;
+        }
+
         _logger.LogInformation(LOG_START_QUERY, documentId);
-        var relevantDocuments = await _database.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount, cancellationToken);
-        if (relevantDocuments is null)
+        try
         {
-            _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
-            return new() { Summary = null!, Rows = null! };
+            var relevantDocuments = await _database.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount, cancellationToken);
+            if (relevantDocuments == null || !relevantDocuments.Any())
+            {
+                _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
+                return null!;
+            }
+            var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantDocuments);
+            var summary = await _database.GetSummaryAsync(documentId, cancellationToken);
+            if (summary == null || summary.IsEmpty)
+            {
+                _logger.LogWarning(LOG_FAIL_QUERY_SUMMARY, documentId);
+                return new SummarizedExcelData { Summary = null!, Rows = rows };
+            }
+            _logger.LogInformation(LOG_SUCCESS_QUERY, documentId, relevantDocuments.Count());
+            return new SummarizedExcelData
+            {
+                Rows = rows,
+                Summary = summary
+            };
         }
-        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantDocuments);
-        var summary = await _database.GetSummaryAsync(documentId, cancellationToken);
-        if (summary.IsEmpty)
+        catch (Exception ex)
         {
-            _logger.LogWarning(LOG_FAIL_QUERY_SUMMARY, documentId);
-            return new() { Summary = null!, Rows = rows };
+            _logger.LogError(ex, LOG_ERROR_QUERYING_VECTOR_DATA, documentId);
+            return null!;
         }
-        _logger.LogInformation(LOG_SUCCESS_QUERY, documentId, relevantDocuments.Count());
-        return new()
-        {
-            Rows = rows,
-            Summary = summary
-        };
     }
     #endregion
 
@@ -171,9 +220,13 @@ public class VectorRepository(
 
             if (!batch.IsEmpty) await writer.WriteAsync(batch, cancellationToken);
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation(LOG_BATCH_CREATION_CANCELLED);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating batches");
+            _logger.LogError(ex, LOG_ERROR_CREATING_BATCHES);
         }
         finally
         {
@@ -203,9 +256,13 @@ public class VectorRepository(
                     _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
             }
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation(LOG_EMBEDDING_COMPUTATION_CANCELLED);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error computing embeddings");
+            _logger.LogError(ex, LOG_ERROR_COMPUTING_EMBEDDINGS);
         }
         finally
         {
@@ -222,19 +279,30 @@ public class VectorRepository(
     {
         string documentId = null!;
         var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
-        await foreach (var (embeddings, batch) in reader.ReadAllAsync(cancellationToken))
+        try
         {
-            await semaphore.WaitAsync(cancellationToken);
-            try
+            await foreach (var (embeddings, batch) in reader.ReadAllAsync(cancellationToken))
             {
-                var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-                await ProcessBatchAsync(embeddings, batch, batchesToStore, cancellationToken);
-                documentId = await SaveBatchOfRowEmbeddings(batchesToStore, documentId, cancellationToken);
+                await semaphore.WaitAsync(cancellationToken);
+                try
+                {
+                    var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
+                    await ProcessBatchAsync(embeddings, batch, batchesToStore, cancellationToken);
+                    documentId = await SaveBatchOfRowEmbeddings(batchesToStore, documentId, cancellationToken);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
             }
-            finally
-            {
-                semaphore.Release();
-            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation(LOG_STORING_EMBEDDINGS_CANCELLED);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, LOG_ERROR_STORING_EMBEDDINGS);
         }
         return documentId;
     }
@@ -248,7 +316,8 @@ public class VectorRepository(
         var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
         await Parallel.ForEachAsync(pairs, new ParallelOptions 
         { 
-            MaxDegreeOfParallelism = _maxConcurrentTasks
+            MaxDegreeOfParallelism = _maxConcurrentTasks,
+            CancellationToken = cancellationToken
         }, 
         async (pair, ct) =>
         {

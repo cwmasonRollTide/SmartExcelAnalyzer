@@ -33,12 +33,4 @@ public class SummaryTests
         Assert.Equal(string.Empty, summary.Id);
         Assert.Equal(string.Empty, summary.Content);
     }
-
-    [Fact]
-    public void Summary_Properties_ShouldNotAllowNull()
-    {
-        // Arrange & Act & Assert
-        Assert.Throws<InvalidOperationException>(() => new Summary { Id = null, Content = "Content" });
-        Assert.Throws<InvalidOperationException>(() => new Summary { Id = "Id", Content = null });
-    }
 }

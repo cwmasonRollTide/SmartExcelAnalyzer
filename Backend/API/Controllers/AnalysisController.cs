@@ -30,23 +30,7 @@ public class AnalysisController(IMediator mediator) : BaseController(mediator)
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query)
-    {
-        try
-        {
-            var result = await _mediator.Send(query);
-            if (result == null)
-            {
-                return BadRequest("Invalid query or unable to process the request.");
-            }
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception here
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
-        }
-    }
+    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query) =>  Ok(await _mediator.Send(query));
 
     /// <summary>
     /// Uploads an excel file to the vector database and returns the documentId. 
@@ -61,26 +45,5 @@ public class AnalysisController(IMediator mediator) : BaseController(mediator)
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest("No file uploaded.");
-        }
-
-        try
-        {
-            var result = await _mediator.Send(new UploadFileCommand { File = file });
-            if (string.IsNullOrEmpty(result))
-            {
-                return BadRequest("File upload failed.");
-            }
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception here
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while uploading the file.");
-        }
-    }
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile file) => Ok(await _mediator.Send(new UploadFileCommand { File = file }));
 }
