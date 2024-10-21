@@ -1,6 +1,7 @@
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
 using Persistence.Repositories.API;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
@@ -113,6 +114,7 @@ public interface ILLMServiceLoadBalancer
     string GetServiceUrl();
 }
 
+[ExcludeFromCodeCoverage]
 public class LLMLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceLoadBalancer
 {
     private int _currentIndex = 0;

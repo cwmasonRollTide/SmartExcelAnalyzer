@@ -12,6 +12,7 @@ using FluentValidation.AspNetCore;
 using Persistence.Repositories.API;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using System.Diagnostics.CodeAnalysis;
 
 namespace API.Extensions;
 
@@ -102,6 +103,7 @@ public static class ConfigurationExtensions
         return builder;
     }
 
+    [ExcludeFromCodeCoverage]
     public static WebApplicationBuilder ConfigureSwagger(this WebApplicationBuilder builder)
     {
         builder.Services.AddSwaggerGen(c =>
@@ -112,6 +114,7 @@ public static class ConfigurationExtensions
         return builder;
     }
 
+    [ExcludeFromCodeCoverage]
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
         if (app.Environment.IsDevelopment()) app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();

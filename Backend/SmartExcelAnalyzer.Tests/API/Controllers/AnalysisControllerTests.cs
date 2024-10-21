@@ -2,12 +2,12 @@ using Moq;
 using MediatR;
 using System.Text;
 using API.Controllers;
+using FluentAssertions;
 using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using FluentAssertions;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 
@@ -21,7 +21,8 @@ public class AnalysisControllerTests
     {
         var query = new SubmitQuery { Query = "test query", DocumentId = "doc1" };
         var expectedResult = new QueryAnswer { Answer = "test answer" };
-        _mediatorMock.Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
+        _mediatorMock
+            .Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
 
         var result = await Sut.SubmitQuery(query);
@@ -34,7 +35,8 @@ public class AnalysisControllerTests
     public async Task SubmitQuery_ReturnsBadRequest_WhenQueryIsInvalid()
     {
         var query = new SubmitQuery { Query = "test query", DocumentId = "doc1" };
-        _mediatorMock.Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
+        _mediatorMock
+            .Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ArgumentException("test exception"));
 
         await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.SubmitQuery(query));
@@ -45,7 +47,8 @@ public class AnalysisControllerTests
     {
         var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
         var expectedResult = "doc1";
-        _mediatorMock.Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
+        _mediatorMock
+            .Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
 
         var result = await Sut.UploadFile(file);
@@ -59,7 +62,8 @@ public class AnalysisControllerTests
     public async Task UploadFile_ReturnsBadRequest_WhenFileIsInvalid()
     {
         var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
-        _mediatorMock.Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
+        _mediatorMock
+            .Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ArgumentException("test exception"));
 
         await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.UploadFile(file));

@@ -82,16 +82,13 @@ public class SubmitQueryHandler(
         var result = await QueryLLMAsync(request, cancellationToken);
         if (result is null) return null;
 
-        if (ShouldEnrichResponse(request.RelevantRowsCount)) 
+        if (ShouldEnrichResponse(request.RelevantRowsCount))
             await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
 
         _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;
     }
-
-    private static bool ShouldEnrichResponse(int? relevantRowsCount) =>
-        relevantRowsCount.HasValue && relevantRowsCount > 10;
-
+    
     private async Task<QueryAnswer?> QueryLLMAsync(SubmitQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation(LogQueryingLLM, request.Query, request.DocumentId);
@@ -101,6 +98,8 @@ public class SubmitQueryHandler(
         return result;
     }
 
+    private static bool ShouldEnrichResponse(int? relevantRowsCount) => relevantRowsCount.HasValue && relevantRowsCount > 10;
+
     private async Task EnrichWithRelevantRowsAsync(SubmitQuery request, QueryAnswer result, CancellationToken cancellationToken)
     {
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
@@ -109,14 +108,6 @@ public class SubmitQueryHandler(
         var vectorResponse = await QueryVectorDbAsync(request, embedding, cancellationToken);
         if (vectorResponse is not null)
             result.RelevantRows = vectorResponse.Rows!;
-    }
-
-    private async Task<float[]?> ComputeEmbeddingAsync(SubmitQuery request, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation(LogComputingEmbedding, request.Query);
-        var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);
-        if (embedding is null) _logger.LogWarning(LogFailedToComputeEmbedding, request.Query);
-        return embedding;
     }
 
     private async Task<SummarizedExcelData?> QueryVectorDbAsync(SubmitQuery request, float[] embedding, CancellationToken cancellationToken)
@@ -130,6 +121,14 @@ public class SubmitQueryHandler(
         );
         if (vectorResponse is null) _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
         return vectorResponse;
+    }
+
+    private async Task<float[]?> ComputeEmbeddingAsync(SubmitQuery request, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation(LogComputingEmbedding, request.Query);
+        var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);
+        if (embedding is null) _logger.LogWarning(LogFailedToComputeEmbedding, request.Query);
+        return embedding;
     }
     #endregion
 }
