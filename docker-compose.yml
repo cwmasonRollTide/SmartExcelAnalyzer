@@ -9,8 +9,8 @@ x-llm-service: &llm-service
   env_file:
     - .env
   environment:
-    - QDRANT_PORT=${DatabaseOptions__PORT}
-    - QDRANT_HOST=${DatabaseOptions__HOST}
+    - QDRANT_PORT=6333
+    - QDRANT_HOST=qdrant
     - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
     - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
     - QDRANT_API_KEY=${QDRANT_API_KEY}
@@ -25,14 +25,14 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     ports:
-      - "${DatabaseOptions__PORT}:${DatabaseOptions__PORT}"
+      - "6333:6333"
     command:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/production.yaml"
     healthcheck:
       <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:${DatabaseOptions__PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
     env_file:
       - .env
 
