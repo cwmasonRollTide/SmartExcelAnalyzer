@@ -7,7 +7,7 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
 public class DatabaseWrapperTests
 {
-    private static Mock<IDatabaseWrapper> Sut => new();
+    private Mock<IDatabaseWrapper> Sut = new();
 
     [Fact]
     public async Task GetSummaryAsync_ReturnsExpectedSummary()

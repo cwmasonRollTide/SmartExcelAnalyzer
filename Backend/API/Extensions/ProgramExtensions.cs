@@ -2,6 +2,7 @@ using System.Text;
 using Qdrant.Client;
 using API.Properties;
 using API.Middleware;
+using API.Controllers;
 using Application.Queries;
 using Application.Services;
 using Persistence.Database;
@@ -9,12 +10,11 @@ using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using Persistence.Repositories.API;
-using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace API.Extensions;
 
-[ExcludeFromCodeCoverage]
 public static class ConfigurationExtensions
 {
     public static WebApplicationBuilder ConfigureEnvironmentVariables(this WebApplicationBuilder? builder)
@@ -47,7 +47,9 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureApiAccess(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
+        builder.Services.AddScoped<BaseController>();
+        builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddHealthChecks();
         builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
         return builder;

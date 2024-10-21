@@ -1,6 +1,5 @@
 using System.Text;
 using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories.API;
 
@@ -13,7 +12,6 @@ public interface IWebRepository<T>
     );
 }
 
-[ExcludeFromCodeCoverage]
 public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
 {
     /// <summary>
