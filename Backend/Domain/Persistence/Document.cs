@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Persistence;
 
-[ExcludeFromCodeCoverage]
 public class Document
 {
     public required string Id { get; set; }

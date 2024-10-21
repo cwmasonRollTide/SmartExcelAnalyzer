@@ -1,9 +1,7 @@
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Persistence.DTOs;
 
-[ExcludeFromCodeCoverage]
 public class QueryAnswer
 {
     public string Question { get; set; } = "";

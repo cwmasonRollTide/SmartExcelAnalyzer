@@ -1,10 +1,8 @@
 using Domain.Persistence;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Database;
 
-[ExcludeFromCodeCoverage]
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public virtual DbSet<Summary> Summaries { get; set; }
