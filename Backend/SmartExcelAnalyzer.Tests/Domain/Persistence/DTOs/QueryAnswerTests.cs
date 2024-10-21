@@ -8,20 +8,19 @@ public class QueryAnswerTests
     [Fact]
     public void QueryAnswer_Properties_ShouldBeSettable()
     {
-        // Arrange
+
         var queryAnswer = new QueryAnswer
         {
-            Answer = "Test Answer" // This is required
+            Answer = "Test Answer",
+            Question = "Test Question",
+            DocumentId = "Test Document ID"
         };
-
-        // Act
-        queryAnswer.Question = "Test Question";
-        queryAnswer.DocumentId = "Test Document ID";
-        var relevantRows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        relevantRows.Add(new ConcurrentDictionary<string, object> { ["TestKey"] = "TestValue" });
+        var relevantRows = new ConcurrentBag<ConcurrentDictionary<string, object>>
+        {
+            new() { ["TestKey"] = "TestValue" }
+        };
         queryAnswer.RelevantRows = relevantRows;
 
-        // Assert
         Assert.Equal("Test Question", queryAnswer.Question);
         Assert.Equal("Test Document ID", queryAnswer.DocumentId);
         Assert.Equal("Test Answer", queryAnswer.Answer);
@@ -32,13 +31,11 @@ public class QueryAnswerTests
     [Fact]
     public void QueryAnswer_DefaultValues_ShouldBeCorrect()
     {
-        // Arrange & Act
         var queryAnswer = new QueryAnswer
         {
-            Answer = "Test Answer" // This is required
+            Answer = "Test Answer"
         };
 
-        // Assert
         Assert.Equal("", queryAnswer.Question);
         Assert.Equal("", queryAnswer.DocumentId);
         Assert.Equal("Test Answer", queryAnswer.Answer);

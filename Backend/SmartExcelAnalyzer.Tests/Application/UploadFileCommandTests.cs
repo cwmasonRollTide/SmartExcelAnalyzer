@@ -6,6 +6,7 @@ using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using FluentValidation.TestHelper;
 using Microsoft.Extensions.Logging;
+using FluentAssertions;
 
 namespace SmartExcelAnalyzer.Tests.Application;
 
@@ -71,7 +72,7 @@ public class UploadFileCommandTests
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Null(result);
+            result.Should().BeNull();
             _vectorDbRepositoryMock.Verify(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
@@ -86,8 +87,7 @@ public class UploadFileCommandTests
                 .ReturnsAsync((string)null!);
 
             var result = await _handler.Handle(command, CancellationToken.None);
-
-            Assert.Null(result);
+            result.Should().BeNull();
         }
 
         [Fact]
@@ -103,7 +103,8 @@ public class UploadFileCommandTests
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Equal(expectedDocumentId, result);
+            result.Should().NotBeNull();
+            result.Should().Be(expectedDocumentId);
         }
 
         [Fact]
@@ -125,7 +126,7 @@ public class UploadFileCommandTests
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
                     It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!));
         }
     }
 }

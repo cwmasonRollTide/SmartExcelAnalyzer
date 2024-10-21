@@ -1,12 +1,13 @@
 using Moq;
 using MediatR;
+using System.Text;
 using API.Controllers;
 using Application.Queries;
+using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Text;
-using Application.Commands;
+using FluentAssertions;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 
@@ -26,7 +27,7 @@ public class AnalysisControllerTests
         var result = await Sut.SubmitQuery(query);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(expectedResult, okResult.Value);
+        okResult.Value.Should().BeEquivalentTo(expectedResult);
     }
 
     [Fact]
@@ -50,7 +51,8 @@ public class AnalysisControllerTests
         var result = await Sut.UploadFile(file);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(expectedResult, okResult.Value);
+        okResult.Value.Should().BeEquivalentTo(expectedResult);
+
     }
 
     [Fact]

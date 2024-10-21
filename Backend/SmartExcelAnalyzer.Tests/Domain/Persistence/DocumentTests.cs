@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Domain.Persistence;
 
 namespace SmartExcelAnalyzer.Tests.Domain.Persistence;
@@ -7,47 +8,44 @@ public class DocumentTests
     [Fact]
     public void Document_Properties_ShouldSetAndGetCorrectly()
     {
-        // Arrange
+        var id = "doc123";
+        var content = "This is a test document";
+        float[] testVector = [0.1f, 0.2f, 0.3f];
         var document = new Document
         {
-            Id = "doc123",
-            Content = "This is a test document",
-            Embedding = new float[] { 0.1f, 0.2f, 0.3f }
+            Id = id,
+            Content = content,
+            Embedding = testVector
         };
 
-        // Act & Assert
-        Assert.Equal("doc123", document.Id);
-        Assert.Equal("This is a test document", document.Content);
-        Assert.Equal(new float[] { 0.1f, 0.2f, 0.3f }, document.Embedding);
+        document.Id.Should().Be(id);
+        document.Content.Should().Be(content);
+        document.Embedding.Should().BeEquivalentTo(testVector);
     }
 
     [Fact]
     public void Document_Embedding_ShouldAllowEmptyArray()
     {
-        // Arrange & Act
         var document = new Document
         {
             Id = "doc456",
             Content = "Another test document",
-            Embedding = Array.Empty<float>()
+            Embedding = []
         };
 
-        // Assert
-        Assert.Empty(document.Embedding);
+        document.Embedding.Should().BeEmpty();
     }
 
     [Fact]
     public void Document_Embedding_ShouldAllowNullArray()
     {
-        // Arrange & Act
         var document = new Document
         {
             Id = "doc789",
             Content = "Yet another test document",
-            Embedding = null
+            Embedding = null!
         };
 
-        // Assert
-        Assert.Null(document.Embedding);
+        document.Embedding.Should().BeNull();
     }
 }

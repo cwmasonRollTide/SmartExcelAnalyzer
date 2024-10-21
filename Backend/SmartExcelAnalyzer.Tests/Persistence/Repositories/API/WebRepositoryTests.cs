@@ -1,10 +1,10 @@
 using Moq;
-using Moq.Protected;
 using System.Net;
 using System.Text;
+using Moq.Protected;
 using Newtonsoft.Json;
-using Persistence.Repositories.API;
 using Newtonsoft.Json.Linq;
+using Persistence.Repositories.API;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Repositories.API;
 
@@ -25,7 +25,6 @@ public class WebRepositoryTests
     [Fact]
     public async Task PostAsync_SuccessfulRequest_ReturnsDeserializedResponse()
     {
-        // Arrange
         var expectedResponse = new { Id = 1, Name = "Test" };
         var jsonResponse = JsonConvert.SerializeObject(expectedResponse);
 
@@ -43,10 +42,8 @@ public class WebRepositoryTests
 
         var repository = new WebRepository<object>(_mockHttpClientFactory.Object);
 
-        // Act
         var result = await repository.PostAsync("https://api.example.com/endpoint", new { Data = "test" });
 
-        // Assert
         Assert.NotNull(result);
         var resultAsJToken = result as JObject;
         Assert.Equal(expectedResponse.Id, resultAsJToken!["Id"]!.Value<int>());
@@ -56,7 +53,6 @@ public class WebRepositoryTests
     [Fact]
     public async Task PostAsync_FailedRequest_ThrowsHttpRequestException()
     {
-        // Arrange
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -71,7 +67,6 @@ public class WebRepositoryTests
 
         var repository = new WebRepository<object>(_mockHttpClientFactory.Object);
 
-        // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() =>
             repository.PostAsync("https://api.example.com/endpoint", new { Data = "test" }));
     }
@@ -79,7 +74,6 @@ public class WebRepositoryTests
     [Fact]
     public async Task PostAsync_VerifyRequestContent()
     {
-        // Arrange
         var payload = new { Data = "test" };
         var expectedContent = JsonConvert.SerializeObject(payload);
 
@@ -102,7 +96,6 @@ public class WebRepositoryTests
 
         var repository = new WebRepository<object>(_mockHttpClientFactory.Object);
 
-        // Act
         await repository.PostAsync("https://api.example.com/endpoint", payload);
 
     }

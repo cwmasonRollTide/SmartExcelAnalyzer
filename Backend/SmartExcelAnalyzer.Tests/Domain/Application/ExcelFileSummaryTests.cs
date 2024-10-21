@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Domain.Application;
 using System.Collections.Concurrent;
 
@@ -7,16 +8,14 @@ public class ExcelFileSummaryTests
 {
     [Fact]
     public void ExcelFileSummary_Properties_ShouldSetAndGetCorrectly()
-    {
-        // Arrange
+    {        
         var summary = new ExcelFileSummary
         {
             RowCount = 100,
             ColumnCount = 5,
-            Columns = new List<string> { "A", "B", "C", "D", "E" }
+            Columns = ["A", "B", "C", "D", "E"]
         };
-
-        // Act
+        
         summary.Sums["A"] = 500.0;
         summary.Mins["B"] = 10.0;
         summary.Maxs["C"] = 1000.0;
@@ -24,31 +23,27 @@ public class ExcelFileSummaryTests
         summary.HashedStrings["E"] = new ConcurrentDictionary<string, string>();
         summary.HashedStrings["E"]["hash1"] = "value1";
 
-        // Assert
-        Assert.Equal(100, summary.RowCount);
-        Assert.Equal(5, summary.ColumnCount);
-        Assert.Equal(new List<string> { "A", "B", "C", "D", "E" }, summary.Columns);
-        Assert.Equal(500.0, summary.Sums["A"]);
-        Assert.Equal(10.0, summary.Mins["B"]);
-        Assert.Equal(1000.0, summary.Maxs["C"]);
-        Assert.Equal(50.0, summary.Averages["D"]);
-        Assert.Equal("value1", summary.HashedStrings["E"]["hash1"]);
+        summary.Columns.Should().BeEquivalentTo(["A", "B", "C", "D", "E" ]);
+        summary.RowCount.Should().Be(100);
+        summary.Columns.Should().HaveCount(5);
+        summary.Sums.Should().ContainKey("A").WhoseValue.Should().Be(500.0);
+        summary.Mins.Should().ContainKey("B").WhoseValue.Should().Be(10.0);
+        summary.Maxs.Should().ContainKey("C").WhoseValue.Should().Be(1000.0);
+        summary.Averages.Should().ContainKey("D").WhoseValue.Should().Be(50.0);
+        summary.HashedStrings.Should().ContainKey("E").WhoseValue.Should().ContainKey("hash1").WhoseValue.Should().Be("value1");
     }
 
     [Fact]
     public void ExcelFileSummary_Dictionaries_ShouldBeInitialized()
     {
-        // Arrange & Act
         var summary = new ExcelFileSummary
         {
-            Columns = new List<string>()
+            Columns = []
         };
-
-        // Assert
-        Assert.NotNull(summary.Sums);
-        Assert.NotNull(summary.Mins);
-        Assert.NotNull(summary.Maxs);
-        Assert.NotNull(summary.Averages);
-        Assert.NotNull(summary.HashedStrings);
+        summary.Sums.Should().NotBeNull();
+        summary.Mins.Should().NotBeNull();
+        summary.Maxs.Should().NotBeNull();
+        summary.Averages.Should().NotBeNull();
+        summary.HashedStrings.Should().NotBeNull();
     }
 }

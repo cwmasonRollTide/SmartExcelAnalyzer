@@ -1,3 +1,4 @@
+using System.Text;
 using Qdrant.Client;
 using API.Properties;
 using API.Middleware;
@@ -27,6 +28,7 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         builder.Logging.ClearProviders();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         builder.Logging.AddConsole();

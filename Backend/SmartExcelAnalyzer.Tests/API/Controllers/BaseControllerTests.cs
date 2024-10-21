@@ -1,6 +1,7 @@
 using Moq;
 using MediatR;
 using API.Controllers;
+using FluentAssertions;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 public class BaseControllerTests
@@ -12,7 +13,7 @@ public class BaseControllerTests
 
         var controller = new BaseController(mockMediator.Object);
 
-        Assert.NotNull(controller);
+        controller.Should().NotBeNull();
     }
 
 }

@@ -1,10 +1,9 @@
 using Moq;
 using API.Middleware;
-using System.Text.Json;
 using FluentAssertions;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using FluentValidation;
 
 namespace SmartExcelAnalyzer.Tests.API.Middleware;
 

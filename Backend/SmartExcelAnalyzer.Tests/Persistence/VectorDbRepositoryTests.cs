@@ -1,14 +1,14 @@
-using System.Collections.Concurrent;
+using Moq;
 using System.Text.Json;
-using Domain.Persistence;
-using Domain.Persistence.Configuration;
-using Domain.Persistence.DTOs;
 using FluentAssertions;
+using Domain.Persistence;
+using Persistence.Database;
+using Domain.Persistence.DTOs;
+using Persistence.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
-using Persistence.Database;
-using Persistence.Repositories;
+using System.Collections.Concurrent;
+using Domain.Persistence.Configuration;
 
 namespace SmartExcelAnalyzer.Tests.Persistence;
 
@@ -36,14 +36,14 @@ public class VectorDbRepositoryTests
         const string documentId = "1";
         var data = new SummarizedExcelData
         {
-            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>
-            {
+            Rows =
+            [
                 new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            },
+            ],
             Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
         };
         _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<float[]> { new float[] { 1.0f } });
+            .ReturnsAsync([[1.0f]]);
         _databaseMock.SetupSequence(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(documentId);
 
@@ -67,7 +67,7 @@ public class VectorDbRepositoryTests
     {
         var data = new SummarizedExcelData
         {
-            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(),
+            Rows = [],
             Summary = new ConcurrentDictionary<string, object>()
         };
 
@@ -83,7 +83,7 @@ public class VectorDbRepositoryTests
         var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
         var documents = new List<Document>
         {
-            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = new float[] { 1.0f, 2.0f, 3.0f } }
+            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = [1.0f, 2.0f, 3.0f] }
         };
         var summaries = new List<Summary>
         {
@@ -114,7 +114,7 @@ public class VectorDbRepositoryTests
         var documentId = "testDoc";
         var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
         _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ConcurrentDictionary<string, object>>());
+            .ReturnsAsync([]);
 
         var result = await Sut.QueryVectorData(documentId, queryVector);
 
@@ -128,7 +128,7 @@ public class VectorDbRepositoryTests
         var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
         var documents = new List<Document>
         {
-            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = new float[] { 1.0f, 2.0f, 3.0f } }
+            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = [1.0f, 2.0f, 3.0f] }
         };
         _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(documents.Select(d => new ConcurrentDictionary<string, object>
@@ -182,10 +182,10 @@ public class VectorDbRepositoryTests
     {
         var data = new SummarizedExcelData
         {
-            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>
-            {
+            Rows =
+            [
                 new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            },
+            ],
             Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
         };
         _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))

@@ -36,7 +36,7 @@ public class ExcelFileServiceTests
         result.Rows.Should().HaveCount(3);
         
         result.Summary.Should().ContainKey("Summary");
-        var summary = result.Summary["Summary"].Should().BeOfType<ExcelFileSummary>().Subject;
+        var summary = result!.Summary!["Summary"].Should().BeOfType<ExcelFileSummary>().Subject;
         summary.RowCount.Should().Be(3);
         summary.ColumnCount.Should().Be(4);
         summary.Columns.Should().BeEquivalentTo(new List<string> { "ID", "Name", "Age", "Salary" });
@@ -64,7 +64,7 @@ public class ExcelFileServiceTests
         result.Summary.Should().NotBeNull();
         result.Rows.Should().BeEmpty();
         result.Summary.Should().ContainKey("Summary");
-        var summary = result.Summary["Summary"].Should().BeOfType<ExcelFileSummary>().Subject;
+        var summary = result!.Summary!["Summary"].Should().BeOfType<ExcelFileSummary>().Subject;
         summary.RowCount.Should().Be(0);
         summary.ColumnCount.Should().Be(4);
         summary.Columns.Should().BeEquivalentTo(new List<string> { "ID", "Name", "Age", "Salary" });

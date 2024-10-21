@@ -1,10 +1,10 @@
 using Moq;
+using FluentAssertions;
 using Application.Queries;
 using Domain.Persistence.DTOs;
-using FluentAssertions;
+using Persistence.Repositories;
 using FluentValidation.TestHelper;
 using Microsoft.Extensions.Logging;
-using Persistence.Repositories;
 using System.Collections.Concurrent;
 
 namespace SmartExcelAnalyzer.Tests.Application;

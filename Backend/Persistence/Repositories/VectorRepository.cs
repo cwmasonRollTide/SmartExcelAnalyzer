@@ -55,7 +55,6 @@ public class VectorRepository(
     private const string LOG_STORING_EMBEDDINGS_CANCELLED = "Storing embeddings was cancelled.";
     private const string LOG_SUCCESS_SAVE = "Saved document with id {DocumentId} to the database.";
     private const string LOG_START_COMPUTE = "Computing embeddings for document with {Count} rows.";
-    private const string LOG_ERROR_SAVING_DOCUMENT = "An error occurred while saving the document.";
     private const string LOG_EMBEDDING_COMPUTATION_CANCELLED = "Embedding computation was cancelled.";
     private const string LOG_FAIL_SAVE_VECTORS = "Failed to save vectors of the document to the database.";
     private const string LOG_COMPUTE_EMBEDDINGS = "Computed {Count} embeddings in {ElapsedMilliseconds}ms";
@@ -92,29 +91,21 @@ public class VectorRepository(
             _logger.LogWarning(LOG_NULL_INPUT_DATA);
             return null!;
         }
-
         _logger.LogInformation(LOG_START_SAVE);
-        try
+        var documentId = await SaveDocumentDataAsync(vectorSpreadsheetData.Rows ?? [], cancellationToken);
+        if (documentId is null)
         {
-            var documentId = await SaveDocumentDataAsync(vectorSpreadsheetData.Rows ?? [], cancellationToken);
-            if (documentId is null)
-            {
-                _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
-                return null!;
-            }
-            if (vectorSpreadsheetData.Summary != null)
-            {
-                var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary, cancellationToken);
-                if (summarySuccess < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
-            }
-            _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
-            return documentId;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, LOG_ERROR_SAVING_DOCUMENT);
+            _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
             return null!;
         }
+        if (vectorSpreadsheetData.Summary != null)
+        {
+            var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary, cancellationToken);
+            if (summarySuccess < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
+        }
+        _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
+        return documentId;
+        
     }
 
     /// <summary>

@@ -8,10 +8,8 @@ public class SummarizedExcelDataTests
     [Fact]
     public void SummarizedExcelData_DefaultValues_ShouldBeNull()
     {
-        // Arrange
         var summarizedData = new SummarizedExcelData();
 
-        // Assert
         Assert.Null(summarizedData.Summary);
         Assert.Null(summarizedData.Rows);
     }
@@ -19,7 +17,6 @@ public class SummarizedExcelDataTests
     [Fact]
     public void SummarizedExcelData_CustomValues_ShouldSetCorrectly()
     {
-        // Arrange
         var summary = new ConcurrentDictionary<string, object>();
         summary["TotalRows"] = 100;
         summary["TotalColumns"] = 5;
@@ -36,7 +33,6 @@ public class SummarizedExcelDataTests
             Rows = rows
         };
 
-        // Assert
         Assert.NotNull(summarizedData.Summary);
         Assert.Equal(100, summarizedData.Summary["TotalRows"]);
         Assert.Equal(5, summarizedData.Summary["TotalColumns"]);
@@ -51,14 +47,12 @@ public class SummarizedExcelDataTests
     [Fact]
     public void SummarizedExcelData_ConcurrentAccess_ShouldBeThreadSafe()
     {
-        // Arrange
         var summarizedData = new SummarizedExcelData
         {
             Summary = new ConcurrentDictionary<string, object>(),
             Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>()
         };
 
-        // Act
         Parallel.For(0, 1000, i =>
         {
             summarizedData.Summary[$"Key{i}"] = $"Value{i}";
@@ -67,7 +61,6 @@ public class SummarizedExcelDataTests
             summarizedData.Rows.Add(row);
         });
 
-        // Assert
         Assert.Equal(1000, summarizedData.Summary.Count);
         Assert.Equal(1000, summarizedData.Rows.Count);
 
