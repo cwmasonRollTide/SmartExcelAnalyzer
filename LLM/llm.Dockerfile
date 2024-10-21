@@ -19,8 +19,9 @@ RUN python -c "from transformers import AutoTokenizer, AutoModel, pipeline; \
 
 COPY . .
 
-ENV PORT 8000
-
-EXPOSE $PORT
-
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT --reload
+EXPOSE 8000
+EXPOSE 8001
+EXPOSE 8002
+EXPOSE 8003
+EXPOSE 8004
+EXPOSE 8005
