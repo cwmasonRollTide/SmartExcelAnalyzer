@@ -61,10 +61,10 @@ function App() {
   const handleQuerySubmit = async (question: string) => {
     if (selectedDocument) {
       try {
-        const result = await submitQuery({
+        const result = await submitQuery(
           question,
-          documentId: selectedDocument.id,
-        });
+          selectedDocument.id
+        );
         setQueryResult(result);
       } catch (error) {
         console.error('Query submission failed:', error);

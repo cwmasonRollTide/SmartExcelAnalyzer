@@ -1,59 +1,32 @@
+import axios from 'axios';
 
-/**
- * Uploads a file to the analysis/upload endpoint for the llm to interpret
- * its data and save to the database
- * 
- * @param {File} file - The file to be uploaded.
- * @returns {Promise<string>} - A promise that resolves to the server's response.
- * @throws {Error} - Throws an error if the file upload fails.
- */
+const API_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:5000/api';
+
 export const uploadFile = async (file: File): Promise<string> => {
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/analysis/upload`, {
-      method: 'POST',
-      body: formData,
-    });
+  const formData = new FormData();
+  formData.append('file', file);
 
-    if (!response.ok) {
-      throw new Error('File upload failed');
-    }
-    return response.json();
-  } catch (error) {
-    console.error(error);
-    throw new Error('File upload failed');
-  }
-}
-
-type Query = {
-  question: string;
-  documentId: string;
-};
-
-export interface QueryResponse extends Query {
-  answer: string;
-  relevantRows: any[];
-}
-
-/**
- * Ask a question about a document that has been uploaded to the server.
- * Computes the text of the question from the LLM and compares it to the
- * data from the document its already converted to get relevant answers
- * @param query 
- * @returns 
- */
-export const submitQuery = async (query: Query): Promise<QueryResponse> => {
-  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/analysis/query`, {
-    method: 'POST',
+  const response = await axios.post(`${API_URL}/analysis/upload`, formData, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
-    body: JSON.stringify({ query }),
   });
 
-  if (!response.ok) {
-    throw new Error('Query submission failed');
-  }
-  return response.json();
+  return response.data;
+};
+
+export interface QueryResponse {
+  answer: string;
+  question: string;
+  documentId: string;
+  relevantRows: Record<string, unknown>[];
+}
+
+export const submitQuery = async (query: string, documentId: string): Promise<QueryResponse> => {
+  const response = await axios.post<QueryResponse>(`${API_URL}/analysis/query`, {
+    query,
+    documentId,
+  });
+
+  return response.data;
 };

@@ -1,55 +1,49 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import { QueryResponse } from '../../services/api';
-import { 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper 
-} from '@mui/material';
 
 interface QueryResultProps {
-  result: QueryResponse | null;
+  result: QueryResponse;
 }
 
 const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
-  if (!result) {
-    return <Component paragraph>No data available</Component>;
-  }
+  const { answer, question, documentId, relevantRows } = result;
 
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
-        Answer:
-      </Typography>
-      <Component paragraph>{result.answer}</Component>
-      <Typography variant="h6" gutterBottom>
-        Relevant Data:
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="relevant-rows">
-          <TableHead>
-            <TableRow>
-              {Object.keys(result.relevantRows[0] || {}).map((key) => (
-                <TableCell key={key}>{key}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {result.relevantRows.map((row, index) => (
-              <TableRow key={index}>
-                {Object.values(row).map((value: any, cellIndex) => (
-                  <TableCell key={cellIndex}>{value}</TableCell>
+    <Box sx={{ mt: 2 }}>
+      <Typography variant="h6" gutterBottom>Query Result</Typography>
+      <Typography variant="body1"><strong>Question:</strong> {question}</Typography>
+      <Typography variant="body1"><strong>Answer:</strong> {answer}</Typography>
+      <Typography variant="body2"><strong>Document ID:</strong> {documentId}</Typography>
+
+      {relevantRows && relevantRows.length > 0 ? (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="h6" gutterBottom>Relevant Data</Typography>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  {Object.keys(relevantRows[0]).map((header) => (
+                    <TableCell key={header}>{header}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {relevantRows.map((row, index) => (
+                  <TableRow key={index}>
+                    {Object.entries(row).map(([key, value]) => (
+                      <TableCell key={`${index}-${key}`}>{value?.toString() || ''}</TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      ) : (
+        <Typography variant="body2" sx={{ mt: 2 }}>No relevant data found.</Typography>
+      )}
+    </Box>
   );
 };
 

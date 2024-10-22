@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/documentlist/documentlist.tsx","./src/components/fileupload/fileupload.tsx","./src/components/queryform/queryform.tsx","./src/components/queryresult/queryresult.tsx","./src/services/api.ts","./src/utils/healthcheck.ts"],"version":"5.6.3"}

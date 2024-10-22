@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Typography, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, Typography, Box, LinearProgress } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
 interface FileUploadProps {
   onFileUpload: (file: File) => void;
@@ -8,6 +9,32 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const [dragActive, setDragActive] = useState(false);
+  const [parseProgress, setParseProgress] = useState(0);
+  const [saveProgress, setSaveProgress] = useState(0);
+  const [connection, setConnection] = useState<HubConnection | null>(null);
+
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl("/progressHub")
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+  }, []);
+
+  useEffect(() => {
+    if (connection) {
+      connection.start()
+        .then(() => {
+          console.log('SignalR Connected');
+          connection.on('ReceiveProgress', (parseProgress: number, saveProgress: number) => {
+            setParseProgress(parseProgress * 100);
+            setSaveProgress(saveProgress * 100);
+          });
+        })
+        .catch((err: Error) => console.error('SignalR Connection Error: ', err));
+    }
+  }, [connection]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -69,9 +96,16 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
       <Typography variant="body2" sx={{ mt: 2 }}>
         Drag and drop your file here or click to select
       </Typography>
+      {(parseProgress > 0 || saveProgress > 0) && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2">Parsing Progress:</Typography>
+          <LinearProgress variant="determinate" value={parseProgress} />
+          <Typography variant="body2" sx={{ mt: 1 }}>Saving Progress:</Typography>
+          <LinearProgress variant="determinate" value={saveProgress} />
+        </Box>
+      )}
     </Box>
   );
 };
-
 
 export default FileUpload;
