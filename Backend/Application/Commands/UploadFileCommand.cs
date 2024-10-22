@@ -27,7 +27,7 @@ public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
 public class UploadFileCommand : IRequest<string?>
 {
     public IFormFile? File { get; set; }
-    public IProgress<(double ParseProgress, double SaveProgress)>? Progress { get; set; }
+    public IProgress<(double ParseProgress, double SaveProgress)> Progress { get; set; } = new Progress<(double, double)>();
 }
 
 /// <summary>
@@ -37,10 +37,13 @@ public class UploadFileCommand : IRequest<string?>
 /// </summary>
 /// <param name="excelService"></param>
 /// <param name="vectorDbRepository"></param>
-public class UploadFileCommandHandler(
+/// <param name="logger"></param>
+/// <param name="hubContext">SignalR hub context for reporting progress to the client on parsing and saving</param>
+public UploadFileCommandHandler(
     IExcelFileService excelService,
     IVectorDbRepository vectorDbRepository,
-    ILogger<UploadFileCommandHandler> logger
+    ILogger<UploadFileCommandHandler> logger,
+    IHubContext<ProgressHub> hubContext
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants

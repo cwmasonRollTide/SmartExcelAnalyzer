@@ -28,7 +28,8 @@ public class ExcelFileServiceTests
         var excelData = CreateTestExcelData();
         SetupMockFileStream(excelData);
 
-        var result = await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object);
+        var progressMock = new Mock<IProgress<(double, double)>>();
+        var result = await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object, progressMock.Object);
 
         result.Should().NotBeNull();
         result.Summary.Should().NotBeNull();
@@ -50,6 +51,8 @@ public class ExcelFileServiceTests
         summary.Averages.Should().ContainKey("Age").WhoseValue.Should().BeApproximately(35, 0.01);
         summary.Averages.Should().ContainKey("Salary").WhoseValue.Should().BeApproximately(30, 0.01);
         summary.HashedStrings.Should().ContainKey("Name").WhoseValue.Should().HaveCount(3);
+
+        progressMock.Verify(p => p.Report(It.IsAny<(double, double)>()), Times.AtLeastOnce());
     }
 
     [Fact]
@@ -58,7 +61,8 @@ public class ExcelFileServiceTests
         var excelData = CreateEmptyExcelData();
         SetupMockFileStream(excelData);
 
-        var result = await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object);
+        var progressMock = new Mock<IProgress<(double, double)>>();
+        var result = await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object, progressMock.Object);
 
         result.Should().NotBeNull();
         result.Summary.Should().NotBeNull();
@@ -74,6 +78,8 @@ public class ExcelFileServiceTests
         summary.Maxs.Should().BeEmpty();
         summary.Averages.Should().BeEmpty();
         summary.HashedStrings.Should().BeEmpty();
+
+        progressMock.Verify(p => p.Report(It.IsAny<(double, double)>()), Times.Never());
     }
 
     [Fact]
@@ -85,8 +91,25 @@ public class ExcelFileServiceTests
         var cts = new CancellationTokenSource();
         cts.Cancel();
 
-        await Sut.Invoking(s => s.PrepareExcelFileForLLMAsync(_mockFile.Object, cts.Token))
+        var progressMock = new Mock<IProgress<(double, double)>>();
+        await Sut.Invoking(s => s.PrepareExcelFileForLLMAsync(_mockFile.Object, progressMock.Object, cts.Token))
             .Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
+    public async Task PrepareExcelFileForLLMAsync_ReportsProgress_DuringFileProcessing()
+    {
+        var excelData = CreateTestExcelData();
+        SetupMockFileStream(excelData);
+
+        var progressReports = new List<(double, double)>();
+        var progress = new Progress<(double, double)>(report => progressReports.Add(report));
+
+        await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object, progress);
+
+        progressReports.Should().NotBeEmpty();
+        progressReports.Should().OnlyContain(report => report.Item1 >= 0 && report.Item1 <= 1 && report.Item2 == 0);
+        progressReports.Last().Item1.Should().Be(1); // Final progress should be 100%
     }
 
     [Fact]

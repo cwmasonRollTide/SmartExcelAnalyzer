@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using FluentValidation.TestHelper;
 using Microsoft.Extensions.Logging;
 using FluentAssertions;
+using Microsoft.AspNetCore.SignalR;
+using API.Hubs;
 
 namespace SmartExcelAnalyzer.Tests.Application;
 
@@ -15,6 +17,7 @@ public class UploadFileCommandTests
     public class UploadFileCommandValidatorTests
     {
         private readonly UploadFileCommandValidator _validator = new();
+        
         [Fact]
         public void Validate_WhenFileIsNull_ShouldHaveValidationError()
         {
@@ -45,35 +48,44 @@ public class UploadFileCommandTests
             result.ShouldNotHaveAnyValidationErrors();
         }
     }
+
     public class UploadFileCommandHandlerTests
     {
         private readonly UploadFileCommandHandler _handler;
         private readonly Mock<IExcelFileService> _excelServiceMock;
         private readonly Mock<IVectorDbRepository> _vectorDbRepositoryMock;
         private readonly Mock<ILogger<UploadFileCommandHandler>> _loggerMock;
+        private readonly Mock<IHubContext<ProgressHub>> _hubContextMock;
+        private readonly Mock<IClientProxy> _clientProxyMock;
 
         public UploadFileCommandHandlerTests()
         {
             _excelServiceMock = new Mock<IExcelFileService>();
             _vectorDbRepositoryMock = new Mock<IVectorDbRepository>();
             _loggerMock = new Mock<ILogger<UploadFileCommandHandler>>();
+            _hubContextMock = new Mock<IHubContext<ProgressHub>>();
+            _clientProxyMock = new Mock<IClientProxy>();
+            
+            _hubContextMock.Setup(h => h.Clients.All).Returns(_clientProxyMock.Object);
+            
             _handler = new UploadFileCommandHandler(
                 _excelServiceMock.Object,
                 _vectorDbRepositoryMock.Object,
-                _loggerMock.Object);
+                _loggerMock.Object,
+                _hubContextMock.Object);
         }
 
         [Fact]
         public async Task Handle_WhenExcelServiceReturnsNull_ShouldReturnNull()
         {
             var command = new UploadFileCommand { File = Mock.Of<IFormFile>() };
-            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<CancellationToken>()))
+            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((SummarizedExcelData)null!);
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
             result.Should().BeNull();
-            _vectorDbRepositoryMock.Verify(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<CancellationToken>()), Times.Never);
+            _vectorDbRepositoryMock.Verify(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -81,9 +93,9 @@ public class UploadFileCommandTests
         {
             var command = new UploadFileCommand { File = Mock.Of<IFormFile>() };
             var summarizedData = new SummarizedExcelData();
-            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<CancellationToken>()))
+            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(summarizedData);
-            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<CancellationToken>()))
+            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((string)null!);
 
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -96,9 +108,9 @@ public class UploadFileCommandTests
             var command = new UploadFileCommand { File = Mock.Of<IFormFile>() };
             var summarizedData = new SummarizedExcelData();
             var expectedDocumentId = "test-document-id";
-            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<CancellationToken>()))
+            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(summarizedData);
-            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<CancellationToken>()))
+            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedDocumentId);
 
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -108,25 +120,37 @@ public class UploadFileCommandTests
         }
 
         [Fact]
-        public async Task Handle_ShouldLogInformation()
+        public async Task Handle_ShouldReportProgress()
         {
             var command = new UploadFileCommand { File = Mock.Of<IFormFile>() };
             var summarizedData = new SummarizedExcelData();
             var expectedDocumentId = "test-document-id";
-            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<CancellationToken>()))
+            var progressReported = false;
+
+            _excelServiceMock.Setup(x => x.PrepareExcelFileForLLMAsync(It.IsAny<IFormFile>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
+                .Callback<IFormFile, IProgress<(double, double)>?, CancellationToken>((_, progress, _) =>
+                {
+                    if (progress != null)
+                    {
+                        progress.Report((0.5, 0.5));
+                        progressReported = true;
+                    }
+                })
                 .ReturnsAsync(summarizedData);
-            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<CancellationToken>()))
+
+            _vectorDbRepositoryMock.Setup(x => x.SaveDocumentAsync(It.IsAny<SummarizedExcelData>(), It.IsAny<IProgress<(double, double)>?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedDocumentId);
 
-            await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-            _loggerMock.Verify(
-                x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Information),
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => true),
-                    It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!));
+            result.Should().Be(expectedDocumentId);
+            progressReported.Should().BeTrue();
+            _clientProxyMock.Verify(
+                x => x.SendCoreAsync(
+                    "ReceiveProgress",
+                    It.Is<object[]>(o => o != null && o.Length == 2 && (double)o[0] == 0.5 && (double)o[1] == 0.5),
+                    default),
+                Times.Once);
         }
     }
 }
