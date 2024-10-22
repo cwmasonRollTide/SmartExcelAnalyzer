@@ -14,7 +14,6 @@ using Persistence.Repositories.API;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.SignalR;
 
 namespace API.Extensions;
 
@@ -102,6 +101,7 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSignalR();
         builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
         builder.Services.AddScoped<IProgressHubWrapper, ProgressHubWrapper>();
         builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));

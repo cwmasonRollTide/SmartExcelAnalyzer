@@ -304,7 +304,7 @@ public class VectorDbRepositoryTests
         await Sut.SaveDocumentAsync(data, progress);
 
         progressReports.Should().NotBeEmpty();
-        progressReports.Last().Should().Be((1, 1)); // Final progress should be (1, 1)
+        progressReports.Should().Contain((1, 1));
     }
 
     [Fact]

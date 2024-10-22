@@ -9,36 +9,6 @@ using static Qdrant.Client.Grpc.Conditions;
 
 namespace Persistence.Repositories;
 
-public interface IQdrantClient
-{
-    Task<UpdateResult> UpsertAsync(
-        string collectionName, 
-        IReadOnlyList<PointStruct> points, 
-        bool wait = true, 
-        WriteOrderingType? ordering = null, 
-        ShardKeySelector? shardKeySelector = null, 
-        CancellationToken cancellationToken = default
-    );
-
-    Task<IReadOnlyList<ScoredPoint>> SearchAsync(
-        string collectionName, 
-        ReadOnlyMemory<float> vector, 
-        Filter? filter = null, 
-        SearchParams? searchParams = null, 
-        ulong limit = 10, 
-        ulong offset = 0, 
-        WithPayloadSelector? payloadSelector = null, 
-        WithVectorsSelector? vectorsSelector = null, 
-        float? scoreThreshold = null, 
-        string? vectorName = null, 
-        ReadConsistency? readConsistency = null, 
-        ShardKeySelector? shardKeySelector = null, 
-        ReadOnlyMemory<uint>? sparseIndices = null, 
-        TimeSpan? timeout = null, 
-        CancellationToken cancellationToken = default
-    );
-}
-
 public class QdrantDatabaseWrapper(
     IQdrantClient client,
     IOptions<DatabaseOptions> options, 
