@@ -3,6 +3,8 @@ import { Button, Typography, Box, LinearProgress } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
+const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+
 interface FileUploadProps {
   onFileUpload: (file: File) => void;
 }
@@ -15,7 +17,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl("/progressHub")
+      .withUrl(`${SIGNALR_HUB_URL}/progressHub`)  // Updated to use the full URL
       .withAutomaticReconnect()
       .build();
 
