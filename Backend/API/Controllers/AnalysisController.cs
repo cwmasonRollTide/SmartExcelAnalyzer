@@ -1,10 +1,10 @@
 using MediatR;
+using Persistence.Hubs;
 using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using API.Hubs;
 
 namespace API.Controllers;
 
@@ -14,15 +14,8 @@ namespace API.Controllers;
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
-public class AnalysisController : BaseController
+public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hubContext) : BaseController(mediator)
 {
-    private readonly IHubContext<ProgressHub> _hubContext;
-
-    public AnalysisController(IMediator mediator, IHubContext<ProgressHub> hubContext) : base(mediator)
-    {
-        _hubContext = hubContext;
-    }
-
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -61,7 +54,6 @@ public class AnalysisController : BaseController
             await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
         });
 
-        var result = await _mediator.Send(new UploadFileCommand { File = file, Progress = progress });
-        return Ok(result);
+        return Ok(await _mediator.Send(new UploadFileCommand { File = file, Progress = progress }));
     }
 }

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Application.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,10 +8,7 @@ using Domain.Persistence.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ConfigurationExtensions = API.Extensions.ConfigurationExtensions;
-using Microsoft.AspNetCore.Mvc;
-using API.Controllers;
 using Domain.Persistence.DTOs;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartExcelAnalyzer.Tests.API.Extensions;
 
@@ -50,21 +46,6 @@ public class ProgramExtensionsTests
 
         httpClientFactory.Should().NotBeNull();
     }
-
-    // [Fact]
-    // public void ConfigureApiAccess_ShouldConfigureControllers()
-    // {
-    //     var builder = WebApplication.CreateBuilder();
-    //     builder.Services.AddControllers();
-    //     builder.Services.AddSingleton<BaseController>();
-    //     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AnalysisController).Assembly));
-    //     builder = ConfigurationExtensions.ConfigureApiAccess(builder);
-
-    //     var serviceProvider = builder.Services.BuildServiceProvider();
-    //     var controllerFeature = serviceProvider.GetService<AnalysisController>();
-
-    //     controllerFeature.Should().NotBeNull();
-    // }
 
     [Fact]
     public void ConfigureDatabase_ShouldConfigureDatabaseOptions()

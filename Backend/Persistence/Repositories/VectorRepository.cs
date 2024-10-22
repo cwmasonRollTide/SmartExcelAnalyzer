@@ -11,7 +11,7 @@ namespace Persistence.Repositories;
 
 public interface IVectorDbRepository
 {
-    Task<string> SaveDocumentAsync(
+    Task<string?> SaveDocumentAsync(
         SummarizedExcelData vectorSpreadsheetData, 
         IProgress<(double, double)>? progress = null,
         CancellationToken cancellationToken = default
@@ -86,9 +86,9 @@ public class VectorRepository(
     /// <param name="progress"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, IProgress<(double, double)>? progress = null, CancellationToken cancellationToken = default)
+    public async Task<string?> SaveDocumentAsync(SummarizedExcelData vectorSpreadsheetData, IProgress<(double, double)>? progress = null, CancellationToken cancellationToken = default)
     {
-        if (vectorSpreadsheetData == null)
+        if (vectorSpreadsheetData is null)
         {
             _logger.LogWarning(LOG_NULL_INPUT_DATA);
             return null!;
@@ -100,14 +100,13 @@ public class VectorRepository(
             _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
             return null!;
         }
-        if (vectorSpreadsheetData.Summary != null)
+        if (vectorSpreadsheetData.Summary is not null)
         {
             var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary, cancellationToken);
-            if (summarySuccess < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
+            if (summarySuccess is < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
         }
         _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
         return documentId;
-        
     }
 
     /// <summary>
@@ -126,31 +125,33 @@ public class VectorRepository(
             _logger.LogWarning(LOG_NULL_DOCUMENT_ID);
             return null!;
         }
-
-        if (queryVector == null || queryVector.Length == 0)
+        if (queryVector is null || queryVector.Length is 0)
         {
             _logger.LogWarning(LOG_EMPTY_QUERY_VECTOR);
             return null!;
         }
-
         _logger.LogInformation(LOG_START_QUERY, documentId);
         try
         {
             var relevantDocuments = await _database.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount, cancellationToken);
-            if (relevantDocuments == null || !relevantDocuments.Any())
+            if (relevantDocuments is null || !relevantDocuments.Any())
             {
                 _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
                 return null!;
             }
             var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantDocuments);
             var summary = await _database.GetSummaryAsync(documentId, cancellationToken);
-            if (summary == null || summary.IsEmpty)
+            if (summary is null || summary.IsEmpty)
             {
                 _logger.LogWarning(LOG_FAIL_QUERY_SUMMARY, documentId);
-                return new SummarizedExcelData { Summary = null!, Rows = rows };
+                return new() 
+                { 
+                    Rows = rows,
+                    Summary = null!
+                };
             }
             _logger.LogInformation(LOG_SUCCESS_QUERY, documentId, relevantDocuments.Count());
-            return new SummarizedExcelData
+            return new()
             {
                 Rows = rows,
                 Summary = summary
@@ -325,23 +326,28 @@ public class VectorRepository(
         ConcurrentBag<ConcurrentDictionary<string, object>> batchesToStore,
         CancellationToken cancellationToken)
     {
-        var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
-        await Parallel.ForEachAsync(pairs, new ParallelOptions 
+        var parallelOptions = new ParallelOptions 
         { 
             MaxDegreeOfParallelism = _maxConcurrentTasks,
             CancellationToken = cancellationToken
-        }, 
-        async (pair, ct) =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await Task.Yield();
-            var (row, embedding) = pair;
-            if (embedding != null)
-                row["embedding"] = embedding;
-            else
-                _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
-            batchesToStore.Add(row);
-        });
+        };
+        var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
+        await Parallel.ForEachAsync(
+            pairs, 
+            parallelOptions, 
+            async (pair, ct) =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await Task.Yield();
+                
+                var (row, embedding) = pair;
+
+                if (embedding != null) row["embedding"] = embedding;
+                else _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
+
+                batchesToStore.Add(row);
+            }
+        );
     }
 
     private async ValueTask<string> SaveBatchOfRowEmbeddings(

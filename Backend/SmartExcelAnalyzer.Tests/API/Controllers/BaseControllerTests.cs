@@ -4,6 +4,7 @@ using API.Controllers;
 using FluentAssertions;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
+
 public class BaseControllerTests
 {
     [Fact]
@@ -15,5 +16,4 @@ public class BaseControllerTests
 
         controller.Should().NotBeNull();
     }
-
 }

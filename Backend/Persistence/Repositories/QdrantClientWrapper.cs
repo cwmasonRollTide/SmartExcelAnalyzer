@@ -1,8 +1,10 @@
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Repositories;
 
+[ExcludeFromCodeCoverage]
 public class QdrantClientWrapper(QdrantClient client) : IQdrantClient
 {
     private readonly QdrantClient _client = client;

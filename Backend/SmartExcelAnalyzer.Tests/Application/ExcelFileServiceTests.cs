@@ -79,7 +79,7 @@ public class ExcelFileServiceTests
         summary.Averages.Should().BeEmpty();
         summary.HashedStrings.Should().BeEmpty();
 
-        progressMock.Verify(p => p.Report(It.IsAny<(double, double)>()), Times.Never());
+        progressMock.Verify(p => p.Report(It.IsAny<(double, double)>()), Times.AtLeastOnce());
     }
 
     [Fact]
@@ -108,8 +108,21 @@ public class ExcelFileServiceTests
         await Sut.PrepareExcelFileForLLMAsync(_mockFile.Object, progress);
 
         progressReports.Should().NotBeEmpty();
-        progressReports.Should().OnlyContain(report => report.Item1 >= 0 && report.Item1 <= 1 && report.Item2 == 0);
-        progressReports.Last().Item1.Should().Be(1); // Final progress should be 100%
+        progressReports.First().Item1.Should().Be(0); // Starts at 0
+        progressReports.Should().Contain(r => r.Item1 > 0 && r.Item1 < 1); // Has intermediate progress
+        progressReports.Should().OnlyContain(report => 
+            report.Item1 >= 0 && 
+            report.Item1 <= 1 && 
+            report.Item2 == 0);
+
+        // Verify progress increases
+        progressReports.Should().BeInAscendingOrder(report => report.Item1);
+
+        // Verify we get progress updates for each row (3 rows in test data)
+        progressReports.Should().HaveCountGreaterThan(2);
+
+        // Verify we reach 100% at the end
+        progressReports.Last().Item1.Should().Be(1.0);
     }
 
     [Fact]

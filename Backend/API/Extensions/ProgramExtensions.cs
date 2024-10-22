@@ -1,9 +1,9 @@
-using API.Hubs;
 using System.Text;
 using Qdrant.Client;
 using API.Properties;
 using API.Middleware;
 using API.Controllers;
+using Persistence.Hubs;
 using Application.Queries;
 using Application.Services;
 using Persistence.Database;

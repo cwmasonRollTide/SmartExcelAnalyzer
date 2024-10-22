@@ -1,45 +1,48 @@
 using MediatR;
 using FluentValidation;
+using Persistence.Hubs;
 using System.Diagnostics;
 using Application.Services;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Commands;
 
-/// <summary>
-/// Validates the uploadfilecommand request
-/// Ensures that the file is not null and has a length greater than 0
-/// Also must be smaller than 15MB
-/// </summary>
+public class UploadFileCommand : IRequest<string?>
+{
+    [Required]
+    public IFormFile File { get; set; } = null!;    
+    public IProgress<(double ParseProgress, double SaveProgress)> Progress { get; set; } = new Progress<(double, double)>();
+}
+
 public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
 {
     public UploadFileCommandValidator()
     {
-        RuleFor(x => x.File).NotNull().WithMessage("File is required.");
-        RuleFor(x => x.File).Must(file => file is not null && file.Length > 0).WithMessage("File is empty.");
-        RuleFor(x => x.File).Must(file => file is not null && file.Length < 15 * 1024 * 1024).WithMessage("File size must be less than 15 MB.");
+        RuleFor(x => x.File)
+            .NotNull()
+            .WithMessage("File is required.");
+
+        RuleFor(x => x.File)
+            .Must(file => file?.Length > 0)
+            .When(x => x.File != null)
+            .WithMessage("File is empty.");
     }
 }
 
-public class UploadFileCommand : IRequest<string?>
-{
-    public IFormFile? File { get; set; }
-    public IProgress<(double ParseProgress, double SaveProgress)> Progress { get; set; } = new Progress<(double, double)>();
-}
-
 /// <summary>
+/// The service responsible for handling Excel file operations.
 /// UploadFileCommandHandler handles the UploadFileCommand request
-/// dependencies: IExcelFileService, IVectorDbRepository, ILogger<UploadFileCommandHandler>
-/// Returns the documentId of the uploaded file if successful, otherwise null
 /// </summary>
-/// <param name="excelService"></param>
-/// <param name="vectorDbRepository"></param>
-/// <param name="logger"></param>
+/// <param name="excelService">Service for processing Excel files</param>
+/// <param name="vectorDbRepository">Repository for vector database operations</param>
+/// <param name="logger">Logger for operation tracking</param>
 /// <param name="hubContext">SignalR hub context for reporting progress to the client on parsing and saving</param>
-public UploadFileCommandHandler(
+public class UploadFileCommandHandler(
     IExcelFileService excelService,
     IVectorDbRepository vectorDbRepository,
     ILogger<UploadFileCommandHandler> logger,
@@ -47,6 +50,7 @@ public UploadFileCommandHandler(
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants
+    private const string SignalRMethod = "ReceiveProgress";
     private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
     private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
     private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
@@ -58,48 +62,82 @@ public UploadFileCommandHandler(
 
     #region Dependencies
     private readonly IExcelFileService _excelService = excelService;
+    private readonly IHubContext<ProgressHub> _hubContext = hubContext;
     private readonly ILogger<UploadFileCommandHandler> _logger = logger;
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
-
     #endregion
 
-    #region Handle Method
     /// <summary>
     /// Handles the UploadFileCommand request. Prepares the excel file for the LLM and saves it to the vector database.
     /// Parses the excel file and computes the embedding of each row with the LLM.
     /// Saves the way the LLM computes the embedding of all the rows of each excel file in the database
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="request">The upload file command containing the file and progress tracker</param>
+    /// <param name="cancellationToken">Cancellation token for operation cancellation</param>
     /// <returns>
     /// DocumentId? string. If it is null, the operation failed either at the parsing stage
     /// or the saving to the vector db stage
     /// </returns>
-    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
+    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken)
     {
-        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, request.Progress, cancellationToken);
+        var progress = new Progress<(double, double)>(
+            async report =>
+                await _hubContext
+                    .Clients
+                    .All
+                    .SendAsync(
+                        method: SignalRMethod, 
+                        report.Item1, 
+                        report.Item2, 
+                        cancellationToken: cancellationToken
+                    )
+        );
+
+        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, progress, cancellationToken);
         if (summarizedExcelData is null) return null;
-        return await SaveToVectorDatabaseAsync(summarizedExcelData, request.File!.FileName, request.Progress, cancellationToken);
+        
+        return await SaveToVectorDatabaseAsync(
+            summarizedExcelData, 
+            request.File!.FileName, 
+            progress, 
+            cancellationToken
+        );
     }
 
-    private async Task<SummarizedExcelData?> PrepareExcelFileAsync(IFormFile file, IProgress<(double, double)>? progress, CancellationToken cancellationToken)
+    private async Task<SummarizedExcelData?> PrepareExcelFileAsync(
+        IFormFile file, 
+        IProgress<(double, double)> progress, 
+        CancellationToken cancellationToken)
     {
         _logger.LogTrace(LogPreparingExcelFile, file.FileName);
         var stopwatch = Stopwatch.StartNew();
-        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file, progress, cancellationToken);
+        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(
+            file, 
+            progress, 
+            cancellationToken
+        );
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
 
-        if (summarizedExcelData is null) _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
+        if (summarizedExcelData is null)
+            _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
 
         return summarizedExcelData;
     }
 
-    private async Task<string?> SaveToVectorDatabaseAsync(SummarizedExcelData data, string fileName, IProgress<(double, double)>? progress, CancellationToken cancellationToken)
+    private async Task<string?> SaveToVectorDatabaseAsync(
+        SummarizedExcelData data, 
+        string fileName, 
+        IProgress<(double, double)> progress, 
+        CancellationToken cancellationToken)
     {
         _logger.LogTrace(LogSavingDocument, fileName);
         var stopwatch = Stopwatch.StartNew();
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(data, progress, cancellationToken);
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(
+            data, 
+            progress, 
+            cancellationToken
+        );           
         stopwatch.Stop();
         _logger.LogTrace(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
 
@@ -110,5 +148,4 @@ public UploadFileCommandHandler(
 
         return documentId;
     }
-    #endregion
 }
