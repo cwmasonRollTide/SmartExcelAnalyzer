@@ -77,4 +77,4 @@ services:
     env_file:
       - .env
     environment:
-      - VITE_BASE_API_URL=http://localhost:5001
+      - VITE_BASE_API_URL=http://localhost:5001/api

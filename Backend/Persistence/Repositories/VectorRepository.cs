@@ -411,7 +411,7 @@ public class VectorRepository(
         {
             documentId = batchDocumentId;
         }
-        else if (!string.Equals(documentId, batchDocumentId, StringComparison.InvariantCultureIgnoreCase))
+        else if (documentId != batchDocumentId)
         {
             _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
         }
