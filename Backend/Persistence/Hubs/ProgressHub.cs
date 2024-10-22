@@ -2,7 +2,12 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Persistence.Hubs;
 
-public class ProgressHub : Hub
+public class ProgressHub(IProgressHubWrapper progressHubWrapper) : Hub
 {
-    public async Task SendProgress(double parseProgress, double saveProgress) => await Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
+    private readonly IProgressHubWrapper _progressHubWrapper = progressHubWrapper;
+
+    public async Task SendProgress(double parseProgress, double saveProgress)
+    {
+        await _progressHubWrapper.SendProgress(parseProgress, saveProgress);
+    }
 }

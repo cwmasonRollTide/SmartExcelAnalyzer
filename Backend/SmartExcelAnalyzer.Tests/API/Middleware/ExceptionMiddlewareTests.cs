@@ -1,4 +1,5 @@
 using Moq;
+using System.Net;
 using API.Middleware;
 using FluentAssertions;
 using FluentValidation;
@@ -85,6 +86,142 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("400");
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task InvokeAsync_TaskCanceledExceptionThrown_ReturnsRequestTimeout()
+    {
+        const string exceptionMessage = "A task was canceled.";
+        var context = new DefaultHttpContext();
+        context.Response.Body = new MemoryStream();
+        static Task next(HttpContext httpContext)
+        {
+            throw new TaskCanceledException(exceptionMessage);
+        }
+        var middleware = new ExceptionMiddleware(next, _loggerMock.Object);
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status408RequestTimeout);
+        context.Response.ContentType.Should().Contain("application/json");
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(context.Response.Body);
+        var responseBody = await reader.ReadToEndAsync();
+        
+        responseBody.Should().Contain(exceptionMessage);
+        responseBody.Should().Contain("408");
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task InvokeAsync_TimeoutExceptionThrown_ReturnsRequestTimeout()
+    {
+        const string exceptionMessage = "A timeout occurred.";
+        var context = new DefaultHttpContext();
+        context.Response.Body = new MemoryStream();
+        static Task next(HttpContext httpContext)
+        {
+            throw new TimeoutException(exceptionMessage);
+        }
+        var middleware = new ExceptionMiddleware(next, _loggerMock.Object);
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status408RequestTimeout);
+        context.Response.ContentType.Should().Contain("application/json");
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(context.Response.Body);
+        var responseBody = await reader.ReadToEndAsync();
+        
+        responseBody.Should().Contain(exceptionMessage);
+        responseBody.Should().Contain("408");
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task InvokeAsync_HttpRequestExceptionThrown_ReturnsCorrectStatusCode()
+    {
+        const string exceptionMessage = "An HTTP request exception occurred.";
+        var context = new DefaultHttpContext();
+        context.Response.Body = new MemoryStream();
+        static Task next(HttpContext httpContext)
+        {
+            throw new HttpRequestException(exceptionMessage, null, HttpStatusCode.BadGateway);
+        }
+        var middleware = new ExceptionMiddleware(next, _loggerMock.Object);
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status502BadGateway);
+        context.Response.ContentType.Should().Contain("application/json");
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(context.Response.Body);
+        var responseBody = await reader.ReadToEndAsync();
+        
+        responseBody.Should().Contain(exceptionMessage);
+        responseBody.Should().Contain("502");
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task InvokeAsync_OperationCanceledExceptionThrown_ReturnsRequestTimeout()
+    {
+        const string exceptionMessage = "An operation was canceled.";
+        var context = new DefaultHttpContext();
+        context.Response.Body = new MemoryStream();
+        static Task next(HttpContext httpContext)
+        {
+            throw new OperationCanceledException(exceptionMessage);
+        }
+        var middleware = new ExceptionMiddleware(next, _loggerMock.Object);
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status408RequestTimeout);
+        context.Response.ContentType.Should().Contain("application/json");
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(context.Response.Body);
+        var responseBody = await reader.ReadToEndAsync();
+        
+        responseBody.Should().Contain(exceptionMessage);
+        responseBody.Should().Contain("408");
         _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Error,

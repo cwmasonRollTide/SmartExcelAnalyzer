@@ -1,36 +1,27 @@
 using Moq;
 using Persistence.Hubs;
-using Microsoft.AspNetCore.SignalR;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
 
-public class ProgressHubTests
+public class ProgressHubTestsTest
 {
-    [Fact]
-    public async Task SendProgress_ShouldSendProgressToAllClients()
+    private readonly Mock<IProgressHubWrapper> _hubContextMock = new();
+    private ProgressHub Sut => new(_hubContextMock.Object);
+
+    public ProgressHubTestsTest()
     {
-        var mockClients = new Mock<IHubCallerClients>();
-        var mockClientProxy = new Mock<IClientProxy>();
+        _hubContextMock
+            .Setup(h => h.SendProgress(It.IsAny<double>(), It.IsAny<double>()))
+            .Returns(Task.CompletedTask);
+    }
 
-        mockClients.Setup(clients => clients.All).Returns(mockClientProxy.Object);
+    [Fact]
+    public async Task SendProgressUpdate_ShouldInvokeClientMethod()
+    {
+        var progress = 50;
 
-        var hub = new ProgressHub
-        {
-            Clients = mockClients.Object
-        };
+        await Sut.SendProgress(progress, progress);
 
-        double parseProgress = 0.5;
-        double saveProgress = 0.75;
-
-        await hub.SendProgress(parseProgress, saveProgress);
-
-        mockClientProxy.Verify(
-            clientProxy => clientProxy.SendCoreAsync(
-                "ReceiveProgress",
-                It.Is<object[]>(objects => (double)objects[0] == parseProgress && (double)objects[1] == saveProgress),
-                default
-            ),
-            Times.Once
-        );
+        _hubContextMock.Verify(h => h.SendProgress(progress, progress), Times.Once);
     }
 }

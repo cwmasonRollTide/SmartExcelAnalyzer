@@ -103,6 +103,7 @@ public static class ConfigurationExtensions
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
+        builder.Services.AddScoped<IProgressHubWrapper, ProgressHubWrapper>();
         builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));
         return builder;
     }
