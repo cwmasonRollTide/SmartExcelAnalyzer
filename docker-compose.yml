@@ -36,9 +36,6 @@ services:
     env_file:
       - .env
 
-  llm-service:
-    <<: *llm-service
-
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
     ports:
@@ -48,7 +45,12 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     depends_on:
       - qdrant
-      - llm-service
+      - llm-service-0
+      - llm-service-1
+      - llm-service-2
+      - llm-service-3
+      - llm-service-4
+      - llm-service-5
     env_file:
       - .env
 

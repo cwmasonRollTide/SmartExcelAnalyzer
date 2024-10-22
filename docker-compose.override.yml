@@ -1,14 +1,69 @@
 services:
-  llm-service:
+  llm-service-0:
+    extends:
+      service: llm-service
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
     volumes:
       - ./LLM:/app
       - model_cache:/root/.cache/huggingface
-    deploy:
-      replicas: 6
+
+  llm-service-1:
+    extends:
+      service: llm-service
     environment:
-      - PORT=${PORT:-8000}
+      - PORT=8001
     ports:
-      - "8000-8005:8000"
+      - "8001:8001"
+    volumes:
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
+
+  llm-service-2:
+    extends:
+      service: llm-service
+    environment:
+      - PORT=8002
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
+
+  llm-service-3:
+    extends:
+      service: llm-service
+    environment:
+      - PORT=8003
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
+
+  llm-service-4:
+    extends:
+      service: llm-service
+    environment:
+      - PORT=8004
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
+
+  llm-service-5:
+    extends:
+      service: llm-service
+    environment:
+      - PORT=8005
+    ports:
+      - "8005:8005"
+    volumes:
+      - ./LLM:/app
+      - model_cache:/root/.cache/huggingface
 
   backend:
     volumes:
