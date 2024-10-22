@@ -1,34 +1,38 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /source
+# Dockerfile for backend 
+# FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build 
+# WORKDIR /app 
+# COPY . . 
+# RUN dotnet restore 
+# RUN dotnet publish -c Release -o out 
+# RUN mkdir /app/publish 
+# RUN cp -r /app/out /app/publish 
+# FROM mcr.microsoft.com/dotnet/aspnet:8.0 
+# WORKDIR /app 
+# COPY --from=build /app/out . 
+# COPY --from=build /app/publish /app/publish 
+# EXPOSE 80
+# EXPOSE 443
+# EXPOSE 5000
+# EXPOSE 5001
+# ENTRYPOINT ["dotnet", "API.dll"] 
 
-# Copy project files first
-COPY ["Backend/API/API.csproj", "API/"]
-COPY ["Backend/Application/Application.csproj", "Application/"]
-COPY ["Backend/Domain/Domain.csproj", "Domain/"]
-COPY ["Backend/Persistence/Persistence.csproj", "Persistence/"]
-
-# Restore all packages
-RUN dotnet restore "API/API.csproj"
-
-# Copy the rest of the code
-COPY ["Backend/API/", "API/"]
-COPY ["Backend/Application/", "Application/"]
-COPY ["Backend/Domain/", "Domain/"]
-COPY ["Backend/Persistence/", "Persistence/"]
-
-# Build and publish
-RUN dotnet publish "API/API.csproj" -c Release -o /app --no-restore
-
-# Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Dockerfile for backend local development
+FROM mcr.microsoft.com/dotnet/sdk:8.0
 WORKDIR /app
-COPY --from=build /app ./
 
-# Set environment variables
-ENV ASPNETCORE_URLS=http://+:8080
-ENV ASPNETCORE_ENVIRONMENT=Development
+# Copy everything
+COPY . .
 
-EXPOSE 8080
+# Expose ports
+EXPOSE 80
+# EXPOSE 443
+# EXPOSE 5000
+# EXPOSE 5001
 
-# Update the entrypoint to explicitly use Program
-ENTRYPOINT ["dotnet", "API.dll", "--server.urls", "http://+:8080"]
+# Set the entrypoint to find the project, restore, and run
+# ENTRYPOINT ["/bin/sh", "-c", "\
+#     PROJECT_PATH=$(find . -name 'API.csproj') && \
+#     dotnet restore $PROJECT_PATH && \
+#     dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80 \
+# "]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "API/API.csproj", "--urls", "http://+:80"]

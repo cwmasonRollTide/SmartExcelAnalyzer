@@ -46,21 +46,17 @@ public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hu
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
-    {
-        var progress = new Progress<(double, double)>(
-            async progressTuple =>
+    public async Task<IActionResult> UploadFile(
+        [FromForm] IFormFile file
+    ) => Ok(await _mediator.Send(new UploadFileCommand
             {
-                var (parseProgress, saveProgress) = progressTuple;
-                await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
-            }
-        );
-        return Ok(await _mediator.Send(
-            new UploadFileCommand
-            { 
-                File = file, 
-                Progress = progress 
-            }
-        ));
-    }
+                File = file,
+                Progress = new Progress<(double, double)>(
+                    async progressTuple =>
+                    {
+                        var (parseProgress, saveProgress) = progressTuple;
+                        await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
+                    }
+                )
+            }));
 }

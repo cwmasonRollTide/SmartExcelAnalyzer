@@ -415,7 +415,6 @@ public class VectorRepository(
         {
             _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
         }
-
         return documentId;
     }
     #endregion
