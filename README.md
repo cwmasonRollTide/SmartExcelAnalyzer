@@ -176,39 +176,51 @@ POST /api/query
   "query": "What are the total sales for Q1 2024?",
   "fileId": "12345"
 }
-Development
-To set up the development environment:
 
-Backend:
+## Development
+- To set up the development environment:
 
-Install .NET 8 SDK
-Open the solution in Visual Studio or VS Code
-Run dotnet restore to install dependencies
-Frontend:
+  - Backend:
+    ```
+    Install .NET 8 SDK
+    Open the solution in Visual Studio or VS Code
+    Run dotnet restore to install dependencies
+    ```
+      
+  - Frontend:
+    ```
+    Install Node.js and npm
+    Navigate to the Frontend directory
+    Run npm install to install dependencies
+    Use npm run dev for development server
+    ```
+    
+  - LLM Services:
+    ```
+    Install Python 3.9+
+    Navigate to the LLM directory
+    Create a virtual environment: python -m venv venv
+    Activate the virtual environment and install dependencies: pip install -r requirements.txt
+    ```
+    
+## Docker
+- All of our docker images will be published to this docker hub container registry:
 
-Install Node.js and npm
-Navigate to the Frontend directory
-Run npm install to install dependencies
-Use npm run dev for development server
-LLM Services:
+## Docker Hub Repository
+- This process is kicked off in the file in this Github Action
 
-Install Python 3.9+
-Navigate to the LLM directory
-Create a virtual environment: python -m venv venv
-Activate the virtual environment and install dependencies: pip install -r requirements.txt
-Docker
-All of our docker images will be published to this docker hub container registry:
-
-Docker Hub Repository
-This process is kicked off in the file in this Github Action
-
+  ```
   ~/.github/workflows/docker-build-push.yml
-Testing
-Backend tests: Run dotnet test in the ./Backend/ directory.
-Frontend tests: Run npm test in the ./Frontend/ directory.
-Contact
-If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
+  ```
+  
+## Testing
+- Backend tests: Run dotnet test in the ./Backend/ directory.
+  
+- Frontend tests: Run npm test in the ./Frontend/ directory.
+  
+## Contact
+- If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
 
-Connor Mason - connor.mason@fivemconsulting.com
+  - Connor Mason - connor.mason@fivemconsulting.com
 
-[GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
+  - [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
