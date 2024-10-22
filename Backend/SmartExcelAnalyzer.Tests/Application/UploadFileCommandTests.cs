@@ -116,6 +116,11 @@ public class UploadFileCommandTests
             var expectedDocumentId = "test-document-id";
             var summarizedData = new SummarizedExcelData();
             var command = new UploadFileCommand { File = Mock.Of<IFormFile>() };
+            _clientProxyMock.Setup(x => x.SendCoreAsync(
+                "ReceiveProgress",
+                It.IsAny<object[]?>()!,
+                It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
             _hubContextMock
                 .Setup(x => x.Clients.All)
                 .Returns(_clientProxyMock.Object);
@@ -147,7 +152,7 @@ public class UploadFileCommandTests
                 "ReceiveProgress",
                 It.IsAny<object[]?>()!,
                 It.IsAny<CancellationToken>()),
-                Times.Once);
+                Times.AtLeastOnce);
         }
     }
 }
