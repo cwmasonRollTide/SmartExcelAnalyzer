@@ -11,8 +11,7 @@
 8. [Development](#development)
 9. [Docker](#docker)
 10. [Testing](#testing)
-11. [License](#license)
-12. [Contact](#contact)
+11. [Contact](#contact)
 
 ## Introduction
 
