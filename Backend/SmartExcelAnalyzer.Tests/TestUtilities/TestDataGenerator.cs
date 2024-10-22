@@ -7,8 +7,13 @@ namespace SmartExcelAnalyzer.Tests.TestUtilities;
 
 public static class TestDataGenerator
 {
-    public static IFormFile GenerateExcelFile(int rowCount, List<string> headers, string fileName = "test.xlsx")
+    public static IFormFile GenerateExcelFile(
+        int rowCount,
+        List<string>? headers = null,
+        string fileName = "test.xlsx"
+    )
     {
+        headers ??= ["id", "document_id", "content", "embedding"];
         var allHeaders = new List<string>(headers);
         if (!allHeaders.Contains("embedding"))
         {
@@ -53,8 +58,9 @@ public static class TestDataGenerator
         return file;
     }
 
-    public static IEnumerable<ConcurrentDictionary<string, object>> GenerateLargeDataSet(int count, List<string> headers)
+    public static IEnumerable<ConcurrentDictionary<string, object>> GenerateLargeDataSet(int count, List<string>? headers = null)
     {
+        headers ??= ["id", "document_id", "content", "embedding"];
         for (int i = 0; i < count; i++)
         {
             var row = new ConcurrentDictionary<string, object>();

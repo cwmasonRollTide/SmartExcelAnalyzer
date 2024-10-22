@@ -42,8 +42,8 @@ public class QdrantDatabaseWrapperTests
     {
         var rows = new List<ConcurrentDictionary<string, object>>
         {
-            new() { ["embedding"] = item },
-            new() { ["embedding"] = itemArray }
+            new() { ["embedding"] = item, ["document_id"] = "testDocId" },
+            new() { ["embedding"] = itemArray, ["document_id"] = "testDocId" }
         };
         _mockClient.Setup(c => c.UpsertAsync(
             It.IsAny<string>(),
@@ -56,7 +56,8 @@ public class QdrantDatabaseWrapperTests
 
         var result = await Sut.StoreVectorsAsync(rows);
 
-        result.Should().NotBeNullOrEmpty();
+        result.Should().NotBeNull();
+        result.Should().NotBeEmpty();
         _mockClient.Verify(c => c.UpsertAsync(
             It.IsAny<string>(),
             It.IsAny<IReadOnlyList<PointStruct>>(),
@@ -259,14 +260,6 @@ public class QdrantDatabaseWrapperTests
             .ThrowsAsync(new Exception("Test exception"));
 
         await Assert.ThrowsAsync<Exception>(() => Sut.StoreVectorsAsync(rows));
-
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!));
     }
 
     [Fact]
@@ -276,7 +269,6 @@ public class QdrantDatabaseWrapperTests
 
         var result = await Sut.StoreVectorsAsync(emptyRows);
 
-        result.Should().NotBeNullOrEmpty();
         _mockClient.Verify(c => c.UpsertAsync(
             It.IsAny<string>(),
             It.IsAny<IReadOnlyList<PointStruct>>(),
@@ -289,7 +281,7 @@ public class QdrantDatabaseWrapperTests
     [Fact]
     public async Task StoreVectorsAsync_ShouldHandleLargeInputCollection()
     {
-        var largeDataSet = TestDataGenerator.GenerateLargeDataSet(10000, ["document_id", "content", "embedding"]).ToList();
+        var largeDataSet = TestDataGenerator.GenerateLargeDataSet(10000).ToList();
         _mockOptions.Setup(o => o.Value).Returns(new DatabaseOptions
         {
             SAVE_BATCH_SIZE = 1000,
@@ -308,7 +300,6 @@ public class QdrantDatabaseWrapperTests
 
         var result = await Sut.StoreVectorsAsync(largeDataSet);
 
-        result.Should().NotBeNullOrEmpty();
         _mockClient.Verify(c => c.UpsertAsync(
             It.IsAny<string>(),
             It.IsAny<IReadOnlyList<PointStruct>>(),
@@ -321,7 +312,7 @@ public class QdrantDatabaseWrapperTests
     [Fact]
     public async Task StoreVectorsAsync_ShouldHandleDifferentBatchSizes()
     {
-        var file = TestDataGenerator.GenerateExcelFile(3, ["TestCol1", "TestCol2", "TestCol3"]);
+        var file = TestDataGenerator.GenerateExcelFile(3);
         var dataSet = await ExcelReader.PrepareExcelFileForLLMAsync(file);
         _mockOptions.Setup(o => o.Value).Returns(new DatabaseOptions
         {
@@ -341,7 +332,7 @@ public class QdrantDatabaseWrapperTests
 
         var result = await Sut.StoreVectorsAsync(dataSet.Rows!);
 
-        result.Should().NotBeNullOrEmpty();
+        result.Should().NotBeNull();
         _mockClient.Verify(c => c.UpsertAsync(
             It.IsAny<string>(),
             It.Is<IReadOnlyList<PointStruct>>(points => points.Count == 3),

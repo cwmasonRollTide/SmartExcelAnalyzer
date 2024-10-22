@@ -57,6 +57,17 @@ public class QdrantDatabaseWrapper(
     private string CollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
     private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
+
+    private static byte[] RandomBytes => new byte[4];
+    private static Random Random => new();
+    private static byte[] NextRandomBytes
+    {
+        get
+        {
+            Random.NextBytes(RandomBytes);
+            return RandomBytes;
+        }
+    }
     #endregion
 
     #region Public Methods
@@ -68,16 +79,19 @@ public class QdrantDatabaseWrapper(
     /// <param name="docId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string> StoreVectorsAsync(
+    public async Task<string?> StoreVectorsAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
-        string? docId = default,
-        CancellationToken cancellationToken = default)
-    {
-        var documentId = docId ?? Guid.NewGuid().ToString();
+        string? documentId = null,
+        CancellationToken cancellationToken = default
+    )
+    {   
+        documentId ??= NewDocumentId();
         var points = await CreateRowsInParallelAsync(rows, documentId, cancellationToken);
-        await InsertRowsInBatchesAsync(points, cancellationToken);
+        if (points.Any()) await InsertRowsInBatchesAsync(points, cancellationToken);
         return documentId;
     }
+
+    private static string NewDocumentId() => BitConverter.ToString(NextRandomBytes).Replace("-", "");
 
     /// <summary>
     /// StoreSummaryAsync stores the summary of the document in the database.
@@ -135,23 +149,23 @@ public class QdrantDatabaseWrapper(
             limit: (ulong)topRelevantCount,
             cancellationToken: cancellationToken
         );
-
-        return searchResult?.Select(point => 
-        {
-            if (point.Payload.TryGetValue("content", out var contentValue) && contentValue.StringValue != null)
-            {
-                return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(contentValue.StringValue, _serializerOptions) 
-                    ?? new ConcurrentDictionary<string, object>();
-            }
-            return new ConcurrentDictionary<string, object>();
-        }) ?? [];
+        return searchResult?
+            .Select(point => point.Payload)
+            .Select(point => point.TryGetValue("content", out var contentValue) 
+                ? contentValue.StringValue 
+                : null)
+            .Select(content => content != null 
+                ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions) 
+                : null)
+            .Where(content => content != null) // Filter out null values
+            .Select(content => content!) 
+        ?? [];
     }
 
-    /// <summary>
     /// Simple lookup for the summary
     /// </summary>
     /// <param name="documentId"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken"></param>    
     /// <returns></returns>
     public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(string documentId, CancellationToken cancellationToken = default)
     {
@@ -174,35 +188,38 @@ public class QdrantDatabaseWrapper(
     #region Private Methods
     private async Task<IEnumerable<PointStruct>> CreateRowsInParallelAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
-        string documentId,
-        CancellationToken cancellationToken
+        string? documentId,
+        CancellationToken cancellationToken = default
     )
     {
+        var parallelOptions = CreateParallelOptions(cancellationToken);
         var points = new ConcurrentBag<PointStruct>();
-        await Parallel.ForEachAsync(rows, CreateParallelOptions(cancellationToken), 
-            (row, ct) =>
+        await Parallel.ForEachAsync(
+            rows, 
+            parallelOptions, 
+            async (row, ct) =>
             {
-                var point = CreateRow(row, documentId);
+                await Task.Yield();
+                var point = CreateRow(row, documentId!);
                 points.Add(point);
-                return ValueTask.CompletedTask;
             }
         );
         return points;
     }
 
-    private PointStruct CreateRow(ConcurrentDictionary<string, object> row, string documentId)
+    private PointStruct CreateRow(ConcurrentDictionary<string, object> row, string? documentId)
     {
         var point = new PointStruct 
         { 
             Id = new PointId(), 
             Vectors = row.TryGetValue("embedding", out var embedding) ? (embedding as Vectors) ?? Array.Empty<float>() : Array.Empty<float>()
         };
-        point.Payload.Add("document_id", new Value { StringValue = documentId });
+        point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
         point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions)});
         return point;
     }
 
-    private async Task InsertRowsInBatchesAsync(IEnumerable<PointStruct> points, CancellationToken cancellationToken)
+    private async Task InsertRowsInBatchesAsync(IEnumerable<PointStruct> points, CancellationToken cancellationToken = default)
     {
         int totalInserted = 0;
         foreach (var batch in points.Chunk(BatchSize))
@@ -225,7 +242,7 @@ public class QdrantDatabaseWrapper(
         }
     }
 
-    private ParallelOptions CreateParallelOptions(CancellationToken cancellationToken) => 
+    private ParallelOptions CreateParallelOptions(CancellationToken cancellationToken = default) => 
         new()
         {
             CancellationToken = cancellationToken,

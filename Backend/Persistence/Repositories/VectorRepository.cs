@@ -407,8 +407,14 @@ public class VectorRepository(
             _logger.LogWarning(LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT, documentId);
             return documentId;
         }
-        documentId ??= batchDocumentId;
-        if (documentId != batchDocumentId) _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
+        if (documentId == null)
+        {
+            documentId = batchDocumentId;
+        }
+        else if (!string.Equals(documentId, batchDocumentId, StringComparison.InvariantCultureIgnoreCase))
+        {
+            _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
+        }
 
         return documentId;
     }

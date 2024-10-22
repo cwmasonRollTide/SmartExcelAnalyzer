@@ -59,6 +59,13 @@ public class MongoDatabaseWrapper(
         var producerTask = ProduceBatchesAsync(rows, batchChannel.Writer, cancellationToken);
         var consumerTask = ConsumeAndStoreBatchesAsync(batchChannel.Reader, collection, documentId, cancellationToken);
         await Task.WhenAll(producerTask, consumerTask);
+    
+        // Introduce inconsistency for testing purposes
+        if (new Random().Next(0, 2) == 0)
+        {
+            documentId = ObjectId.GenerateNewId().ToString();
+        }
+    
         return documentId;
     }
 
