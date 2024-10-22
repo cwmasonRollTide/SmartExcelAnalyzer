@@ -3,18 +3,26 @@ using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using API.Hubs;
 
 namespace API.Controllers;
 
 /// <summary>
 /// AnalysisController handles the API requests for the LLM and the vector database.
-/// dependencies: IMediator
+/// dependencies: IMediator, IHubContext<ProgressHub>
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
-/// <param name="mediator"></param>
-public class AnalysisController(IMediator mediator) : BaseController(mediator)
+public class AnalysisController : BaseController
 {
+    private readonly IHubContext<ProgressHub> _hubContext;
+
+    public AnalysisController(IMediator mediator, IHubContext<ProgressHub> hubContext) : base(mediator)
+    {
+        _hubContext = hubContext;
+    }
+
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -45,5 +53,15 @@ public class AnalysisController(IMediator mediator) : BaseController(mediator)
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file) => Ok(await _mediator.Send(new UploadFileCommand { File = file }));
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
+    {
+        var progress = new Progress<(double, double)>(async (progress) =>
+        {
+            var (parseProgress, saveProgress) = progress;
+            await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
+        });
+
+        var result = await _mediator.Send(new UploadFileCommand { File = file, Progress = progress });
+        return Ok(result);
+    }
 }

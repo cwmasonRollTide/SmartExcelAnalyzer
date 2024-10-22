@@ -27,6 +27,7 @@ public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
 public class UploadFileCommand : IRequest<string?>
 {
     public IFormFile? File { get; set; }
+    public IProgress<(double ParseProgress, double SaveProgress)>? Progress { get; set; }
 }
 
 /// <summary>
@@ -56,6 +57,7 @@ public class UploadFileCommandHandler(
     private readonly IExcelFileService _excelService = excelService;
     private readonly ILogger<UploadFileCommandHandler> _logger = logger;
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
+
     #endregion
 
     #region Handle Method
@@ -72,16 +74,16 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken = default)
     {
-        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, cancellationToken);
+        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, request.Progress, cancellationToken);
         if (summarizedExcelData is null) return null;
-        return await SaveToVectorDatabaseAsync(summarizedExcelData, request.File!.FileName, cancellationToken);
+        return await SaveToVectorDatabaseAsync(summarizedExcelData, request.File!.FileName, request.Progress, cancellationToken);
     }
 
-    private async Task<SummarizedExcelData?> PrepareExcelFileAsync(IFormFile file, CancellationToken cancellationToken)
+    private async Task<SummarizedExcelData?> PrepareExcelFileAsync(IFormFile file, IProgress<(double, double)>? progress, CancellationToken cancellationToken)
     {
         _logger.LogTrace(LogPreparingExcelFile, file.FileName);
         var stopwatch = Stopwatch.StartNew();
-        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file, cancellationToken);
+        var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(file, progress, cancellationToken);
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
 
@@ -90,11 +92,11 @@ public class UploadFileCommandHandler(
         return summarizedExcelData;
     }
 
-    private async Task<string?> SaveToVectorDatabaseAsync(SummarizedExcelData data, string fileName, CancellationToken cancellationToken)
+    private async Task<string?> SaveToVectorDatabaseAsync(SummarizedExcelData data, string fileName, IProgress<(double, double)>? progress, CancellationToken cancellationToken)
     {
         _logger.LogTrace(LogSavingDocument, fileName);
         var stopwatch = Stopwatch.StartNew();
-        var documentId = await _vectorDbRepository.SaveDocumentAsync(data, cancellationToken);
+        var documentId = await _vectorDbRepository.SaveDocumentAsync(data, progress, cancellationToken);
         stopwatch.Stop();
         _logger.LogTrace(LogTimeSaveTaken, stopwatch.ElapsedMilliseconds);
 

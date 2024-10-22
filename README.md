@@ -83,7 +83,7 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
     ```
      
     ```bash
-      cd smart-excel-analyzer
+      cd SmartExcelAnalyzer
     ```
 
 2. Ensure Docker and Docker Compose are installed on your system

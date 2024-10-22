@@ -11,7 +11,7 @@ namespace Application.Services;
 
 public interface IExcelFileService
 {
-    Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default);
+    Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, IProgress<(double, double)>? progress = null, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -34,13 +34,15 @@ public class ExcelFileService : IExcelFileService
     /// 
     /// </summary>
     /// <param name="file"></param>
+    /// <param name="progress"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, CancellationToken cancellationToken = default)
+    public async Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, IProgress<(double, double)>? progress = null, CancellationToken cancellationToken = default)
     {
         var table = await LoadExcelTableAsync(file);
         var columns = GetTableColumns(table);
         var parallelOptions = CreateParallelOptions(cancellationToken);
-        var rowsTask = ProcessRowsAsync(table, columns, parallelOptions);
+        var rowsTask = ProcessRowsAsync(table, columns, parallelOptions, progress);
         var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
         await Task.WhenAll(rowsTask, summaryTask);
         return new()
@@ -65,15 +67,21 @@ public class ExcelFileService : IExcelFileService
     private static async Task<ConcurrentBag<ConcurrentDictionary<string, object>>> ProcessRowsAsync(
         DataTable table, 
         DataColumn[] columns, 
-        ParallelOptions parallelOptions)
+        ParallelOptions parallelOptions,
+        IProgress<(double, double)>? progress)
     {
         var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
+        var totalRows = table.Rows.Count;
+        var processedRows = 0;
+
         await Task.Run(() =>
         {
-            Parallel.For(0, table.Rows.Count, parallelOptions, i =>
+            Parallel.For(0, totalRows, parallelOptions, i =>
             {
                 var rowDict = ProcessRow(table.Rows[i], columns);
                 rows.Add(rowDict);
+                Interlocked.Increment(ref processedRows);
+                progress?.Report((processedRows / (double)totalRows, 0));
             });
         }, parallelOptions.CancellationToken);
         return rows;

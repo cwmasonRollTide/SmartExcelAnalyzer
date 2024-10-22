@@ -1,3 +1,4 @@
+using API.Hubs;
 using System.Text;
 using Qdrant.Client;
 using API.Properties;
@@ -10,9 +11,9 @@ using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using Persistence.Repositories.API;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using System.Diagnostics.CodeAnalysis;
 
 namespace API.Extensions;
 
@@ -48,6 +49,7 @@ public static class ConfigurationExtensions
 
     public static WebApplicationBuilder ConfigureApiAccess(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSignalR();
         builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
         builder.Services.AddScoped<BaseController>();
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
@@ -71,12 +73,13 @@ public static class ConfigurationExtensions
             .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
         var options = databaseOptions.Get<DatabaseOptions>();
-        builder.Services.AddSingleton(sp => (IQdrantClient)new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
+        builder.Services.AddSingleton<QdrantClient>(sp => new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
+        builder.Services.AddSingleton<IQdrantClient, QdrantClientWrapper>();
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
         return builder;
     }
-
+    
     public static WebApplicationBuilder ConfigureLLMService(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMLoadBalancer>();
@@ -122,6 +125,13 @@ public static class ConfigurationExtensions
         app.UseCors().UseRouting().UseMiddleware<ExceptionMiddleware>();
         app.MapControllers();
         app.MapHealthChecks("/health");
+        return app;
+    }
+
+    [ExcludeFromCodeCoverage]
+    public static WebApplication ConfigureHubs(this WebApplication app)
+    {
+        app.MapHub<ProgressHub>("/progressHub");
         return app;
     }
 }
