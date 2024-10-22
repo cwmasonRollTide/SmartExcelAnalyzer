@@ -24,7 +24,7 @@ public class VectorDbRepositoryTests
     private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
     private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
 
-    private static readonly float[] singleArray = new float[] { 1.0f };
+    private static readonly float[] singleArray = [1.0f];
 
     public VectorDbRepositoryTests()
     {

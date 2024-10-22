@@ -37,7 +37,7 @@ public class QdrantDatabaseWrapper(
             Random.NextBytes(RandomBytes);
             return RandomBytes;
         }
-    }
+    } 
     #endregion
 
     #region Public Methods
@@ -124,10 +124,10 @@ public class QdrantDatabaseWrapper(
             .Select(point => point.TryGetValue("content", out var contentValue) 
                 ? contentValue.StringValue 
                 : null)
-            .Select(content => content != null 
+            .Select(content => content is not null 
                 ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions) 
                 : null)
-            .Where(content => content != null) // Filter out null values
+            .Where(content => content is not null) // Filter out null values
             .Select(content => content!) 
         ?? [];
     }
@@ -146,7 +146,7 @@ public class QdrantDatabaseWrapper(
             limit: 1,
             cancellationToken: cancellationToken
         );
-        if (searchResult is null || searchResult.Count == 0) return new ConcurrentDictionary<string, object>();
+        if (searchResult is null || searchResult.Count is 0) return new ConcurrentDictionary<string, object>();
 
         var summary = searchResult[0];
         if (!summary!.Payload.TryGetValue("content", out Value? value)) return new ConcurrentDictionary<string, object>();
@@ -184,7 +184,10 @@ public class QdrantDatabaseWrapper(
             Id = new PointId(), 
             Vectors = row.TryGetValue("embedding", out var embedding) ? (embedding as Vectors) ?? Array.Empty<float>() : Array.Empty<float>()
         };
-        point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
+        if (documentId is not null)
+        {
+            point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
+        }
         point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions)});
         return point;
     }
