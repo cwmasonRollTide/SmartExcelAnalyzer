@@ -168,13 +168,13 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 - **Get Analysis**:
   ```json
-  GET /api/analysis/{fileId}
+  POST /api/analysis/query
   ```
 
 POST /api/query
 {
   "query": "What are the total sales for Q1 2024?",
-  "fileId": "12345"
+  "documentId": "12345"
 }
 
 ## Development
