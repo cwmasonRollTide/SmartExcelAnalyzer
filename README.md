@@ -158,10 +158,6 @@ To set up the development environment:
 
 - Frontend tests: Run `npm test` in the ```~./Frontend/``` directory.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
 ## Contact
 
 If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
