@@ -131,7 +131,7 @@ public static class ConfigurationExtensions
     }
 
     [ExcludeFromCodeCoverage]
-    public static WebApplication ConfigureHubs(this WebApplication app)
+    public static WebApplication ConfigureProgressHub(this WebApplication app)
     {
         app.MapHub<ProgressHub>("/progressHub");
         return app;

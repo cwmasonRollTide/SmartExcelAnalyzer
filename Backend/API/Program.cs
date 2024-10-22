@@ -11,6 +11,6 @@ WebApplication
     .ConfigureHttpClient()
     .ConfigureLLMService()
     .Build()
-    .ConfigureHubs()
+    .ConfigureProgressHub()
     .ConfigureMiddleware()
     .Run();
