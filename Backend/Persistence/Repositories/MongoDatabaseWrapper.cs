@@ -48,7 +48,7 @@ public class MongoDatabaseWrapper(
     /// <param name="docId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string> StoreVectorsAsync(
+    public async Task<string?> StoreVectorsAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
         string? docId = default,
         CancellationToken cancellationToken = default)
@@ -56,10 +56,8 @@ public class MongoDatabaseWrapper(
         var collection = _database.GetCollection<BsonDocument>("documents");
         var documentId = docId ?? ObjectId.GenerateNewId().ToString();
         var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(20) { FullMode = BoundedChannelFullMode.Wait });
-
         var producerTask = ProduceBatchesAsync(rows, batchChannel.Writer, cancellationToken);
         var consumerTask = ConsumeAndStoreBatchesAsync(batchChannel.Reader, collection, documentId, cancellationToken);
-
         await Task.WhenAll(producerTask, consumerTask);
         return documentId;
     }

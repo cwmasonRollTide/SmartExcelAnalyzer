@@ -19,6 +19,26 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
             _logger.LogError(validationException, "A validation exception occurred.");
             await HandleExceptionAsync(context, validationException, HttpStatusCode.BadRequest);
         }
+        catch (TaskCanceledException taskCanceledException)
+        {
+            _logger.LogError(taskCanceledException, "A task was canceled.");
+            await HandleExceptionAsync(context, taskCanceledException, HttpStatusCode.RequestTimeout);
+        }
+        catch (TimeoutException timeoutException)
+        {
+            _logger.LogError(timeoutException, "A timeout occurred.");
+            await HandleExceptionAsync(context, timeoutException, HttpStatusCode.RequestTimeout);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            _logger.LogError(httpRequestException, "An HTTP request exception occurred.");
+            await HandleExceptionAsync(context, httpRequestException, httpRequestException.StatusCode!.Value);
+        }
+        catch (OperationCanceledException operationCanceledException)
+        {
+            _logger.LogError(operationCanceledException, "An operation was canceled.");
+            await HandleExceptionAsync(context, operationCanceledException, HttpStatusCode.RequestTimeout);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unhandled exception occurred.");

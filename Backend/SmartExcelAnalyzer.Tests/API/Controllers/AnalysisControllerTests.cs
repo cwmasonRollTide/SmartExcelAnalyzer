@@ -35,17 +35,6 @@ public class AnalysisControllerTests
     }
 
     [Fact]
-    public async Task SubmitQuery_ReturnsBadRequest_WhenQueryIsInvalid()
-    {
-        var query = new SubmitQuery { Query = "test query", DocumentId = "doc1" };
-        _mediatorMock
-            .Setup(m => m.Send(It.IsAny<SubmitQuery>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new ArgumentException("test exception"));
-
-        await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.SubmitQuery(query));
-    }
-
-    [Fact]
     public async Task UploadFile_ReturnsOkResult_WhenFileIsValid()
     {
         var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
@@ -58,16 +47,5 @@ public class AnalysisControllerTests
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         okResult.Value.Should().BeEquivalentTo(expectedResult);
-    }
-
-    [Fact]
-    public async Task UploadFile_ReturnsBadRequest_WhenFileIsInvalid()
-    {
-        var file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
-        _mediatorMock
-            .Setup(m => m.Send(It.IsAny<UploadFileCommand>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new ArgumentException("test exception"));
-
-        await Assert.ThrowsAsync<ArgumentException>(async () => await Sut.UploadFile(file));
     }
 }

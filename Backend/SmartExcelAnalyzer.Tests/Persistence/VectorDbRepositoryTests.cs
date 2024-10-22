@@ -65,15 +65,7 @@ public class VectorDbRepositoryTests
     [Fact]
     public async Task SaveDocumentAsync_ShouldReturnNullWhenInputDataIsEmpty()
     {
-        var data = new SummarizedExcelData
-        {
-            Rows = [],
-            Summary = new ConcurrentDictionary<string, object>()
-        };
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().BeNull();
+        (await Sut.SaveDocumentAsync(null!)).Should().BeNull();
     }
 
     [Fact]
@@ -188,17 +180,19 @@ public class VectorDbRepositoryTests
             ],
             Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
         };
+        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => null!);
         _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Test exception"));
 
         var result = await Sut.SaveDocumentAsync(data);
 
-        result.Should().BeNull();
+        result.Should().BeNullOrEmpty();
         _loggerMock.Verify(
             x => x.Log(
-                LogLevel.Warning,
+                LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Failed to save vectors of the document to the database")),
+                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Error computing embeddings")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);

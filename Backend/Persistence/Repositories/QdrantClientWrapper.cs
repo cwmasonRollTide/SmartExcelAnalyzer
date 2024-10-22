@@ -15,10 +15,8 @@ public class QdrantClientWrapper(QdrantClient client) : IQdrantClient
         bool wait = true,
         WriteOrderingType? ordering = null,
         ShardKeySelector? shardKeySelector = null,
-        CancellationToken cancellationToken = default)
-    {
-        return _client.UpsertAsync(collectionName, points, wait, ordering, shardKeySelector, cancellationToken);
-    }
+        CancellationToken cancellationToken = default
+    ) => _client.UpsertAsync(collectionName, points, wait, ordering, shardKeySelector, cancellationToken);
 
     public Task<IReadOnlyList<ScoredPoint>> SearchAsync(
         string collectionName,
@@ -35,8 +33,6 @@ public class QdrantClientWrapper(QdrantClient client) : IQdrantClient
         ShardKeySelector? shardKeySelector = null,
         ReadOnlyMemory<uint>? sparseIndices = null,
         TimeSpan? timeout = null,
-        CancellationToken cancellationToken = default)
-    {
-        return _client.SearchAsync(collectionName, vector, filter, searchParams, limit, offset, payloadSelector, vectorsSelector, scoreThreshold, vectorName, readConsistency, shardKeySelector, sparseIndices, timeout, cancellationToken);
-    }
+        CancellationToken cancellationToken = default
+    ) => _client.SearchAsync(collectionName, vector, filter, searchParams, limit, offset, payloadSelector, vectorsSelector, scoreThreshold, vectorName, readConsistency, shardKeySelector, sparseIndices, timeout, cancellationToken);
 }

@@ -14,6 +14,7 @@ using Persistence.Repositories.API;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.SignalR;
 
 namespace API.Extensions;
 
@@ -73,7 +74,7 @@ public static class ConfigurationExtensions
             .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
         var options = databaseOptions.Get<DatabaseOptions>();
-        builder.Services.AddSingleton<QdrantClient>(sp => new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
+        builder.Services.AddSingleton(sp => new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
         builder.Services.AddSingleton<IQdrantClient, QdrantClientWrapper>();
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
