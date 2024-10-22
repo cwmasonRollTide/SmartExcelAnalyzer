@@ -3,11 +3,8 @@ using FluentValidation;
 
 namespace API.Middleware;
 
-public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
 {
-    private readonly RequestDelegate _next = next;
-    private readonly ILogger<ExceptionMiddleware> _logger = logger;
-
     public async Task InvokeAsync(HttpContext context)
     {
         try

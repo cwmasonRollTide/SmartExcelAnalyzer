@@ -65,7 +65,7 @@ public class SubmitQueryHandler(
     private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
     #endregion
 
-    #region Handle Method
+    #region Handle
     /// <summary>
     /// Handles the SubmitQuery request. Asks the LLM to process the query and returns the answer.
     /// If the relevantRowsCount is provided, it also asks the VectorDb to return the most relevant rows.
@@ -77,7 +77,10 @@ public class SubmitQueryHandler(
     /// <returns>
     ///     QueryAnswer. The answer to the query and possibly the most relevant rows
     /// </returns>
-    public async Task<QueryAnswer?> Handle(SubmitQuery request, CancellationToken cancellationToken = default) 
+    public async Task<QueryAnswer?> Handle(
+        SubmitQuery request, 
+        CancellationToken cancellationToken = default
+    ) 
     {
         var result = await QueryLLMAsync(request, cancellationToken);
         if (result is null) return null;
@@ -89,7 +92,10 @@ public class SubmitQueryHandler(
         return result;
     }
     
-    private async Task<QueryAnswer?> QueryLLMAsync(SubmitQuery request, CancellationToken cancellationToken)
+    private async Task<QueryAnswer?> QueryLLMAsync(
+        SubmitQuery request, 
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(LogQueryingLLM, request.Query, request.DocumentId);
         var result = await _llmRepository.QueryLLM(document_id: request.DocumentId, question: request.Query, cancellationToken);
@@ -100,7 +106,11 @@ public class SubmitQueryHandler(
 
     private static bool ShouldEnrichResponse(int? relevantRowsCount) => relevantRowsCount.HasValue && relevantRowsCount > 10;
 
-    private async Task EnrichWithRelevantRowsAsync(SubmitQuery request, QueryAnswer result, CancellationToken cancellationToken)
+    private async Task EnrichWithRelevantRowsAsync(
+        SubmitQuery request, 
+        QueryAnswer result, 
+        CancellationToken cancellationToken
+    )
     {
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
         if (embedding is null) return;
@@ -110,7 +120,11 @@ public class SubmitQueryHandler(
             result.RelevantRows = vectorResponse.Rows!;
     }
 
-    private async Task<SummarizedExcelData?> QueryVectorDbAsync(SubmitQuery request, float[] embedding, CancellationToken cancellationToken)
+    private async Task<SummarizedExcelData?> QueryVectorDbAsync(
+        SubmitQuery request, 
+        float[] embedding, 
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(LogQueryingVectorDb, request.Query, request.DocumentId);
         var vectorResponse = await _vectorDbRepository.QueryVectorData(
@@ -123,7 +137,10 @@ public class SubmitQueryHandler(
         return vectorResponse;
     }
 
-    private async Task<float[]?> ComputeEmbeddingAsync(SubmitQuery request, CancellationToken cancellationToken)
+    private async Task<float[]?> ComputeEmbeddingAsync(
+        SubmitQuery request, 
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(LogComputingEmbedding, request.Query);
         var embedding = await _llmRepository.ComputeEmbedding(text: request.Query, cancellationToken);

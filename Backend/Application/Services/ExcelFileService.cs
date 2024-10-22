@@ -11,7 +11,11 @@ namespace Application.Services;
 
 public interface IExcelFileService
 {
-    Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(IFormFile file, IProgress<(double, double)>? progress = null, CancellationToken cancellationToken = default);
+    Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(
+        IFormFile file, 
+        IProgress<(double, double)>? progress = null, 
+        CancellationToken cancellationToken = default
+    );
 }
 
 /// <summary>
@@ -43,13 +47,16 @@ public class ExcelFileService : IExcelFileService
     public async Task<SummarizedExcelData> PrepareExcelFileForLLMAsync(
         IFormFile file,
         IProgress<(double, double)>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         progress ??= new Progress<(double, double)>(_ => { });
         var parallelOptions = CreateParallelOptions(cancellationToken);
         progress.Report((0, 0));
+        
         var table = await LoadExcelTableAsync(file);
         progress.Report((LOADING_WEIGHT, 0));
+        
         if (table.Rows.Count is 0)
         {
             progress.Report((1.0, 0));
@@ -59,6 +66,7 @@ public class ExcelFileService : IExcelFileService
                 Summary = await CalculateSummaryStatisticsAsync(table, parallelOptions)
             };
         }
+        
         var columns = GetTableColumns(table);
         var currentProgress = LOADING_WEIGHT;
         var progressQueue = new ConcurrentQueue<double>();
@@ -66,7 +74,6 @@ public class ExcelFileService : IExcelFileService
         {
             var scaledValue = LOADING_WEIGHT + (report.Item1 * PROCESSING_ROWS_WEIGHT);
             progressQueue.Enqueue(scaledValue);
-            // Report the lowest value in the queue that's higher than current progress
             while (progressQueue.TryPeek(out var nextProgress) && nextProgress > currentProgress)
             {
                 if (progressQueue.TryDequeue(out var value))
@@ -76,7 +83,9 @@ public class ExcelFileService : IExcelFileService
                 }
             }
         });
+        
         var rowsTask = ProcessRowsAsync(table, columns, parallelOptions, scaledProgress);
+        progress.Report((LOADING_WEIGHT + SUMMARIZING_WEIGHT, 0));
         var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
         await Task.WhenAll(rowsTask, summaryTask);
         progress.Report((1.0, 0));
