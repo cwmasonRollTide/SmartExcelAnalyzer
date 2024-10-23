@@ -19,6 +19,4 @@ RUN python -c "from transformers import AutoTokenizer, AutoModel, pipeline; \
 
 COPY . .
 
-ENV PORT 8000
-
 EXPOSE ${PORT}

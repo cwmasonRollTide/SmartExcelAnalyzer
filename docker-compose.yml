@@ -4,16 +4,6 @@ x-healthcheck: &default-healthcheck
   retries: 3
   start_period: 40s
 
-x-llm-service: &llm-service
-  deploy:
-    mode: replicated
-    replicas: 6
-  healthcheck:
-    <<: *default-healthcheck
-    test: curl -f http://localhost:${PORT:-8000}/health
-  depends_on:
-    - qdrant
-
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -27,8 +17,24 @@ services:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
 
-  # llm-service:
-  #   <<: *llm-service
+  llm-service:
+    image: fivemowner/smart-excel-analyzer-llm:latest
+    env_file:
+      - .env
+    environment:
+      - QDRANT_PORT=6333
+      - QDRANT_HOST=qdrant
+      - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
+      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+    deploy:
+      mode: replicated
+      replicas: 3
+    healthcheck:
+      <<: *default-healthcheck
+      test: curl -f http://localhost:${PORT:-8000}/health
+    depends_on:
+      - qdrant
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -40,6 +46,9 @@ services:
     depends_on:
       - qdrant
       - llm-service
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest

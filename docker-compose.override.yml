@@ -1,63 +1,8 @@
 services:
   llm-service:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    env_file:
-      - .env
-    environment:
-      - QDRANT_PORT=6333
-      - QDRANT_HOST=qdrant
-      - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
-      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - QDRANT_API_KEY=${QDRANT_API_KEY}
-    command: uvicorn main:app --host 0.0.0.0 --port ${PORT}
-
-  llm-service-0:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8000
+    command: sh -c 'export PORT=$((8000 + DOCKER_SERVICE_REPLICA_ID)) && uvicorn main:app --host 0.0.0.0 --port $${PORT}'
     ports:
-      - "8000:8000"
-
-  llm-service-1:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8001
-    ports:
-      - "8001:8000"
-
-  llm-service-2:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8002
-    ports:
-      - "8002:8000"
-
-  llm-service-3:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8003
-    ports:
-      - "8003:8000"
-
-  llm-service-4:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8004
-    ports:
-      - "8004:8000"
-
-  llm-service-5:
-    extends:
-      service: llm-service
-    environment:
-      - PORT=8005
-    ports:
-      - "8005:8000"
+      - '${PORT_BASE:-8000}-${PORT_MAX:-8005}:8000-8005'
 
   backend:
     volumes:
