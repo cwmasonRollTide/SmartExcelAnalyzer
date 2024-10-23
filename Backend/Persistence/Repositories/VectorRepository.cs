@@ -407,7 +407,7 @@ public class VectorRepository(
             _logger.LogWarning(LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT, documentId);
             return documentId;
         }
-        if (documentId == null)
+        if (documentId is null)
         {
             documentId = batchDocumentId;
         }

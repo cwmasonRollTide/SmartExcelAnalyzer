@@ -15,7 +15,7 @@ public class SwaggerFileOperationFilter : IOperationFilter
     {
         var fileUploadMime = "multipart/form-data";
         
-        if (operation.RequestBody == null)
+        if (operation.RequestBody is null)
             return;
 
         if (!operation.RequestBody.Content.Any(x => x.Key.Equals(fileUploadMime, StringComparison.InvariantCultureIgnoreCase)))

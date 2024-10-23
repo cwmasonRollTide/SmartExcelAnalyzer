@@ -259,7 +259,7 @@ public class MongoDatabaseWrapper(
         var collection = _database.GetCollection<BsonDocument>("summaries");
         var filter = Builders<BsonDocument>.Filter.Eq("_id", documentId);
         var result = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
-        if (result == null) return new ConcurrentDictionary<string, object>();
+        if (result is null) return new ConcurrentDictionary<string, object>();
         return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(result["content"].ToJson(), _serializerOptions)!;
     }
 }
