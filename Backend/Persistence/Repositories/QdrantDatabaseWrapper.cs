@@ -22,14 +22,6 @@ public class QdrantDatabaseWrapper(
     #endregion
 
     #region Fields
-    private readonly Vectors _dummyVector = new(new float[] { 0.0f });
-    private int BatchSize => options.Value.SAVE_BATCH_SIZE;
-    private string CollectionName => options.Value.CollectionName;
-    private string SummaryCollectionName => options.Value.CollectionNameTwo;
-    private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
-
-    private static byte[] RandomBytes => new byte[4];
-    private static Random Random => new();
     private static byte[] NextRandomBytes
     {
         get
@@ -38,6 +30,13 @@ public class QdrantDatabaseWrapper(
             return RandomBytes;
         }
     } 
+    private static Random Random => new();
+    private static byte[] RandomBytes => new byte[4];
+    private int BatchSize => options.Value.SAVE_BATCH_SIZE;
+    private string CollectionName => options.Value.CollectionName;
+    private readonly Vectors _dummyVector = new(new float[] { 0.0f });
+    private string SummaryCollectionName => options.Value.CollectionNameTwo;
+    private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;    
     #endregion
 
     #region Public Methods
@@ -82,8 +81,6 @@ public class QdrantDatabaseWrapper(
 
         return documentId;
     }
-
-    private static string NewDocumentId() => BitConverter.ToString(NextRandomBytes).Replace("-", "");
 
     /// <summary>
     /// StoreSummaryAsync stores the summary of the document in the database.
@@ -134,11 +131,11 @@ public class QdrantDatabaseWrapper(
         CancellationToken cancellationToken = default
     )
     {
-        var searchResult = await _client.SearchAsync(//Native Qdrant Vector Search
+        var searchResult = await _client.SearchAsync(// Native Qdrant Vector Search
             collectionName: CollectionName,
-            vector: queryVector.AsMemory(),//Our Query as a vector interpreted by the LLM
-            filter: MatchKeyword("document_id", documentId),
-            limit: (ulong)topRelevantCount,
+            vector: queryVector.AsMemory(),// Our Query as a vector interpreted by the LLM
+            filter: MatchKeyword("document_id", documentId), // On our specific excel file
+            limit: (ulong)topRelevantCount, // Number of results the user is interested in
             cancellationToken: cancellationToken
         );
         return searchResult?
@@ -178,6 +175,8 @@ public class QdrantDatabaseWrapper(
     #endregion
 
     #region Private Methods
+    private static string NewDocumentId() => BitConverter.ToString(NextRandomBytes).Replace("-", "");
+
     private async Task<IEnumerable<PointStruct>> CreateRowsInParallelAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
         string? documentId,
@@ -204,7 +203,9 @@ public class QdrantDatabaseWrapper(
         var point = new PointStruct 
         { 
             Id = new PointId(), 
-            Vectors = row.TryGetValue("embedding", out var embedding) ? (embedding as Vectors) ?? Array.Empty<float>() : Array.Empty<float>()
+            Vectors = row.TryGetValue("embedding", out var embedding) 
+                ? (embedding as Vectors) ?? Array.Empty<float>() 
+                : Array.Empty<float>()
         };
         if (documentId is not null)
         {

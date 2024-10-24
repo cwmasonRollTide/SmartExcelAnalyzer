@@ -54,7 +54,20 @@ public static class ConfigurationExtensions
         builder.Services.AddScoped<BaseController>();
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddHealthChecks();
-        builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+        
+        // Allow only the frontend origin
+        var frontendUrl = builder.Configuration["FrontendUrl"];
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder =>
+            {
+                builder.WithOrigins(frontendUrl)
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+            });
+        });
+
         return builder;
     }
 
@@ -134,6 +147,16 @@ public static class ConfigurationExtensions
     public static WebApplication ConfigureProgressHub(this WebApplication app)
     {
         app.MapHub<ProgressHub>("/progressHub");
+
+        // Configure CORS for SignalR
+        app.UseCors(builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+
         return app;
     }
 }

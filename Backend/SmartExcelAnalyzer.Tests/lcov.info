@@ -1,733 +1,527 @@
-SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\API\Middleware\ExceptionMiddleware.cs
-FN:46,System.Threading.Tasks.Task API.Middleware.ExceptionMiddleware::HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext,System.Exception,System.Net.HttpStatusCode)
-FNDA:6,System.Threading.Tasks.Task API.Middleware.ExceptionMiddleware::HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext,System.Exception,System.Net.HttpStatusCode)
-DA:47,6
-DA:48,6
-DA:49,6
-DA:50,6
-DA:51,6
-DA:52,6
-DA:53,6
-DA:54,6
-DA:55,6
-FN:5,System.Void API.Middleware.ExceptionMiddleware::.ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger`1<API.Middleware.ExceptionMiddleware>)
-FNDA:7,System.Void API.Middleware.ExceptionMiddleware::.ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger`1<API.Middleware.ExceptionMiddleware>)
-DA:6,7
-FN:8,System.Void API.Middleware.ExceptionMiddleware/<InvokeAsync>d__3::MoveNext()
-FNDA:7,System.Void API.Middleware.ExceptionMiddleware/<InvokeAsync>d__3::MoveNext()
-DA:9,7
-DA:11,7
-DA:12,7
-DA:13,1
-DA:14,1
-DA:15,1
-DA:16,1
-DA:17,1
-DA:18,1
-DA:19,1
-DA:20,1
-DA:21,1
-DA:22,1
-DA:23,1
-DA:24,1
-DA:25,1
-DA:26,1
-DA:27,1
-DA:28,1
-DA:29,1
-DA:30,1
-DA:31,1
-DA:32,1
-DA:33,1
-DA:34,1
-DA:35,1
-DA:36,1
-DA:37,1
-DA:38,1
-DA:39,1
-DA:40,1
-DA:41,1
-DA:42,1
-DA:43,1
-DA:44,7
-BRDA:39,331,1,1
-BRDA:39,331,2,1
-BRDA:39,331,3,1
-BRDA:39,331,4,1
-BRDA:39,331,5,1
-BRDA:39,331,6,1
-BRDA:39,331,0,7
-LF:45
-LH:45
-BRF:7
-BRH:7
-FNF:3
-FNH:3
-end_of_record
-SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\API\Extensions\ProgramExtensions.cs
-FN:22,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureEnvironmentVariables(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:3,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureEnvironmentVariables(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:23,3
-DA:24,3
-DA:25,3
-DA:26,3
-DA:27,3
-DA:28,3
-DA:29,3
-BRDA:24,2,0,0
-BRDA:24,2,1,3
-FN:31,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureLogging(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:3,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureLogging(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:32,3
-DA:33,3
-DA:34,3
-DA:35,3
-DA:36,3
-DA:37,3
-DA:38,3
-DA:39,3
-FN:41,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureHttpClient(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:3,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureHttpClient(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:42,3
-DA:43,3
-DA:44,0
-DA:45,0
-DA:46,3
-DA:47,3
-DA:48,3
-FN:50,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureApiAccess(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:2,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureApiAccess(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:51,2
-DA:52,2
-DA:53,2
-DA:54,2
-DA:55,2
-DA:56,2
-DA:57,6
-DA:58,2
-DA:59,2
-FN:61,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureDatabase(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:2,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureDatabase(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:62,2
-DA:63,2
-DA:64,2
-DA:65,2
-DA:66,2
-DA:67,1
-DA:68,1
-DA:69,1
-DA:70,1
-DA:71,1
-DA:72,1
-DA:73,1
-DA:74,3
-DA:75,2
-DA:76,2
-DA:77,2
-DA:78,2
-DA:79,2
-DA:80,2
-DA:81,2
-FN:83,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureLLMService(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:2,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureLLMService(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:84,2
-DA:85,2
-DA:86,2
-DA:87,2
-DA:88,2
-DA:89,4
-DA:90,2
-DA:91,2
-DA:92,2
-FN:94,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureMediatR(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:2,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureMediatR(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:95,2
-DA:96,2
-DA:97,2
-DA:98,4
-DA:99,2
-DA:100,2
-FN:102,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureServices(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-FNDA:2,Microsoft.AspNetCore.Builder.WebApplicationBuilder API.Extensions.ConfigurationExtensions::ConfigureServices(Microsoft.AspNetCore.Builder.WebApplicationBuilder)
-DA:103,2
-DA:104,2
-DA:105,2
-DA:106,2
-DA:107,2
-DA:108,2
-DA:109,2
-LF:73
-LH:71
-BRF:2
-BRH:1
-FNF:8
-FNH:8
-end_of_record
-SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\API\Controllers\AnalysisController.cs
-FN:16,System.Void API.Controllers.AnalysisController::.ctor(MediatR.IMediator,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-FNDA:2,System.Void API.Controllers.AnalysisController::.ctor(MediatR.IMediator,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-DA:17,2
-FN:55,System.Void API.Controllers.AnalysisController/<<UploadFile>b__3_0>d::MoveNext()
-FNDA:0,System.Void API.Controllers.AnalysisController/<<UploadFile>b__3_0>d::MoveNext()
-DA:56,0
-DA:57,0
-DA:58,0
-DA:59,0
-FN:33,System.Void API.Controllers.AnalysisController/<SubmitQuery>d__2::MoveNext()
-FNDA:1,System.Void API.Controllers.AnalysisController/<SubmitQuery>d__2::MoveNext()
-DA:34,1
-FN:50,System.Void API.Controllers.AnalysisController/<UploadFile>d__3::MoveNext()
-FNDA:1,System.Void API.Controllers.AnalysisController/<UploadFile>d__3::MoveNext()
-DA:51,1
-DA:52,1
-DA:53,1
-DA:54,1
-DA:55,1
-DA:60,1
-DA:61,1
-LF:13
-LH:9
-BRF:0
-BRH:0
-FNF:4
-FNH:3
-end_of_record
-SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\API\Controllers\BaseController.cs
-FN:7,System.Void API.Controllers.BaseController::.ctor(MediatR.IMediator)
-FNDA:3,System.Void API.Controllers.BaseController::.ctor(MediatR.IMediator)
-DA:8,3
-DA:10,3
-LF:2
-LH:2
-BRF:0
-BRH:0
-FNF:1
-FNH:1
-end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Services\ExcelFileService.cs
 FN:99,System.Threading.Tasks.ParallelOptions Application.Services.ExcelFileService::CreateParallelOptions(System.Threading.CancellationToken)
-FNDA:11,System.Threading.Tasks.ParallelOptions Application.Services.ExcelFileService::CreateParallelOptions(System.Threading.CancellationToken)
-DA:100,11
-DA:101,11
-DA:102,11
-DA:103,11
-DA:104,11
+FNDA:0,System.Threading.Tasks.ParallelOptions Application.Services.ExcelFileService::CreateParallelOptions(System.Threading.CancellationToken)
+DA:100,0
+DA:101,0
+DA:102,0
+DA:103,0
+DA:104,0
 FN:108,System.Data.DataColumn[] Application.Services.ExcelFileService::GetTableColumns(System.Data.DataTable)
-FNDA:4,System.Data.DataColumn[] Application.Services.ExcelFileService::GetTableColumns(System.Data.DataTable)
-DA:109,4
+FNDA:0,System.Data.DataColumn[] Application.Services.ExcelFileService::GetTableColumns(System.Data.DataTable)
+DA:109,0
 FN:239,System.Boolean Application.Services.ExcelFileService::IsNumericColumn(System.Data.DataColumn,System.Data.DataTable)
-FNDA:16,System.Boolean Application.Services.ExcelFileService::IsNumericColumn(System.Data.DataColumn,System.Data.DataTable)
-DA:240,16
-DA:241,16
-DA:242,16
-DA:243,16
-DA:244,6
-DA:246,10
-DA:247,6
-DA:248,16
-DA:249,16
-BRDA:241,40,0,16
-BRDA:241,68,0,10
-BRDA:241,96,0,10
-BRDA:241,124,0,10
-BRDA:241,40,1,6
-BRDA:241,68,1,6
-BRDA:241,96,1,6
-BRDA:241,124,1,6
-BRDA:241,157,0,6
-BRDA:241,157,1,10
+FNDA:0,System.Boolean Application.Services.ExcelFileService::IsNumericColumn(System.Data.DataColumn,System.Data.DataTable)
+DA:240,0
+DA:241,0
+DA:242,0
+DA:243,0
+DA:244,0
+DA:246,0
+DA:247,0
+DA:248,0
+DA:249,0
+BRDA:241,40,0,0
+BRDA:241,68,0,0
+BRDA:241,96,0,0
+BRDA:241,124,0,0
+BRDA:241,40,1,0
+BRDA:241,68,1,0
+BRDA:241,96,1,0
+BRDA:241,124,1,0
+BRDA:241,157,0,0
+BRDA:241,157,1,0
 FN:257,System.Void Application.Services.ExcelFileService::CalculateNumericColumnStatistics(System.Data.DataTable,System.Data.DataColumn,Domain.Application.ExcelFileSummary)
-FNDA:10,System.Void Application.Services.ExcelFileService::CalculateNumericColumnStatistics(System.Data.DataTable,System.Data.DataColumn,Domain.Application.ExcelFileSummary)
-DA:258,10
-DA:259,10
-DA:260,10
-DA:261,18
-DA:262,18
-DA:263,10
-DA:265,10
-DA:266,6
-DA:267,6
-DA:268,6
-DA:269,6
-DA:270,6
-DA:271,6
-DA:272,10
-BRDA:265,79,0,6
-BRDA:265,79,1,10
-BRDA:261,17,0,18
+FNDA:0,System.Void Application.Services.ExcelFileService::CalculateNumericColumnStatistics(System.Data.DataTable,System.Data.DataColumn,Domain.Application.ExcelFileSummary)
+DA:258,0
+DA:259,0
+DA:260,0
+DA:261,0
+DA:262,0
+DA:263,0
+DA:265,0
+DA:266,0
+DA:267,0
+DA:268,0
+DA:269,0
+DA:270,0
+DA:271,0
+DA:272,0
+BRDA:265,79,0,0
+BRDA:265,79,1,0
+BRDA:261,17,0,0
 BRDA:261,17,1,0
 FN:274,System.Boolean Application.Services.ExcelFileService::IsStringColumn(System.Data.DataColumn)
-FNDA:6,System.Boolean Application.Services.ExcelFileService::IsStringColumn(System.Data.DataColumn)
-DA:275,6
+FNDA:0,System.Boolean Application.Services.ExcelFileService::IsStringColumn(System.Data.DataColumn)
+DA:275,0
 FN:312,System.String Application.Services.ExcelFileService::ComputeHash(System.String)
-FNDA:627,System.String Application.Services.ExcelFileService::ComputeHash(System.String)
-DA:313,627
+FNDA:0,System.String Application.Services.ExcelFileService::ComputeHash(System.String)
+DA:313,0
 FN:52,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
-FNDA:19,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
-DA:53,19
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
+DA:53,0
 FN:178,ExcelDataReader.ExcelDataTableConfiguration Application.Services.ExcelFileService/<>c::<LoadExcelDataAsync>b__9_1(ExcelDataReader.IExcelDataReader)
-FNDA:5,ExcelDataReader.ExcelDataTableConfiguration Application.Services.ExcelFileService/<>c::<LoadExcelDataAsync>b__9_1(ExcelDataReader.IExcelDataReader)
-DA:179,5
-DA:180,5
-DA:181,5
-DA:182,5
-DA:183,5
-DA:184,5
-DA:185,5
-DA:186,70
-DA:187,5
-DA:188,5
+FNDA:0,ExcelDataReader.ExcelDataTableConfiguration Application.Services.ExcelFileService/<>c::<LoadExcelDataAsync>b__9_1(ExcelDataReader.IExcelDataReader)
+DA:179,0
+DA:180,0
+DA:181,0
+DA:182,0
+DA:183,0
+DA:184,0
+DA:185,0
+DA:186,0
+DA:187,0
+DA:188,0
 FN:208,System.String Application.Services.ExcelFileService/<>c::<CalculateSummaryStatisticsAsync>b__10_1(System.Data.DataColumn)
-FNDA:20,System.String Application.Services.ExcelFileService/<>c::<CalculateSummaryStatisticsAsync>b__10_1(System.Data.DataColumn)
-DA:209,20
+FNDA:0,System.String Application.Services.ExcelFileService/<>c::<CalculateSummaryStatisticsAsync>b__10_1(System.Data.DataColumn)
+DA:209,0
 FN:220,System.Void Application.Services.ExcelFileService/<>c__DisplayClass10_0/<<CalculateSummaryStatisticsAsync>b__0>d::MoveNext()
-FNDA:16,System.Void Application.Services.ExcelFileService/<>c__DisplayClass10_0/<<CalculateSummaryStatisticsAsync>b__0>d::MoveNext()
-DA:221,16
-DA:222,16
-DA:223,20
-DA:224,6
-DA:225,12
-DA:226,16
-BRDA:222,103,0,10
-BRDA:222,103,1,6
-BRDA:224,248,0,6
-BRDA:224,248,1,16
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c__DisplayClass10_0/<<CalculateSummaryStatisticsAsync>b__0>d::MoveNext()
+DA:221,0
+DA:222,0
+DA:223,0
+DA:224,0
+DA:225,0
+DA:226,0
+BRDA:222,103,0,0
+BRDA:222,103,1,0
+BRDA:224,248,0,0
+BRDA:224,248,1,0
 FN:293,System.Void Application.Services.ExcelFileService/<>c__DisplayClass14_0/<<CalculateStringColumnHashes>b__0>d::MoveNext()
-FNDA:18,System.Void Application.Services.ExcelFileService/<>c__DisplayClass14_0/<<CalculateStringColumnHashes>b__0>d::MoveNext()
-DA:294,18
-DA:295,18
-DA:296,18
-DA:297,18
-DA:299,18
-DA:300,18
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c__DisplayClass14_0/<<CalculateStringColumnHashes>b__0>d::MoveNext()
+DA:294,0
+DA:295,0
+DA:296,0
+DA:297,0
+DA:299,0
+DA:300,0
 BRDA:295,42,0,0
-BRDA:295,42,1,18
-BRDA:296,74,0,18
-BRDA:296,74,1,18
+BRDA:295,42,1,0
+BRDA:296,74,0,0
+BRDA:296,74,1,0
 FN:73,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
-FNDA:9,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
-DA:74,9
-DA:75,9
-DA:76,9
-DA:77,17
-DA:78,8
-DA:79,8
-DA:80,8
-DA:81,8
-DA:82,8
-DA:83,8
-DA:84,8
-DA:85,13
-BRDA:77,54,0,11
-BRDA:77,54,1,6
-BRDA:77,70,0,8
-BRDA:79,90,0,8
-BRDA:79,90,1,8
-BRDA:77,70,1,9
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
+DA:74,0
+DA:75,0
+DA:76,0
+DA:77,0
+DA:78,0
+DA:79,0
+DA:80,0
+DA:81,0
+DA:82,0
+DA:83,0
+DA:84,0
+DA:85,0
+BRDA:77,54,0,0
+BRDA:77,54,1,0
+BRDA:77,70,0,0
+BRDA:79,90,0,0
+BRDA:79,90,1,0
+BRDA:77,70,1,0
 FN:121,System.Void Application.Services.ExcelFileService/<>c__DisplayClass7_0::<ProcessRowsAsync>b__0()
-FNDA:3,System.Void Application.Services.ExcelFileService/<>c__DisplayClass7_0::<ProcessRowsAsync>b__0()
-DA:122,3
-DA:123,3
-DA:124,3
-DA:125,3
-DA:126,3
-DA:127,3
-DA:128,9
-DA:129,9
-DA:130,9
-DA:131,9
-DA:132,3
-DA:133,9
-DA:134,9
-DA:135,9
-DA:136,9
-DA:137,9
-DA:138,9
-DA:139,9
-DA:140,9
-DA:141,9
-DA:142,3
-DA:143,7
-BRDA:123,31,0,3
-BRDA:123,31,1,3
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c__DisplayClass7_0::<ProcessRowsAsync>b__0()
+DA:122,0
+DA:123,0
+DA:124,0
+DA:125,0
+DA:126,0
+DA:127,0
+DA:128,0
+DA:129,0
+DA:130,0
+DA:131,0
+DA:132,0
+DA:133,0
+DA:134,0
+DA:135,0
+DA:136,0
+DA:137,0
+DA:138,0
+DA:139,0
+DA:140,0
+DA:141,0
+DA:142,0
+DA:143,0
+BRDA:123,31,0,0
+BRDA:123,31,1,0
 FN:153,System.Void Application.Services.ExcelFileService/<>c__DisplayClass8_0/<<ProcessRowAsync>b__0>d::MoveNext()
-FNDA:36,System.Void Application.Services.ExcelFileService/<>c__DisplayClass8_0/<<ProcessRowAsync>b__0>d::MoveNext()
-DA:154,36
-DA:155,36
-DA:156,36
-DA:157,36
-DA:158,36
-BRDA:156,91,0,36
+FNDA:0,System.Void Application.Services.ExcelFileService/<>c__DisplayClass8_0/<<ProcessRowAsync>b__0>d::MoveNext()
+DA:154,0
+DA:155,0
+DA:156,0
+DA:157,0
+DA:158,0
+BRDA:156,91,0,0
 BRDA:156,91,1,0
 BRDA:156,99,1,0
-BRDA:156,99,0,36
-BRDA:156,122,0,36
+BRDA:156,99,0,0
+BRDA:156,122,0,0
 BRDA:156,122,1,0
 BRDA:156,134,0,0
-BRDA:156,134,1,36
+BRDA:156,134,1,0
 FN:174,System.Data.DataSet Application.Services.ExcelFileService/<>c__DisplayClass9_0::<LoadExcelDataAsync>b__0()
-FNDA:5,System.Data.DataSet Application.Services.ExcelFileService/<>c__DisplayClass9_0::<LoadExcelDataAsync>b__0()
-DA:175,5
-DA:176,5
-DA:177,5
-DA:178,5
-DA:189,5
-DA:190,5
+FNDA:0,System.Data.DataSet Application.Services.ExcelFileService/<>c__DisplayClass9_0::<LoadExcelDataAsync>b__0()
+DA:175,0
+DA:176,0
+DA:177,0
+DA:178,0
+DA:189,0
+DA:190,0
 FN:285,System.Void Application.Services.ExcelFileService/<CalculateStringColumnHashes>d__14::MoveNext()
-FNDA:6,System.Void Application.Services.ExcelFileService/<CalculateStringColumnHashes>d__14::MoveNext()
-DA:286,6
-DA:287,6
-DA:288,6
-DA:289,6
-DA:290,6
-DA:291,6
-DA:292,6
-DA:293,6
-DA:298,6
-DA:301,6
-DA:302,6
-DA:303,6
+FNDA:0,System.Void Application.Services.ExcelFileService/<CalculateStringColumnHashes>d__14::MoveNext()
+DA:286,0
+DA:287,0
+DA:288,0
+DA:289,0
+DA:290,0
+DA:291,0
+DA:292,0
+DA:293,0
+DA:298,0
+DA:301,0
+DA:302,0
+DA:303,0
 FN:203,System.Void Application.Services.ExcelFileService/<CalculateSummaryStatisticsAsync>d__10::MoveNext()
-FNDA:5,System.Void Application.Services.ExcelFileService/<CalculateSummaryStatisticsAsync>d__10::MoveNext()
-DA:204,5
-DA:205,5
-DA:206,5
-DA:207,5
-DA:208,5
-DA:210,5
-DA:211,5
-DA:212,5
-DA:213,5
-DA:214,5
-DA:215,5
-DA:216,5
-DA:217,5
-DA:218,5
-DA:219,5
-DA:220,5
-DA:227,5
-DA:228,4
-DA:229,4
-DA:230,4
-DA:231,4
+FNDA:0,System.Void Application.Services.ExcelFileService/<CalculateSummaryStatisticsAsync>d__10::MoveNext()
+DA:204,0
+DA:205,0
+DA:206,0
+DA:207,0
+DA:208,0
+DA:210,0
+DA:211,0
+DA:212,0
+DA:213,0
+DA:214,0
+DA:215,0
+DA:216,0
+DA:217,0
+DA:218,0
+DA:219,0
+DA:220,0
+DA:227,0
+DA:228,0
+DA:229,0
+DA:230,0
+DA:231,0
 FN:170,System.Void Application.Services.ExcelFileService/<LoadExcelDataAsync>d__9::MoveNext()
-FNDA:5,System.Void Application.Services.ExcelFileService/<LoadExcelDataAsync>d__9::MoveNext()
-DA:171,5
-DA:172,5
-DA:173,5
-DA:174,5
-DA:191,5
-DA:192,5
+FNDA:0,System.Void Application.Services.ExcelFileService/<LoadExcelDataAsync>d__9::MoveNext()
+DA:171,0
+DA:172,0
+DA:173,0
+DA:174,0
+DA:191,0
+DA:192,0
 FN:106,System.Void Application.Services.ExcelFileService/<LoadExcelTableAsync>d__5::MoveNext()
-FNDA:5,System.Void Application.Services.ExcelFileService/<LoadExcelTableAsync>d__5::MoveNext()
-DA:107,5
+FNDA:0,System.Void Application.Services.ExcelFileService/<LoadExcelTableAsync>d__5::MoveNext()
+DA:107,0
 BRDA:107,135,0,0
-BRDA:107,135,1,5
+BRDA:107,135,1,0
 FN:51,System.Void Application.Services.ExcelFileService/<PrepareExcelFileForLLMAsync>d__3::MoveNext()
-FNDA:5,System.Void Application.Services.ExcelFileService/<PrepareExcelFileForLLMAsync>d__3::MoveNext()
-DA:52,5
-DA:54,5
-DA:55,5
-DA:57,5
-DA:58,5
-DA:60,5
-DA:61,1
-DA:62,1
-DA:63,1
-DA:64,1
-DA:65,1
-DA:66,1
-DA:67,1
-DA:70,4
-DA:71,4
-DA:72,4
-DA:73,4
-DA:87,4
-DA:88,4
-DA:89,4
-DA:90,4
-DA:91,3
-DA:92,3
-DA:93,3
-DA:94,3
-DA:95,3
-DA:96,3
-DA:97,4
-BRDA:53,100,0,1
-BRDA:53,100,1,5
-BRDA:60,394,0,1
-BRDA:60,394,1,4
+FNDA:0,System.Void Application.Services.ExcelFileService/<PrepareExcelFileForLLMAsync>d__3::MoveNext()
+DA:52,0
+DA:54,0
+DA:55,0
+DA:57,0
+DA:58,0
+DA:60,0
+DA:61,0
+DA:62,0
+DA:63,0
+DA:64,0
+DA:65,0
+DA:66,0
+DA:67,0
+DA:70,0
+DA:71,0
+DA:72,0
+DA:73,0
+DA:87,0
+DA:88,0
+DA:89,0
+DA:90,0
+DA:91,0
+DA:92,0
+DA:93,0
+DA:94,0
+DA:95,0
+DA:96,0
+DA:97,0
+BRDA:53,100,0,0
+BRDA:53,100,1,0
+BRDA:60,394,0,0
+BRDA:60,394,1,0
 FN:147,System.Void Application.Services.ExcelFileService/<ProcessRowAsync>d__8::MoveNext()
-FNDA:9,System.Void Application.Services.ExcelFileService/<ProcessRowAsync>d__8::MoveNext()
-DA:148,9
-DA:149,9
-DA:150,9
-DA:151,9
-DA:152,9
-DA:153,9
-DA:159,9
-DA:160,9
-DA:161,9
+FNDA:0,System.Void Application.Services.ExcelFileService/<ProcessRowAsync>d__8::MoveNext()
+DA:148,0
+DA:149,0
+DA:150,0
+DA:151,0
+DA:152,0
+DA:153,0
+DA:159,0
+DA:160,0
+DA:161,0
 FN:115,System.Void Application.Services.ExcelFileService/<ProcessRowsAsync>d__7::MoveNext()
-FNDA:4,System.Void Application.Services.ExcelFileService/<ProcessRowsAsync>d__7::MoveNext()
-DA:116,4
-DA:117,4
-DA:118,4
-DA:119,4
-DA:120,4
-DA:121,4
-DA:144,3
-DA:145,3
+FNDA:0,System.Void Application.Services.ExcelFileService/<ProcessRowsAsync>d__7::MoveNext()
+DA:116,0
+DA:117,0
+DA:118,0
+DA:119,0
+DA:120,0
+DA:121,0
+DA:144,0
+DA:145,0
 LF:185
-LH:185
+LH:0
 BRF:56
-BRH:46
+BRH:0
 FNF:22
-FNH:22
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Queries\SubmitQuery.cs
 FN:11,System.Void Application.Queries.SubmitQueryValidator::.ctor()
-FNDA:7,System.Void Application.Queries.SubmitQueryValidator::.ctor()
-DA:12,7
-DA:13,7
-DA:14,7
-DA:15,7
-DA:16,7
-DA:17,7
-DA:18,7
-DA:19,7
-DA:20,14
-DA:21,7
+FNDA:0,System.Void Application.Queries.SubmitQueryValidator::.ctor()
+DA:12,0
+DA:13,0
+DA:14,0
+DA:15,0
+DA:16,0
+DA:17,0
+DA:18,0
+DA:19,0
+DA:20,0
+DA:21,0
 FN:26,System.String Application.Queries.SubmitQuery::get_Query()
-FNDA:41,System.String Application.Queries.SubmitQuery::get_Query()
-DA:27,41
+FNDA:0,System.String Application.Queries.SubmitQuery::get_Query()
+DA:27,0
 FN:28,System.String Application.Queries.SubmitQuery::get_DocumentId()
-FNDA:38,System.String Application.Queries.SubmitQuery::get_DocumentId()
-DA:29,38
+FNDA:0,System.String Application.Queries.SubmitQuery::get_DocumentId()
+DA:29,0
 FN:29,System.Nullable`1<System.Int32> Application.Queries.SubmitQuery::get_RelevantRowsCount()
-FNDA:29,System.Nullable`1<System.Int32> Application.Queries.SubmitQuery::get_RelevantRowsCount()
-DA:30,29
+FNDA:0,System.Nullable`1<System.Int32> Application.Queries.SubmitQuery::get_RelevantRowsCount()
+DA:30,0
 FN:106,System.Boolean Application.Queries.SubmitQueryHandler::ShouldEnrichResponse(System.Nullable`1<System.Int32>)
-FNDA:2,System.Boolean Application.Queries.SubmitQueryHandler::ShouldEnrichResponse(System.Nullable`1<System.Int32>)
-DA:107,2
-BRDA:107,7,0,1
-BRDA:107,7,1,1
+FNDA:0,System.Boolean Application.Queries.SubmitQueryHandler::ShouldEnrichResponse(System.Nullable`1<System.Int32>)
+DA:107,0
+BRDA:107,7,0,0
+BRDA:107,7,1,0
 FN:45,System.Void Application.Queries.SubmitQueryHandler::.ctor(Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Queries.SubmitQueryHandler>,Persistence.Repositories.IVectorDbRepository)
-FNDA:4,System.Void Application.Queries.SubmitQueryHandler::.ctor(Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Queries.SubmitQueryHandler>,Persistence.Repositories.IVectorDbRepository)
-DA:46,4
-DA:47,4
-DA:48,4
-DA:49,4
-DA:50,4
-DA:63,4
-DA:64,4
-DA:65,4
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler::.ctor(Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Queries.SubmitQueryHandler>,Persistence.Repositories.IVectorDbRepository)
+DA:46,0
+DA:47,0
+DA:48,0
+DA:49,0
+DA:50,0
+DA:63,0
+DA:64,0
+DA:65,0
 FN:143,System.Void Application.Queries.SubmitQueryHandler/<ComputeEmbeddingAsync>d__16::MoveNext()
-FNDA:1,System.Void Application.Queries.SubmitQueryHandler/<ComputeEmbeddingAsync>d__16::MoveNext()
-DA:144,1
-DA:145,1
-DA:146,1
-DA:147,1
-DA:148,1
-DA:149,1
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler/<ComputeEmbeddingAsync>d__16::MoveNext()
+DA:144,0
+DA:145,0
+DA:146,0
+DA:147,0
+DA:148,0
+DA:149,0
 BRDA:147,220,0,0
-BRDA:147,220,1,1
+BRDA:147,220,1,0
 FN:113,System.Void Application.Queries.SubmitQueryHandler/<EnrichWithRelevantRowsAsync>d__14::MoveNext()
-FNDA:1,System.Void Application.Queries.SubmitQueryHandler/<EnrichWithRelevantRowsAsync>d__14::MoveNext()
-DA:114,1
-DA:115,1
-DA:116,1
-DA:118,1
-DA:119,1
-DA:120,1
-DA:121,1
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler/<EnrichWithRelevantRowsAsync>d__14::MoveNext()
+DA:114,0
+DA:115,0
+DA:116,0
+DA:118,0
+DA:119,0
+DA:120,0
+DA:121,0
 BRDA:116,174,0,0
-BRDA:116,174,1,1
-BRDA:119,340,0,1
-BRDA:119,340,1,1
+BRDA:116,174,1,0
+BRDA:119,340,0,0
+BRDA:119,340,1,0
 FN:83,System.Void Application.Queries.SubmitQueryHandler/<Handle>d__11::MoveNext()
-FNDA:4,System.Void Application.Queries.SubmitQueryHandler/<Handle>d__11::MoveNext()
-DA:84,4
-DA:85,4
-DA:86,6
-DA:88,2
-DA:89,1
-DA:91,2
-DA:92,2
-DA:93,4
-BRDA:86,176,0,2
-BRDA:86,176,1,2
-BRDA:88,205,0,1
-BRDA:88,205,1,2
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler/<Handle>d__11::MoveNext()
+DA:84,0
+DA:85,0
+DA:86,0
+DA:88,0
+DA:89,0
+DA:91,0
+DA:92,0
+DA:93,0
+BRDA:86,176,0,0
+BRDA:86,176,1,0
+BRDA:88,205,0,0
+BRDA:88,205,1,0
 FN:98,System.Void Application.Queries.SubmitQueryHandler/<QueryLLMAsync>d__12::MoveNext()
-FNDA:4,System.Void Application.Queries.SubmitQueryHandler/<QueryLLMAsync>d__12::MoveNext()
-DA:99,4
-DA:100,4
-DA:101,4
-DA:102,4
-DA:103,2
-DA:104,4
-DA:105,4
-BRDA:102,245,0,2
-BRDA:102,245,1,4
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler/<QueryLLMAsync>d__12::MoveNext()
+DA:99,0
+DA:100,0
+DA:101,0
+DA:102,0
+DA:103,0
+DA:104,0
+DA:105,0
+BRDA:102,245,0,0
+BRDA:102,245,1,0
 FN:127,System.Void Application.Queries.SubmitQueryHandler/<QueryVectorDbAsync>d__15::MoveNext()
-FNDA:1,System.Void Application.Queries.SubmitQueryHandler/<QueryVectorDbAsync>d__15::MoveNext()
-DA:128,1
-DA:129,1
-DA:130,1
-DA:131,1
-DA:132,1
-DA:133,1
-DA:134,1
-DA:135,1
-DA:136,1
-DA:137,1
-DA:138,1
+FNDA:0,System.Void Application.Queries.SubmitQueryHandler/<QueryVectorDbAsync>d__15::MoveNext()
+DA:128,0
+DA:129,0
+DA:130,0
+DA:131,0
+DA:132,0
+DA:133,0
+DA:134,0
+DA:135,0
+DA:136,0
+DA:137,0
+DA:138,0
 BRDA:136,267,0,0
-BRDA:136,267,1,1
+BRDA:136,267,1,0
 LF:61
-LH:61
+LH:0
 BRF:16
-BRH:13
+BRH:0
 FNF:11
-FNH:11
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Commands\UploadFileCommand.cs
 FN:17,Microsoft.AspNetCore.Http.IFormFile Application.Commands.UploadFileCommand::get_File()
-FNDA:31,Microsoft.AspNetCore.Http.IFormFile Application.Commands.UploadFileCommand::get_File()
-DA:18,31
+FNDA:0,Microsoft.AspNetCore.Http.IFormFile Application.Commands.UploadFileCommand::get_File()
+DA:18,0
 FN:18,System.IProgress`1<System.ValueTuple`2<System.Double,System.Double>> Application.Commands.UploadFileCommand::get_Progress()
-FNDA:9,System.IProgress`1<System.ValueTuple`2<System.Double,System.Double>> Application.Commands.UploadFileCommand::get_Progress()
-DA:19,9
+FNDA:0,System.IProgress`1<System.ValueTuple`2<System.Double,System.Double>> Application.Commands.UploadFileCommand::get_Progress()
+DA:19,0
 FN:23,System.Void Application.Commands.UploadFileCommandValidator::.ctor()
-FNDA:3,System.Void Application.Commands.UploadFileCommandValidator::.ctor()
-DA:24,3
-DA:25,3
-DA:26,3
-DA:27,3
-DA:28,3
-DA:30,3
-DA:31,2
-DA:32,3
-DA:33,3
-DA:34,3
+FNDA:0,System.Void Application.Commands.UploadFileCommandValidator::.ctor()
+DA:24,0
+DA:25,0
+DA:26,0
+DA:27,0
+DA:28,0
+DA:30,0
+DA:31,0
+DA:32,0
+DA:33,0
+DA:34,0
 BRDA:31,1,0,0
-BRDA:31,1,1,2
+BRDA:31,1,1,0
 FN:44,System.Void Application.Commands.UploadFileCommandHandler::.ctor(Application.Services.IExcelFileService,Persistence.Repositories.IVectorDbRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Commands.UploadFileCommandHandler>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-FNDA:4,System.Void Application.Commands.UploadFileCommandHandler::.ctor(Application.Services.IExcelFileService,Persistence.Repositories.IVectorDbRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Commands.UploadFileCommandHandler>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-DA:45,4
-DA:46,4
-DA:47,4
-DA:48,4
-DA:49,4
-DA:50,4
-DA:64,4
-DA:65,4
-DA:66,4
-DA:67,4
+FNDA:0,System.Void Application.Commands.UploadFileCommandHandler::.ctor(Application.Services.IExcelFileService,Persistence.Repositories.IVectorDbRepository,Microsoft.Extensions.Logging.ILogger`1<Application.Commands.UploadFileCommandHandler>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
+DA:45,0
+DA:46,0
+DA:47,0
+DA:48,0
+DA:49,0
+DA:50,0
+DA:64,0
+DA:65,0
+DA:66,0
+DA:67,0
 FN:84,System.Void Application.Commands.UploadFileCommandHandler/<>c__DisplayClass13_0/<<Handle>b__0>d::MoveNext()
-FNDA:1,System.Void Application.Commands.UploadFileCommandHandler/<>c__DisplayClass13_0/<<Handle>b__0>d::MoveNext()
-DA:85,1
-DA:86,1
-DA:87,1
-DA:88,1
-DA:89,1
-DA:90,1
-DA:91,1
-DA:92,1
-DA:93,1
+FNDA:0,System.Void Application.Commands.UploadFileCommandHandler/<>c__DisplayClass13_0/<<Handle>b__0>d::MoveNext()
+DA:85,0
+DA:86,0
+DA:87,0
+DA:88,0
+DA:89,0
+DA:90,0
+DA:91,0
+DA:92,0
+DA:93,0
 FN:81,System.Void Application.Commands.UploadFileCommandHandler/<Handle>d__13::MoveNext()
-FNDA:4,System.Void Application.Commands.UploadFileCommandHandler/<Handle>d__13::MoveNext()
-DA:82,4
-DA:83,4
-DA:84,4
-DA:94,4
-DA:96,4
-DA:97,5
-DA:99,3
-DA:100,3
-DA:101,3
-DA:102,3
-DA:103,3
-DA:104,3
-DA:105,4
-BRDA:97,268,0,1
-BRDA:97,268,1,3
+FNDA:0,System.Void Application.Commands.UploadFileCommandHandler/<Handle>d__13::MoveNext()
+DA:82,0
+DA:83,0
+DA:84,0
+DA:94,0
+DA:96,0
+DA:97,0
+DA:99,0
+DA:100,0
+DA:101,0
+DA:102,0
+DA:103,0
+DA:104,0
+DA:105,0
+BRDA:97,268,0,0
+BRDA:97,268,1,0
 FN:110,System.Void Application.Commands.UploadFileCommandHandler/<PrepareExcelFileAsync>d__14::MoveNext()
-FNDA:4,System.Void Application.Commands.UploadFileCommandHandler/<PrepareExcelFileAsync>d__14::MoveNext()
-DA:111,4
-DA:112,4
-DA:113,4
-DA:114,4
-DA:115,4
-DA:116,4
-DA:117,4
-DA:118,4
-DA:119,4
-DA:120,4
-DA:122,4
-DA:123,1
-DA:125,4
-DA:126,4
-BRDA:122,291,0,1
-BRDA:122,291,1,4
+FNDA:0,System.Void Application.Commands.UploadFileCommandHandler/<PrepareExcelFileAsync>d__14::MoveNext()
+DA:111,0
+DA:112,0
+DA:113,0
+DA:114,0
+DA:115,0
+DA:116,0
+DA:117,0
+DA:118,0
+DA:119,0
+DA:120,0
+DA:122,0
+DA:123,0
+DA:125,0
+DA:126,0
+BRDA:122,291,0,0
+BRDA:122,291,1,0
 FN:132,System.Void Application.Commands.UploadFileCommandHandler/<SaveToVectorDatabaseAsync>d__15::MoveNext()
-FNDA:3,System.Void Application.Commands.UploadFileCommandHandler/<SaveToVectorDatabaseAsync>d__15::MoveNext()
-DA:133,3
-DA:134,3
-DA:135,3
-DA:136,3
-DA:137,3
-DA:138,3
-DA:139,3
-DA:140,3
-DA:141,3
-DA:142,3
-DA:144,3
-DA:145,1
-DA:147,2
-DA:149,3
-DA:150,3
-BRDA:144,286,0,1
-BRDA:144,286,1,2
+FNDA:0,System.Void Application.Commands.UploadFileCommandHandler/<SaveToVectorDatabaseAsync>d__15::MoveNext()
+DA:133,0
+DA:134,0
+DA:135,0
+DA:136,0
+DA:137,0
+DA:138,0
+DA:139,0
+DA:140,0
+DA:141,0
+DA:142,0
+DA:144,0
+DA:145,0
+DA:147,0
+DA:149,0
+DA:150,0
+BRDA:144,286,0,0
+BRDA:144,286,1,0
 LF:73
-LH:73
+LH:0
 BRF:8
-BRH:7
+BRH:0
 FNF:8
-FNH:8
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Utilities\VectorMath.cs
 FN:48,System.Single Domain.Utilities.VectorMath::CalculateSimilarity(System.Single[],System.Single[])
-FNDA:17,System.Single Domain.Utilities.VectorMath::CalculateSimilarity(System.Single[],System.Single[])
-DA:49,17
-DA:50,19
-DA:51,15
-DA:52,15
-BRDA:50,14,0,2
-BRDA:50,14,1,15
+FNDA:34,System.Single Domain.Utilities.VectorMath::CalculateSimilarity(System.Single[],System.Single[])
+DA:49,34
+DA:50,38
+DA:51,30
+DA:52,30
+BRDA:50,14,0,4
+BRDA:50,14,1,30
 FN:61,System.Single Domain.Utilities.VectorMath::DotProduct(System.Single[],System.Single[])
-FNDA:123,System.Single Domain.Utilities.VectorMath::DotProduct(System.Single[],System.Single[])
-DA:62,123
+FNDA:246,System.Single Domain.Utilities.VectorMath::DotProduct(System.Single[],System.Single[])
+DA:62,246
 FN:72,System.Single Domain.Utilities.VectorMath::Magnitude(System.Single[])
-FNDA:44,System.Single Domain.Utilities.VectorMath::Magnitude(System.Single[])
-DA:73,44
-DA:74,174
-DA:75,44
-DA:76,47
-DA:77,41
-DA:78,44
-BRDA:76,56,0,3
-BRDA:76,56,1,41
+FNDA:88,System.Single Domain.Utilities.VectorMath::Magnitude(System.Single[])
+DA:73,88
+DA:74,348
+DA:75,88
+DA:76,94
+DA:77,82
+DA:78,88
+BRDA:76,56,0,6
+BRDA:76,56,1,82
 FN:86,System.Boolean Domain.Utilities.VectorMath::IsPythagoreanTriple(System.Single[])
-FNDA:44,System.Boolean Domain.Utilities.VectorMath::IsPythagoreanTriple(System.Single[])
-DA:87,44
-DA:88,48
-DA:89,160
-DA:90,40
-DA:91,44
-BRDA:88,12,0,4
-BRDA:88,12,1,40
+FNDA:88,System.Boolean Domain.Utilities.VectorMath::IsPythagoreanTriple(System.Single[])
+DA:87,88
+DA:88,96
+DA:89,320
+DA:90,80
+DA:91,88
+BRDA:88,12,0,8
+BRDA:88,12,1,80
 LF:16
 LH:16
 BRF:6
@@ -737,14 +531,14 @@ FNH:4
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Document.cs
 FN:5,System.String Domain.Persistence.Document::get_Id()
-FNDA:28,System.String Domain.Persistence.Document::get_Id()
-DA:6,28
+FNDA:56,System.String Domain.Persistence.Document::get_Id()
+DA:6,56
 FN:6,System.String Domain.Persistence.Document::get_Content()
-FNDA:72,System.String Domain.Persistence.Document::get_Content()
-DA:7,72
+FNDA:144,System.String Domain.Persistence.Document::get_Content()
+DA:7,144
 FN:7,System.Single[] Domain.Persistence.Document::get_Embedding()
-FNDA:32,System.Single[] Domain.Persistence.Document::get_Embedding()
-DA:8,32
+FNDA:64,System.Single[] Domain.Persistence.Document::get_Embedding()
+DA:8,64
 LF:3
 LH:3
 BRF:0
@@ -754,11 +548,11 @@ FNH:3
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Summary.cs
 FN:4,System.String Domain.Persistence.Summary::get_Id()
-FNDA:5,System.String Domain.Persistence.Summary::get_Id()
-DA:5,5
+FNDA:10,System.String Domain.Persistence.Summary::get_Id()
+DA:5,10
 FN:5,System.String Domain.Persistence.Summary::get_Content()
-FNDA:6,System.String Domain.Persistence.Summary::get_Content()
-DA:6,6
+FNDA:12,System.String Domain.Persistence.Summary::get_Content()
+DA:6,12
 LF:2
 LH:2
 BRF:0
@@ -768,17 +562,17 @@ FNH:2
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\QueryAnswer.cs
 FN:6,System.String Domain.Persistence.DTOs.QueryAnswer::get_Question()
-FNDA:9,System.String Domain.Persistence.DTOs.QueryAnswer::get_Question()
-DA:7,9
+FNDA:18,System.String Domain.Persistence.DTOs.QueryAnswer::get_Question()
+DA:7,18
 FN:7,System.String Domain.Persistence.DTOs.QueryAnswer::get_DocumentId()
-FNDA:9,System.String Domain.Persistence.DTOs.QueryAnswer::get_DocumentId()
-DA:8,9
+FNDA:18,System.String Domain.Persistence.DTOs.QueryAnswer::get_DocumentId()
+DA:8,18
 FN:8,System.String Domain.Persistence.DTOs.QueryAnswer::get_Answer()
-FNDA:14,System.String Domain.Persistence.DTOs.QueryAnswer::get_Answer()
-DA:9,14
+FNDA:28,System.String Domain.Persistence.DTOs.QueryAnswer::get_Answer()
+DA:9,28
 FN:9,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.QueryAnswer::get_RelevantRows()
-FNDA:13,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.QueryAnswer::get_RelevantRows()
-DA:10,13
+FNDA:26,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.QueryAnswer::get_RelevantRows()
+DA:10,26
 LF:4
 LH:4
 BRF:0
@@ -788,11 +582,11 @@ FNH:4
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\SummarizedExcelData.cs
 FN:6,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Domain.Persistence.DTOs.SummarizedExcelData::get_Summary()
-FNDA:3047,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Domain.Persistence.DTOs.SummarizedExcelData::get_Summary()
-DA:7,3047
+FNDA:6094,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Domain.Persistence.DTOs.SummarizedExcelData::get_Summary()
+DA:7,6094
 FN:7,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.SummarizedExcelData::get_Rows()
-FNDA:2043,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.SummarizedExcelData::get_Rows()
-DA:8,2043
+FNDA:4086,System.Collections.Concurrent.ConcurrentBag`1<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>> Domain.Persistence.DTOs.SummarizedExcelData::get_Rows()
+DA:8,4086
 LF:2
 LH:2
 BRF:0
@@ -802,47 +596,47 @@ FNH:2
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Configuration\Options.cs
 FN:4,System.Int32 Domain.Persistence.Configuration.LLMServiceOptions::get_COMPUTE_BATCH_SIZE()
-FNDA:76,System.Int32 Domain.Persistence.Configuration.LLMServiceOptions::get_COMPUTE_BATCH_SIZE()
-DA:5,76
+FNDA:152,System.Int32 Domain.Persistence.Configuration.LLMServiceOptions::get_COMPUTE_BATCH_SIZE()
+DA:5,152
 FN:5,System.Collections.Generic.List`1<System.String> Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URLS()
-FNDA:42,System.Collections.Generic.List`1<System.String> Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URLS()
-DA:6,42
+FNDA:84,System.Collections.Generic.List`1<System.String> Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URLS()
+DA:6,84
 FN:6,System.String Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URL()
-FNDA:59,System.String Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URL()
-DA:7,59
+FNDA:118,System.String Domain.Persistence.Configuration.LLMServiceOptions::get_LLM_SERVICE_URL()
+DA:7,118
 FN:11,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_PORT()
-FNDA:7,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_PORT()
-DA:12,7
+FNDA:14,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_PORT()
+DA:12,14
 FN:12,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_SAVE_BATCH_SIZE()
-FNDA:46,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_SAVE_BATCH_SIZE()
-DA:13,46
+FNDA:92,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_SAVE_BATCH_SIZE()
+DA:13,92
 FN:13,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_RETRY_COUNT()
-FNDA:5,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_RETRY_COUNT()
-DA:14,5
+FNDA:10,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_RETRY_COUNT()
+DA:14,10
 FN:14,System.Boolean Domain.Persistence.Configuration.DatabaseOptions::get_USE_HTTPS()
-FNDA:48,System.Boolean Domain.Persistence.Configuration.DatabaseOptions::get_USE_HTTPS()
-DA:15,48
+FNDA:96,System.Boolean Domain.Persistence.Configuration.DatabaseOptions::get_USE_HTTPS()
+DA:15,96
 FN:15,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_CONNECTION_COUNT()
-FNDA:90,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_CONNECTION_COUNT()
-DA:16,90
+FNDA:180,System.Int32 Domain.Persistence.Configuration.DatabaseOptions::get_MAX_CONNECTION_COUNT()
+DA:16,180
 FN:16,System.String Domain.Persistence.Configuration.DatabaseOptions::get_HOST()
-FNDA:50,System.String Domain.Persistence.Configuration.DatabaseOptions::get_HOST()
-DA:17,50
+FNDA:100,System.String Domain.Persistence.Configuration.DatabaseOptions::get_HOST()
+DA:17,100
 FN:17,System.String Domain.Persistence.Configuration.DatabaseOptions::get_DatabaseName()
-FNDA:50,System.String Domain.Persistence.Configuration.DatabaseOptions::get_DatabaseName()
-DA:18,50
+FNDA:100,System.String Domain.Persistence.Configuration.DatabaseOptions::get_DatabaseName()
+DA:18,100
 FN:18,System.String Domain.Persistence.Configuration.DatabaseOptions::get_QDRANT_API_KEY()
-FNDA:51,System.String Domain.Persistence.Configuration.DatabaseOptions::get_QDRANT_API_KEY()
-DA:19,51
+FNDA:102,System.String Domain.Persistence.Configuration.DatabaseOptions::get_QDRANT_API_KEY()
+DA:19,102
 FN:19,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionName()
-FNDA:83,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionName()
-DA:20,83
+FNDA:166,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionName()
+DA:20,166
 FN:20,System.String Domain.Persistence.Configuration.DatabaseOptions::get_ConnectionString()
-FNDA:48,System.String Domain.Persistence.Configuration.DatabaseOptions::get_ConnectionString()
-DA:21,48
+FNDA:96,System.String Domain.Persistence.Configuration.DatabaseOptions::get_ConnectionString()
+DA:21,96
 FN:21,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionNameTwo()
-FNDA:71,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionNameTwo()
-DA:22,71
+FNDA:142,System.String Domain.Persistence.Configuration.DatabaseOptions::get_CollectionNameTwo()
+DA:22,142
 LF:14
 LH:14
 BRF:0
@@ -852,29 +646,29 @@ FNH:14
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Application\ExcelFileSummary.cs
 FN:6,System.Int32 Domain.Application.ExcelFileSummary::get_RowCount()
-FNDA:9,System.Int32 Domain.Application.ExcelFileSummary::get_RowCount()
-DA:7,9
+FNDA:18,System.Int32 Domain.Application.ExcelFileSummary::get_RowCount()
+DA:7,18
 FN:7,System.Int32 Domain.Application.ExcelFileSummary::get_ColumnCount()
-FNDA:8,System.Int32 Domain.Application.ExcelFileSummary::get_ColumnCount()
-DA:8,8
+FNDA:16,System.Int32 Domain.Application.ExcelFileSummary::get_ColumnCount()
+DA:8,16
 FN:8,System.Collections.Generic.List`1<System.String> Domain.Application.ExcelFileSummary::get_Columns()
-FNDA:11,System.Collections.Generic.List`1<System.String> Domain.Application.ExcelFileSummary::get_Columns()
-DA:9,11
+FNDA:22,System.Collections.Generic.List`1<System.String> Domain.Application.ExcelFileSummary::get_Columns()
+DA:9,22
 FN:9,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Sums()
-FNDA:24,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Sums()
-DA:10,24
+FNDA:48,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Sums()
+DA:10,48
 FN:10,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Mins()
-FNDA:23,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Mins()
-DA:11,23
+FNDA:46,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Mins()
+DA:11,46
 FN:11,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Maxs()
-FNDA:24,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Maxs()
-DA:12,24
+FNDA:48,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Maxs()
+DA:12,48
 FN:12,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Averages()
-FNDA:25,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Averages()
-DA:13,25
+FNDA:50,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Double> Domain.Application.ExcelFileSummary::get_Averages()
+DA:13,50
 FN:13,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.String>> Domain.Application.ExcelFileSummary::get_HashedStrings()
-FNDA:24,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.String>> Domain.Application.ExcelFileSummary::get_HashedStrings()
-DA:14,24
+FNDA:48,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.String>> Domain.Application.ExcelFileSummary::get_HashedStrings()
+DA:14,48
 LF:8
 LH:8
 BRF:0
@@ -884,680 +678,682 @@ FNH:8
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\LLMRepository.cs
 FN:41,System.String Persistence.Repositories.LLMRepository::get_QUERY_URL()
-FNDA:1,System.String Persistence.Repositories.LLMRepository::get_QUERY_URL()
-DA:42,1
+FNDA:0,System.String Persistence.Repositories.LLMRepository::get_QUERY_URL()
+DA:42,0
 FN:42,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_URL()
-FNDA:1,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_URL()
-DA:43,1
+FNDA:0,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_URL()
+DA:43,0
 FN:43,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_BATCH_URL()
-FNDA:3,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_BATCH_URL()
-DA:44,3
+FNDA:0,System.String Persistence.Repositories.LLMRepository::get_COMPUTE_BATCH_URL()
+DA:44,0
 FN:33,System.Void Persistence.Repositories.LLMRepository::.ctor(Persistence.Repositories.ILLMServiceLoadBalancer,Persistence.Repositories.API.IWebRepository`1<System.Single[]>,Persistence.Repositories.API.IWebRepository`1<System.Collections.Generic.IEnumerable`1<System.Single[]>>,Persistence.Repositories.API.IWebRepository`1<Domain.Persistence.DTOs.QueryAnswer>)
-FNDA:6,System.Void Persistence.Repositories.LLMRepository::.ctor(Persistence.Repositories.ILLMServiceLoadBalancer,Persistence.Repositories.API.IWebRepository`1<System.Single[]>,Persistence.Repositories.API.IWebRepository`1<System.Collections.Generic.IEnumerable`1<System.Single[]>>,Persistence.Repositories.API.IWebRepository`1<Domain.Persistence.DTOs.QueryAnswer>)
-DA:34,6
-DA:35,6
-DA:36,6
-DA:37,6
-DA:38,6
-DA:39,6
-DA:51,6
-DA:55,6
-DA:59,6
-DA:63,6
+FNDA:0,System.Void Persistence.Repositories.LLMRepository::.ctor(Persistence.Repositories.ILLMServiceLoadBalancer,Persistence.Repositories.API.IWebRepository`1<System.Single[]>,Persistence.Repositories.API.IWebRepository`1<System.Collections.Generic.IEnumerable`1<System.Single[]>>,Persistence.Repositories.API.IWebRepository`1<Domain.Persistence.DTOs.QueryAnswer>)
+DA:34,0
+DA:35,0
+DA:36,0
+DA:37,0
+DA:38,0
+DA:39,0
+DA:51,0
+DA:55,0
+DA:59,0
+DA:63,0
 FN:107,System.Void Persistence.Repositories.LLMRepository/<ComputeBatchEmbeddings>d__13::MoveNext()
-FNDA:3,System.Void Persistence.Repositories.LLMRepository/<ComputeBatchEmbeddings>d__13::MoveNext()
-DA:108,3
+FNDA:0,System.Void Persistence.Repositories.LLMRepository/<ComputeBatchEmbeddings>d__13::MoveNext()
+DA:108,0
 FN:96,System.Void Persistence.Repositories.LLMRepository/<ComputeEmbedding>d__12::MoveNext()
-FNDA:1,System.Void Persistence.Repositories.LLMRepository/<ComputeEmbedding>d__12::MoveNext()
-DA:97,1
+FNDA:0,System.Void Persistence.Repositories.LLMRepository/<ComputeEmbedding>d__12::MoveNext()
+DA:97,0
 FN:83,System.Void Persistence.Repositories.LLMRepository/<QueryLLM>d__11::MoveNext()
-FNDA:1,System.Void Persistence.Repositories.LLMRepository/<QueryLLM>d__11::MoveNext()
-DA:84,1
+FNDA:0,System.Void Persistence.Repositories.LLMRepository/<QueryLLM>d__11::MoveNext()
+DA:84,0
 LF:16
-LH:16
+LH:0
 BRF:0
 BRH:0
 FNF:7
-FNH:7
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\QdrantDatabaseWrapper.cs
-FN:25,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_BatchSize()
-FNDA:4,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_BatchSize()
-DA:26,4
-FN:26,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_CollectionName()
-FNDA:16,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_CollectionName()
-DA:27,16
-FN:27,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_SummaryCollectionName()
-FNDA:6,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_SummaryCollectionName()
-DA:28,6
-FN:28,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_MaxDegreeOfParallelism()
-FNDA:5,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_MaxDegreeOfParallelism()
-DA:29,5
-FN:30,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_RandomBytes()
-FNDA:10,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_RandomBytes()
-DA:31,10
-FN:31,System.Random Persistence.Repositories.QdrantDatabaseWrapper::get_Random()
-FNDA:5,System.Random Persistence.Repositories.QdrantDatabaseWrapper::get_Random()
-DA:32,5
-FN:35,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_NextRandomBytes()
-FNDA:5,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_NextRandomBytes()
-DA:36,5
-DA:37,5
-DA:38,5
-DA:39,5
-FN:85,System.String Persistence.Repositories.QdrantDatabaseWrapper::NewDocumentId()
-FNDA:5,System.String Persistence.Repositories.QdrantDatabaseWrapper::NewDocumentId()
-DA:86,5
-FN:202,Qdrant.Client.Grpc.PointStruct Persistence.Repositories.QdrantDatabaseWrapper::CreateRow(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.String)
-FNDA:10006,Qdrant.Client.Grpc.PointStruct Persistence.Repositories.QdrantDatabaseWrapper::CreateRow(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.String)
-DA:203,10006
-DA:204,10006
-DA:205,10006
-DA:206,10006
-DA:207,10006
-DA:208,10006
-DA:209,10006
-DA:210,10006
-DA:211,10006
-DA:212,10006
-DA:213,10006
-DA:214,10006
-DA:215,10006
-BRDA:204,33,0,0
-BRDA:204,33,1,10006
-BRDA:204,54,0,10006
-BRDA:204,54,1,10006
-BRDA:209,81,0,10006
-BRDA:209,81,1,10006
-FN:240,System.Threading.Tasks.ParallelOptions Persistence.Repositories.QdrantDatabaseWrapper::CreateParallelOptions(System.Threading.CancellationToken)
-FNDA:5,System.Threading.Tasks.ParallelOptions Persistence.Repositories.QdrantDatabaseWrapper::CreateParallelOptions(System.Threading.CancellationToken)
-DA:241,5
-DA:242,5
-DA:243,5
-DA:244,5
-DA:245,5
-FN:148,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper::<GetRelevantDocumentsAsync>b__23_2(System.String)
-FNDA:11,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper::<GetRelevantDocumentsAsync>b__23_2(System.String)
-DA:149,11
-DA:150,11
-DA:151,11
-BRDA:149,1,0,0
-BRDA:149,1,1,11
+FN:27,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_NextRandomBytes()
+FNDA:0,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_NextRandomBytes()
+DA:28,0
+DA:29,0
+DA:30,0
+DA:31,0
+FN:32,System.Random Persistence.Repositories.QdrantDatabaseWrapper::get_Random()
+FNDA:0,System.Random Persistence.Repositories.QdrantDatabaseWrapper::get_Random()
+DA:33,0
+FN:33,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_RandomBytes()
+FNDA:0,System.Byte[] Persistence.Repositories.QdrantDatabaseWrapper::get_RandomBytes()
+DA:34,0
+FN:34,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_BatchSize()
+FNDA:0,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_BatchSize()
+DA:35,0
+FN:35,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_CollectionName()
+FNDA:0,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_CollectionName()
+DA:36,0
+FN:37,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_SummaryCollectionName()
+FNDA:0,System.String Persistence.Repositories.QdrantDatabaseWrapper::get_SummaryCollectionName()
+DA:38,0
+FN:38,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_MaxDegreeOfParallelism()
+FNDA:0,System.Int32 Persistence.Repositories.QdrantDatabaseWrapper::get_MaxDegreeOfParallelism()
+DA:39,0
+FN:177,System.String Persistence.Repositories.QdrantDatabaseWrapper::NewDocumentId()
+FNDA:0,System.String Persistence.Repositories.QdrantDatabaseWrapper::NewDocumentId()
+DA:178,0
+FN:201,Qdrant.Client.Grpc.PointStruct Persistence.Repositories.QdrantDatabaseWrapper::CreateRow(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.String)
+FNDA:0,Qdrant.Client.Grpc.PointStruct Persistence.Repositories.QdrantDatabaseWrapper::CreateRow(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.String)
+DA:202,0
+DA:203,0
+DA:204,0
+DA:205,0
+DA:206,0
+DA:207,0
+DA:208,0
+DA:209,0
+DA:210,0
+DA:211,0
+DA:212,0
+DA:213,0
+DA:214,0
+DA:215,0
+DA:216,0
+BRDA:203,33,0,0
+BRDA:203,33,1,0
+BRDA:203,54,0,0
+BRDA:203,54,1,0
+BRDA:210,81,0,0
+BRDA:210,81,1,0
+FN:241,System.Threading.Tasks.ParallelOptions Persistence.Repositories.QdrantDatabaseWrapper::CreateParallelOptions(System.Threading.CancellationToken)
+FNDA:0,System.Threading.Tasks.ParallelOptions Persistence.Repositories.QdrantDatabaseWrapper::CreateParallelOptions(System.Threading.CancellationToken)
+DA:242,0
+DA:243,0
+DA:244,0
+DA:245,0
+DA:246,0
+FN:145,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper::<GetRelevantDocumentsAsync>b__22_2(System.String)
+FNDA:0,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper::<GetRelevantDocumentsAsync>b__22_2(System.String)
+DA:146,0
+DA:147,0
+DA:148,0
+BRDA:146,1,0,0
+BRDA:146,1,1,0
 FN:11,System.Void Persistence.Repositories.QdrantDatabaseWrapper::.ctor(Persistence.Repositories.IQdrantClient,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.QdrantDatabaseWrapper>)
-FNDA:14,System.Void Persistence.Repositories.QdrantDatabaseWrapper::.ctor(Persistence.Repositories.IQdrantClient,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.QdrantDatabaseWrapper>)
-DA:12,14
-DA:13,14
-DA:14,14
-DA:15,14
-DA:16,14
-DA:19,14
-DA:20,14
-DA:21,14
-DA:25,14
-FN:144,Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_0(Qdrant.Client.Grpc.ScoredPoint)
-FNDA:11,Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_0(Qdrant.Client.Grpc.ScoredPoint)
-DA:145,11
-FN:145,System.String Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_1(Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value>)
-FNDA:11,System.String Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_1(Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value>)
-DA:146,11
-DA:147,11
-DA:148,11
-BRDA:146,13,0,0
-BRDA:146,13,1,11
-FN:151,System.Boolean Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_3(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-FNDA:11,System.Boolean Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_3(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-DA:152,11
-FN:152,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_4(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-FNDA:11,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__23_4(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-DA:153,11
-FN:192,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<>c__DisplayClass25_0/<<CreateRowsInParallelAsync>b__0>d::MoveNext()
-FNDA:10006,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<>c__DisplayClass25_0/<<CreateRowsInParallelAsync>b__0>d::MoveNext()
-DA:193,10006
-DA:194,10006
-DA:195,10006
-DA:196,10006
-DA:197,10006
-BRDA:194,36,0,10006
-BRDA:194,36,1,10006
-FN:185,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<CreateRowsInParallelAsync>d__25::MoveNext()
-FNDA:5,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<CreateRowsInParallelAsync>d__25::MoveNext()
-DA:186,5
-DA:187,5
-DA:188,5
-DA:189,5
-DA:190,5
-DA:191,5
-DA:192,5
-DA:198,5
-DA:199,5
-DA:200,5
-FN:135,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetRelevantDocumentsAsync>d__23::MoveNext()
-FNDA:3,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetRelevantDocumentsAsync>d__23::MoveNext()
-DA:136,3
-DA:137,3
-DA:138,3
-DA:139,3
-DA:140,3
-DA:141,3
-DA:142,3
-DA:143,3
-DA:144,2
-DA:154,2
-DA:155,2
-BRDA:144,257,0,1
-BRDA:144,257,1,1
-BRDA:144,433,0,1
-BRDA:144,433,1,2
-FN:162,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetSummaryAsync>d__24::MoveNext()
-FNDA:4,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetSummaryAsync>d__24::MoveNext()
-DA:163,4
-DA:164,4
-DA:165,4
-DA:166,4
-DA:167,4
-DA:168,4
-DA:169,4
-DA:170,4
-DA:171,7
-DA:173,1
-DA:174,1
-DA:176,1
-DA:177,4
-BRDA:171,246,0,1
-BRDA:171,246,1,3
-BRDA:171,269,0,3
-BRDA:171,269,1,1
-BRDA:174,334,0,0
-BRDA:174,334,1,1
-FN:217,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<InsertRowsInBatchesAsync>d__27::MoveNext()
-FNDA:4,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<InsertRowsInBatchesAsync>d__27::MoveNext()
-DA:218,4
-DA:219,4
-DA:220,37
-DA:221,13
-DA:223,13
-DA:224,13
-DA:225,13
-DA:226,13
-DA:227,13
-DA:228,13
-DA:229,12
-DA:230,12
-DA:231,12
-DA:232,1
-DA:233,1
-DA:234,1
-DA:235,1
-DA:237,12
-DA:238,3
-BRDA:220,404,1,13
-BRDA:220,404,0,3
-FN:100,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreSummaryAsync>d__22::MoveNext()
-FNDA:2,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreSummaryAsync>d__22::MoveNext()
-DA:101,2
-DA:103,2
-DA:104,2
-DA:105,2
-DA:106,2
-DA:107,2
-DA:108,2
-DA:109,2
-DA:110,2
-DA:111,2
-DA:112,2
-DA:113,1
-DA:115,1
-DA:116,1
-DA:117,1
-DA:118,1
-DA:120,2
-FN:56,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreVectorsAsync>d__20::MoveNext()
-FNDA:5,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreVectorsAsync>d__20::MoveNext()
-DA:57,5
-DA:58,5
-DA:59,5
-DA:60,5
-DA:62,5
-DA:63,5
-DA:65,5
-DA:66,4
-DA:68,4
-DA:69,4
-DA:70,3
-DA:71,3
-DA:72,1
-DA:73,1
-DA:74,1
-DA:75,1
-DA:77,3
-DA:79,1
-DA:80,1
-DA:81,1
-DA:83,4
-DA:84,5
-BRDA:59,82,0,5
-BRDA:59,82,1,5
-BRDA:65,337,0,4
-BRDA:65,337,1,1
-LF:144
-LH:144
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper::.ctor(Persistence.Repositories.IQdrantClient,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.QdrantDatabaseWrapper>)
+DA:12,0
+DA:13,0
+DA:14,0
+DA:15,0
+DA:16,0
+DA:19,0
+DA:20,0
+DA:21,0
+DA:37,0
+FN:141,Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_0(Qdrant.Client.Grpc.ScoredPoint)
+FNDA:0,Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_0(Qdrant.Client.Grpc.ScoredPoint)
+DA:142,0
+FN:142,System.String Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_1(Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value>)
+FNDA:0,System.String Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_1(Google.Protobuf.Collections.MapField`2<System.String,Qdrant.Client.Grpc.Value>)
+DA:143,0
+DA:144,0
+DA:145,0
+BRDA:143,13,0,0
+BRDA:143,13,1,0
+FN:148,System.Boolean Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_3(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+FNDA:0,System.Boolean Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_3(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+DA:149,0
+FN:149,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_4(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+FNDA:0,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Persistence.Repositories.QdrantDatabaseWrapper/<>c::<GetRelevantDocumentsAsync>b__22_4(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+DA:150,0
+FN:191,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<>c__DisplayClass25_0/<<CreateRowsInParallelAsync>b__0>d::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<>c__DisplayClass25_0/<<CreateRowsInParallelAsync>b__0>d::MoveNext()
+DA:192,0
+DA:193,0
+DA:194,0
+DA:195,0
+DA:196,0
+BRDA:193,36,0,0
+BRDA:193,36,1,0
+FN:184,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<CreateRowsInParallelAsync>d__25::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<CreateRowsInParallelAsync>d__25::MoveNext()
+DA:185,0
+DA:186,0
+DA:187,0
+DA:188,0
+DA:189,0
+DA:190,0
+DA:191,0
+DA:197,0
+DA:198,0
+DA:199,0
+FN:132,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetRelevantDocumentsAsync>d__22::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetRelevantDocumentsAsync>d__22::MoveNext()
+DA:133,0
+DA:134,0
+DA:135,0
+DA:136,0
+DA:137,0
+DA:138,0
+DA:139,0
+DA:140,0
+DA:141,0
+DA:151,0
+DA:152,0
+BRDA:141,257,0,0
+BRDA:141,257,1,0
+BRDA:141,433,0,0
+BRDA:141,433,1,0
+FN:159,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetSummaryAsync>d__23::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<GetSummaryAsync>d__23::MoveNext()
+DA:160,0
+DA:161,0
+DA:162,0
+DA:163,0
+DA:164,0
+DA:165,0
+DA:166,0
+DA:167,0
+DA:168,0
+DA:170,0
+DA:171,0
+DA:173,0
+DA:174,0
+BRDA:168,246,0,0
+BRDA:168,246,1,0
+BRDA:168,269,0,0
+BRDA:168,269,1,0
+BRDA:171,334,0,0
+BRDA:171,334,1,0
+FN:218,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<InsertRowsInBatchesAsync>d__27::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<InsertRowsInBatchesAsync>d__27::MoveNext()
+DA:219,0
+DA:220,0
+DA:221,0
+DA:222,0
+DA:224,0
+DA:225,0
+DA:226,0
+DA:227,0
+DA:228,0
+DA:229,0
+DA:230,0
+DA:231,0
+DA:232,0
+DA:233,0
+DA:234,0
+DA:235,0
+DA:236,0
+DA:238,0
+DA:239,0
+BRDA:221,404,1,0
+BRDA:221,404,0,0
+FN:97,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreSummaryAsync>d__21::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreSummaryAsync>d__21::MoveNext()
+DA:98,0
+DA:100,0
+DA:101,0
+DA:102,0
+DA:103,0
+DA:104,0
+DA:105,0
+DA:106,0
+DA:107,0
+DA:108,0
+DA:109,0
+DA:110,0
+DA:112,0
+DA:113,0
+DA:114,0
+DA:115,0
+DA:117,0
+FN:55,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreVectorsAsync>d__20::MoveNext()
+FNDA:0,System.Void Persistence.Repositories.QdrantDatabaseWrapper/<StoreVectorsAsync>d__20::MoveNext()
+DA:56,0
+DA:57,0
+DA:58,0
+DA:59,0
+DA:61,0
+DA:62,0
+DA:64,0
+DA:65,0
+DA:67,0
+DA:68,0
+DA:69,0
+DA:70,0
+DA:71,0
+DA:72,0
+DA:73,0
+DA:74,0
+DA:76,0
+DA:78,0
+DA:79,0
+DA:80,0
+DA:82,0
+DA:83,0
+BRDA:58,82,0,0
+BRDA:58,82,1,0
+BRDA:64,337,0,0
+BRDA:64,337,1,0
+LF:146
+LH:0
 BRF:28
-BRH:24
+BRH:0
 FNF:23
-FNH:23
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\VectorRepository.cs
 FN:36,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
-FNDA:19,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
-DA:37,19
-DA:38,19
-DA:39,19
-DA:40,19
-DA:41,19
-DA:42,19
-DA:43,19
-DA:73,19
-DA:74,19
-DA:75,19
-DA:76,19
-DA:77,19
+FNDA:0,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
+DA:37,0
+DA:38,0
+DA:39,0
+DA:40,0
+DA:41,0
+DA:42,0
+DA:43,0
+DA:73,0
+DA:74,0
+DA:75,0
+DA:76,0
+DA:77,0
 FN:380,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-FNDA:96,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-DA:381,96
+FNDA:0,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
+DA:381,0
 FN:225,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
-FNDA:124,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
-DA:226,124
-DA:227,124
-DA:228,124
-DA:229,124
-DA:230,124
-DA:231,124
-DA:232,124
-DA:233,7
-DA:234,7
-DA:235,7
-DA:236,7
-DA:237,7
-DA:238,124
-BRDA:228,59,0,124
-BRDA:228,59,1,124
-BRDA:231,193,0,24
-BRDA:231,193,1,100
-BRDA:232,298,0,7
-BRDA:232,298,1,124
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
+DA:226,0
+DA:227,0
+DA:228,0
+DA:229,0
+DA:230,0
+DA:231,0
+DA:232,0
+DA:233,0
+DA:234,0
+DA:235,0
+DA:236,0
+DA:237,0
+DA:238,0
+BRDA:228,59,0,0
+BRDA:228,59,1,0
+BRDA:231,193,0,0
+BRDA:231,193,1,0
+BRDA:232,298,0,0
+BRDA:232,298,1,0
 FN:273,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-FNDA:13,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-DA:274,13
+FNDA:0,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+DA:274,0
 FN:385,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-FNDA:84,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-DA:386,84
-DA:387,84
-DA:388,84
-DA:389,84
-DA:390,167
-DA:391,1
-DA:393,84
-DA:394,84
-BRDA:388,53,0,84
-BRDA:388,53,1,84
-BRDA:390,177,0,83
-BRDA:390,177,1,1
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
+DA:386,0
+DA:387,0
+DA:388,0
+DA:389,0
+DA:390,0
+DA:391,0
+DA:393,0
+DA:394,0
+BRDA:388,53,0,0
+BRDA:388,53,1,0
+BRDA:390,177,0,0
+BRDA:390,177,1,0
 FN:263,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
-FNDA:8,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
-DA:264,8
-DA:265,8
-DA:266,8
-DA:268,8
-DA:269,8
-DA:270,46
-DA:271,13
-DA:272,13
-DA:273,13
-DA:275,12
-DA:276,12
-DA:277,12
-DA:278,12
-DA:279,12
-DA:280,12
-DA:281,12
-DA:282,12
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
+DA:264,0
+DA:265,0
+DA:266,0
+DA:268,0
+DA:269,0
+DA:270,0
+DA:271,0
+DA:272,0
+DA:273,0
+DA:275,0
+DA:276,0
+DA:277,0
+DA:278,0
+DA:279,0
+DA:280,0
+DA:281,0
+DA:282,0
 DA:284,0
-DA:285,12
-DA:286,6
-DA:287,1
-DA:288,1
-DA:289,1
-DA:290,1
-DA:291,1
-DA:292,1
-DA:293,1
-DA:294,1
-DA:296,8
-DA:297,8
-DA:298,8
-DA:299,8
-BRDA:270,926,1,13
-BRDA:274,289,0,6
-BRDA:274,289,1,13
-BRDA:277,545,0,12
-BRDA:281,714,0,5
-BRDA:281,714,1,7
+DA:285,0
+DA:286,0
+DA:287,0
+DA:288,0
+DA:289,0
+DA:290,0
+DA:291,0
+DA:292,0
+DA:293,0
+DA:294,0
+DA:296,0
+DA:297,0
+DA:298,0
+DA:299,0
+BRDA:270,926,1,0
+BRDA:274,289,0,0
+BRDA:274,289,1,0
+BRDA:277,545,0,0
+BRDA:281,714,0,0
+BRDA:281,714,1,0
 BRDA:277,545,1,0
-BRDA:270,926,0,6
+BRDA:270,926,0,0
 FN:215,System.Void Persistence.Repositories.VectorRepository/<CreateBatchesAsync>d__33::MoveNext()
-FNDA:8,System.Void Persistence.Repositories.VectorRepository/<CreateBatchesAsync>d__33::MoveNext()
-DA:216,8
-DA:218,8
-DA:219,8
-DA:220,8
-DA:221,7
-DA:222,7
-DA:223,7
-DA:224,7
-DA:225,7
-DA:239,7
-DA:241,13
-DA:242,7
-DA:243,1
-DA:244,1
-DA:245,1
-DA:246,1
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<CreateBatchesAsync>d__33::MoveNext()
+DA:216,0
+DA:218,0
+DA:219,0
+DA:220,0
+DA:221,0
+DA:222,0
+DA:223,0
+DA:224,0
+DA:225,0
+DA:239,0
+DA:241,0
+DA:242,0
+DA:243,0
+DA:244,0
+DA:245,0
+DA:246,0
 DA:247,0
 DA:248,0
 DA:249,0
 DA:250,0
-DA:252,8
-DA:253,8
-DA:254,8
-DA:255,8
-BRDA:241,368,0,6
-BRDA:241,368,1,7
+DA:252,0
+DA:253,0
+DA:254,0
+DA:255,0
+BRDA:241,368,0,0
+BRDA:241,368,1,0
 FN:374,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-FNDA:12,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-DA:375,12
-DA:376,12
-DA:377,12
-DA:378,12
-DA:379,12
-DA:380,12
-DA:382,12
-DA:383,12
-DA:384,12
-DA:385,12
-DA:392,12
-DA:395,12
-DA:396,12
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
+DA:375,0
+DA:376,0
+DA:377,0
+DA:378,0
+DA:379,0
+DA:380,0
+DA:382,0
+DA:383,0
+DA:384,0
+DA:385,0
+DA:392,0
+DA:395,0
+DA:396,0
 FN:349,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-FNDA:12,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-DA:350,12
-DA:351,12
-DA:352,12
-DA:354,12
-DA:355,12
-DA:356,12
-DA:357,12
-DA:358,12
-DA:359,12
-DA:360,12
-DA:361,12
-DA:364,12
-DA:365,12
-DA:366,12
-DA:367,12
-BRDA:350,16,0,12
-BRDA:350,16,1,24
-BRDA:360,528,0,5
-BRDA:360,528,1,7
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
+DA:350,0
+DA:351,0
+DA:352,0
+DA:354,0
+DA:355,0
+DA:356,0
+DA:357,0
+DA:358,0
+DA:359,0
+DA:360,0
+DA:361,0
+DA:364,0
+DA:365,0
+DA:366,0
+DA:367,0
+BRDA:350,16,0,0
+BRDA:350,16,1,0
+BRDA:360,528,0,0
+BRDA:360,528,1,0
 FN:130,System.Void Persistence.Repositories.VectorRepository/<QueryVectorData>d__31::MoveNext()
-FNDA:9,System.Void Persistence.Repositories.VectorRepository/<QueryVectorData>d__31::MoveNext()
-DA:131,9
-DA:132,9
-DA:133,1
-DA:134,1
-DA:135,1
-DA:137,8
-DA:138,2
-DA:139,2
-DA:140,2
-DA:142,6
-DA:144,6
-DA:145,6
-DA:146,5
-DA:147,1
-DA:148,1
-DA:149,1
-DA:151,4
-DA:152,4
-DA:153,4
-DA:154,2
-DA:155,2
-DA:156,2
-DA:157,2
-DA:158,2
-DA:159,2
-DA:160,2
-DA:162,2
-DA:163,2
-DA:164,2
-DA:165,2
-DA:166,2
-DA:167,2
-DA:169,1
-DA:170,1
-DA:171,1
-DA:172,1
-DA:174,9
-BRDA:132,32,0,1
-BRDA:132,32,1,8
-BRDA:137,75,0,7
-BRDA:137,75,1,2
-BRDA:137,87,1,2
-BRDA:137,87,0,6
-BRDA:137,105,0,2
-BRDA:137,105,1,6
-BRDA:146,363,0,5
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<QueryVectorData>d__31::MoveNext()
+DA:131,0
+DA:132,0
+DA:133,0
+DA:134,0
+DA:135,0
+DA:137,0
+DA:138,0
+DA:139,0
+DA:140,0
+DA:142,0
+DA:144,0
+DA:145,0
+DA:146,0
+DA:147,0
+DA:148,0
+DA:149,0
+DA:151,0
+DA:152,0
+DA:153,0
+DA:154,0
+DA:155,0
+DA:156,0
+DA:157,0
+DA:158,0
+DA:159,0
+DA:160,0
+DA:162,0
+DA:163,0
+DA:164,0
+DA:165,0
+DA:166,0
+DA:167,0
+DA:169,0
+DA:170,0
+DA:171,0
+DA:172,0
+DA:174,0
+BRDA:132,32,0,0
+BRDA:132,32,1,0
+BRDA:137,75,0,0
+BRDA:137,75,1,0
+BRDA:137,87,1,0
+BRDA:137,87,0,0
+BRDA:137,105,0,0
+BRDA:137,105,1,0
+BRDA:146,363,0,0
 BRDA:146,363,1,0
-BRDA:146,386,0,1
-BRDA:146,386,1,4
-BRDA:153,602,0,2
-BRDA:153,602,1,2
-BRDA:153,622,0,2
-BRDA:153,622,1,2
+BRDA:146,386,0,0
+BRDA:146,386,1,0
+BRDA:153,602,0,0
+BRDA:153,602,1,0
+BRDA:153,622,0,0
+BRDA:153,622,1,0
 FN:402,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-FNDA:12,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-DA:403,12
-DA:404,12
-DA:405,12
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
+DA:403,0
+DA:404,0
+DA:405,0
 DA:406,0
 DA:407,0
 DA:408,0
-DA:410,12
-DA:411,5
-DA:412,5
-DA:413,5
-DA:414,7
-DA:415,1
-DA:416,1
-DA:417,1
-DA:418,12
-DA:419,12
+DA:410,0
+DA:411,0
+DA:412,0
+DA:413,0
+DA:414,0
+DA:415,0
+DA:416,0
+DA:417,0
+DA:418,0
+DA:419,0
 BRDA:405,176,0,0
-BRDA:405,176,1,12
-BRDA:410,241,0,5
-BRDA:410,241,1,7
-BRDA:414,280,0,1
-BRDA:414,280,1,12
+BRDA:405,176,1,0
+BRDA:410,241,0,0
+BRDA:410,241,1,0
+BRDA:414,280,0,0
+BRDA:414,280,1,0
 FN:93,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
-FNDA:10,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
-DA:94,10
-DA:95,10
-DA:96,2
-DA:97,2
-DA:98,2
-DA:100,8
-DA:101,8
-DA:102,8
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
+DA:94,0
+DA:95,0
+DA:96,0
+DA:97,0
+DA:98,0
+DA:100,0
+DA:101,0
+DA:102,0
 DA:103,0
 DA:104,0
 DA:105,0
-DA:107,8
-DA:108,7
-DA:109,7
-DA:110,8
-DA:111,7
-DA:112,8
-DA:113,8
-DA:114,10
-BRDA:95,40,0,2
-BRDA:95,40,1,8
+DA:107,0
+DA:108,0
+DA:109,0
+DA:110,0
+DA:111,0
+DA:112,0
+DA:113,0
+DA:114,0
+BRDA:95,40,0,0
+BRDA:95,40,1,0
 BRDA:101,122,0,0
-BRDA:101,122,1,8
+BRDA:101,122,1,0
 BRDA:102,275,0,0
-BRDA:102,275,1,8
-BRDA:107,333,0,7
-BRDA:110,512,0,1
-BRDA:110,512,1,6
-BRDA:110,535,0,1
-BRDA:110,535,1,7
-BRDA:107,333,1,8
+BRDA:102,275,1,0
+BRDA:107,333,0,0
+BRDA:110,512,0,0
+BRDA:110,512,1,0
+BRDA:110,535,0,0
+BRDA:110,535,1,0
+BRDA:107,333,1,0
 FN:190,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentDataAsync>d__32::MoveNext()
-FNDA:8,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentDataAsync>d__32::MoveNext()
-DA:191,8
-DA:192,8
-DA:193,8
-DA:194,8
-DA:195,8
-DA:196,8
-DA:197,8
-DA:198,8
-DA:199,8
-DA:200,8
-DA:201,8
-DA:202,8
-DA:203,8
-DA:204,8
-DA:205,8
-DA:206,8
-DA:207,8
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentDataAsync>d__32::MoveNext()
+DA:191,0
+DA:192,0
+DA:193,0
+DA:194,0
+DA:195,0
+DA:196,0
+DA:197,0
+DA:198,0
+DA:199,0
+DA:200,0
+DA:201,0
+DA:202,0
+DA:203,0
+DA:204,0
+DA:205,0
+DA:206,0
+DA:207,0
 FN:309,System.Void Persistence.Repositories.VectorRepository/<StoreEmbeddingsAsync>d__35::MoveNext()
-FNDA:8,System.Void Persistence.Repositories.VectorRepository/<StoreEmbeddingsAsync>d__35::MoveNext()
-DA:310,8
-DA:311,8
-DA:312,8
-DA:314,8
-DA:315,8
-DA:316,45
-DA:317,12
-DA:318,12
-DA:319,12
-DA:320,12
-DA:321,12
-DA:322,12
-DA:323,12
-DA:324,12
-DA:325,12
-DA:326,12
-DA:327,7
-DA:328,1
-DA:329,1
-DA:330,1
-DA:331,1
+FNDA:0,System.Void Persistence.Repositories.VectorRepository/<StoreEmbeddingsAsync>d__35::MoveNext()
+DA:310,0
+DA:311,0
+DA:312,0
+DA:314,0
+DA:315,0
+DA:316,0
+DA:317,0
+DA:318,0
+DA:319,0
+DA:320,0
+DA:321,0
+DA:322,0
+DA:323,0
+DA:324,0
+DA:325,0
+DA:326,0
+DA:327,0
+DA:328,0
+DA:329,0
+DA:330,0
+DA:331,0
 DA:332,0
 DA:333,0
 DA:334,0
 DA:335,0
-DA:336,8
-DA:337,8
-BRDA:316,455,1,12
-BRDA:316,455,0,7
-BRDA:336,742,0,3
-BRDA:336,742,1,8
+DA:336,0
+DA:337,0
+BRDA:316,455,1,0
+BRDA:316,455,0,0
+BRDA:336,742,0,0
+BRDA:336,742,1,0
 LF:235
-LH:220
+LH:0
 BRF:62
-BRH:57
+BRH:0
 FNF:14
-FNH:14
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\API\WebRepository.cs
 FN:14,System.Void Persistence.Repositories.API.WebRepository`1::.ctor(System.Net.Http.IHttpClientFactory)
-FNDA:7,System.Void Persistence.Repositories.API.WebRepository`1::.ctor(System.Net.Http.IHttpClientFactory)
-DA:15,7
+FNDA:0,System.Void Persistence.Repositories.API.WebRepository`1::.ctor(System.Net.Http.IHttpClientFactory)
+DA:15,0
 FN:29,System.Void Persistence.Repositories.API.WebRepository`1/<PostAsync>d__2::MoveNext()
-FNDA:3,System.Void Persistence.Repositories.API.WebRepository`1/<PostAsync>d__2::MoveNext()
-DA:30,3
-DA:31,3
-DA:32,3
-DA:33,3
-DA:34,3
-DA:35,2
-DA:36,2
-DA:37,2
+FNDA:0,System.Void Persistence.Repositories.API.WebRepository`1/<PostAsync>d__2::MoveNext()
+DA:30,0
+DA:31,0
+DA:32,0
+DA:33,0
+DA:34,0
+DA:35,0
+DA:36,0
+DA:37,0
 LF:9
-LH:9
+LH:0
 BRF:0
 BRH:0
 FNF:2
-FNH:2
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Hubs\ProgressHub.cs
 FN:9,System.Void Persistence.Hubs.ProgressHubWrapper::.ctor(Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-FNDA:2,System.Void Persistence.Hubs.ProgressHubWrapper::.ctor(Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-DA:10,2
+FNDA:0,System.Void Persistence.Hubs.ProgressHubWrapper::.ctor(Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
+DA:10,0
 FN:11,System.Void Persistence.Hubs.ProgressHubWrapper/<SendProgress>d__2::MoveNext()
-FNDA:1,System.Void Persistence.Hubs.ProgressHubWrapper/<SendProgress>d__2::MoveNext()
-DA:12,1
+FNDA:0,System.Void Persistence.Hubs.ProgressHubWrapper/<SendProgress>d__2::MoveNext()
+DA:12,0
 FN:14,System.Void Persistence.Hubs.ProgressHub::.ctor(Persistence.Hubs.IProgressHubWrapper)
-FNDA:1,System.Void Persistence.Hubs.ProgressHub::.ctor(Persistence.Hubs.IProgressHubWrapper)
-DA:15,1
+FNDA:0,System.Void Persistence.Hubs.ProgressHub::.ctor(Persistence.Hubs.IProgressHubWrapper)
+DA:15,0
 FN:16,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__2::MoveNext()
-FNDA:1,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__2::MoveNext()
-DA:17,1
+FNDA:0,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__2::MoveNext()
+DA:17,0
 LF:4
-LH:4
+LH:0
 BRF:0
 BRH:0
 FNF:4
-FNH:4
+FNH:0
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Cache\EmbeddingCache.cs
 FN:29,System.Single[] Persistence.Cache.MemoryCacheEmbeddingCache::GetEmbedding(System.String)
-FNDA:4,System.Single[] Persistence.Cache.MemoryCacheEmbeddingCache::GetEmbedding(System.String)
-DA:30,4
-DA:31,4
-DA:32,4
+FNDA:0,System.Single[] Persistence.Cache.MemoryCacheEmbeddingCache::GetEmbedding(System.String)
+DA:30,0
+DA:31,0
+DA:32,0
 FN:34,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::SetEmbedding(System.String,System.Single[])
-FNDA:3,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::SetEmbedding(System.String,System.Single[])
-DA:35,3
-DA:36,3
-DA:37,3
+FNDA:0,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::SetEmbedding(System.String,System.Single[])
+DA:35,0
+DA:36,0
+DA:37,0
 FN:39,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::ClearCache()
-FNDA:1,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::ClearCache()
-DA:40,1
-DA:41,1
-DA:42,1
-DA:43,1
-DA:44,1
-DA:45,1
-BRDA:41,19,0,1
-BRDA:41,19,1,1
+FNDA:0,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::ClearCache()
+DA:40,0
+DA:41,0
+DA:42,0
+DA:43,0
+DA:44,0
+DA:45,0
+BRDA:41,19,0,0
+BRDA:41,19,1,0
 FN:16,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::.ctor(Microsoft.Extensions.Options.IOptions`1<Microsoft.Extensions.Caching.Memory.MemoryCacheOptions>)
-FNDA:4,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::.ctor(Microsoft.Extensions.Options.IOptions`1<Microsoft.Extensions.Caching.Memory.MemoryCacheOptions>)
-DA:17,4
-DA:18,4
-DA:19,4
-DA:20,4
-DA:21,4
-DA:22,4
-DA:23,4
-DA:24,4
-DA:25,4
-DA:26,4
-DA:27,4
+FNDA:0,System.Void Persistence.Cache.MemoryCacheEmbeddingCache::.ctor(Microsoft.Extensions.Options.IOptions`1<Microsoft.Extensions.Caching.Memory.MemoryCacheOptions>)
+DA:17,0
+DA:18,0
+DA:19,0
+DA:20,0
+DA:21,0
+DA:22,0
+DA:23,0
+DA:24,0
+DA:25,0
+DA:26,0
+DA:27,0
 LF:23
-LH:23
+LH:0
 BRF:2
-BRH:2
+BRH:0
 FNF:4
-FNH:4
+FNH:0
 end_of_record
