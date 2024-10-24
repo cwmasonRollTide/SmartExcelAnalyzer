@@ -1,5 +1,4 @@
 using MediatR;
-using FluentValidation;
 using Persistence.Hubs;
 using System.Diagnostics;
 using Application.Services;
@@ -19,21 +18,6 @@ public class UploadFileCommand : IRequest<string?>
     public IProgress<(double ParseProgress, double SaveProgress)> Progress { get; set; } = new Progress<(double, double)>();
 }
 
-public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
-{
-    public UploadFileCommandValidator()
-    {
-        RuleFor(x => x.File)
-            .NotNull()
-            .WithMessage("File is required.");
-
-        RuleFor(x => x.File)
-            .Must(file => file?.Length > 0)
-            .When(x => x.File != null)
-            .WithMessage("File is empty.");
-    }
-}
-
 /// <summary>
 /// The service responsible for handling Excel file operations.
 /// UploadFileCommandHandler handles the UploadFileCommand request
@@ -43,10 +27,10 @@ public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
 /// <param name="logger">Logger for operation tracking</param>
 /// <param name="hubContext">SignalR hub context for reporting progress to the client on parsing and saving</param>
 public class UploadFileCommandHandler(
-    IExcelFileService excelService,
-    IVectorDbRepository vectorDbRepository,
-    ILogger<UploadFileCommandHandler> logger,
-    IHubContext<ProgressHub> hubContext
+    IExcelFileService _excelService,
+    IVectorDbRepository _vectorDbRepository,
+    ILogger<UploadFileCommandHandler> _logger,
+    IHubContext<ProgressHub> _hubContext
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants
@@ -60,13 +44,6 @@ public class UploadFileCommandHandler(
     private const string LogSavedDocumentSuccess = "Success: Saved file {Filename} with id {DocumentId} to the vector database.";
     #endregion
 
-    #region Dependencies
-    private readonly IExcelFileService _excelService = excelService;
-    private readonly IHubContext<ProgressHub> _hubContext = hubContext;
-    private readonly ILogger<UploadFileCommandHandler> _logger = logger;
-    private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
-    #endregion
-
     /// <summary>
     /// Handles the UploadFileCommand request. Prepares the excel file for the LLM and saves it to the vector database.
     /// Parses the excel file and computes the embedding of each row with the LLM.
@@ -78,7 +55,10 @@ public class UploadFileCommandHandler(
     /// DocumentId? string. If it is null, the operation failed either at the parsing stage
     /// or the saving to the vector db stage
     /// </returns>
-    public async Task<string?> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+    public async Task<string?> Handle(
+        UploadFileCommand request, 
+        CancellationToken cancellationToken
+    )
     {
         var progress = new Progress<(double, double)>(
             async report =>
@@ -107,10 +87,11 @@ public class UploadFileCommandHandler(
     private async Task<SummarizedExcelData?> PrepareExcelFileAsync(
         IFormFile file, 
         IProgress<(double, double)> progress, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogTrace(LogPreparingExcelFile, file.FileName);
-        var stopwatch = Stopwatch.StartNew();
+        var stopwatch = Now;
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(
             file, 
             progress, 
@@ -129,10 +110,11 @@ public class UploadFileCommandHandler(
         SummarizedExcelData data, 
         string fileName, 
         IProgress<(double, double)> progress, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogTrace(LogSavingDocument, fileName);
-        var stopwatch = Stopwatch.StartNew();
+        var stopwatch = Now;
         var documentId = await _vectorDbRepository.SaveDocumentAsync(
             data, 
             progress, 
@@ -148,4 +130,6 @@ public class UploadFileCommandHandler(
 
         return documentId;
     }
+
+    private static Stopwatch Now => Stopwatch.StartNew();
 }

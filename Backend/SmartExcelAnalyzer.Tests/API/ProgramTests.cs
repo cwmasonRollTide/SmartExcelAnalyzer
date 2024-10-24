@@ -1,43 +1,15 @@
-using API;
+using MediatR;
 using FluentAssertions;
 using Persistence.Hubs;
 using Application.Services;
+using Domain.Persistence.DTOs;
 using Persistence.Repositories;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Persistence.Repositories.API;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SmartExcelAnalyzer.Tests.API;
-
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>
-{
-    protected override IHost CreateHost(IHostBuilder builder)
-    {
-        builder.ConfigureWebHost(webHost =>
-        {
-            webHost.UseTestServer(options => options.PreserveExecutionContext = true);
-            webHost.ConfigureKestrel(options => options.ListenLocalhost(0));
-            webHost.UseEnvironment("Development");
-            webHost.UseStartup<Program>();
-            webHost.Configure(app =>
-            {
-                app.UseRouting();
-                app.UseCors();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                    endpoints.MapHealthChecks("/health");
-                    endpoints.MapHub<ProgressHub>("/progressHub");
-                });
-            });
-        });
-        return base.CreateHost(builder);
-    }
-}
 
 public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<CustomWebApplicationFactory>
 {
@@ -45,12 +17,28 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
     [Fact]
     public void ConfigureServices_ShouldRegisterRequiredServices()
     {
-        var client = _factory.CreateClient();
         var services = _factory.Services;
 
-        services.GetService<IExcelFileService>().Should().NotBeNull();
-        services.GetService<ILLMRepository>().Should().NotBeNull();
-        services.GetService<IProgressHubWrapper>().Should().NotBeNull();
+        services
+            .GetService<IExcelFileService>()
+            .Should()
+            .NotBeNull();
+        services
+            .GetService<ILLMRepository>()
+            .Should()
+            .NotBeNull();
+        services
+            .GetService<IProgressHubWrapper>()
+            .Should()
+            .NotBeNull();
+        services
+            .GetService<IWebRepository<QueryAnswer>>()
+            .Should()
+            .NotBeNull();
+        services
+            .GetService<IMediator>()
+            .Should()
+            .NotBeNull();
     }
 
     [Fact]
@@ -58,8 +46,10 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
     {
         var services = _factory.Services;
 
-        services.GetService<Swashbuckle.AspNetCore.Swagger.ISwaggerProvider>()
-            .Should().NotBeNull();
+        services
+            .GetService<Swashbuckle.AspNetCore.Swagger.ISwaggerProvider>()
+            .Should()
+            .NotBeNull();
     }
 
     [Fact]

@@ -114,10 +114,10 @@ public class ExcelFileService : IExcelFileService
         ParallelOptions parallelOptions,
         IProgress<(double, double)>? progress)
     {
-        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        var totalRows = Math.Max(1, table.Rows.Count);
         var processedRows = 0;
         var lastReportedProgress = 0.0;
+        var totalRows = Math.Max(1, table.Rows.Count);
+        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
         await Task.Run(() =>
         {
             Parallel.For(
@@ -206,12 +206,7 @@ public class ExcelFileService : IExcelFileService
         {
             RowCount = table.Rows.Count,
             ColumnCount = table.Columns.Count,
-            Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList(),
-            Sums = new ConcurrentDictionary<string, double>(),
-            Mins = new ConcurrentDictionary<string, double>(),
-            Maxs = new ConcurrentDictionary<string, double>(),
-            Averages = new ConcurrentDictionary<string, double>(),
-            HashedStrings = new ConcurrentDictionary<string, ConcurrentDictionary<string, string>>()
+            Columns = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList()
         };
         var columns = table.Columns.Cast<DataColumn>().ToArray();
         await Parallel.ForEachAsync(

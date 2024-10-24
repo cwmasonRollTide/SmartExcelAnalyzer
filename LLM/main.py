@@ -68,15 +68,18 @@ qdrant_client = QdrantClient(url=qdrant_url, api_key=QDRANT_API_KEY, prefer_grpc
 async def health():
     try:
         print("Performing health check...")
+        print(f"Checking LLM models at {EMBEDDING_MODEL} and {TEXT_GENERATION_MODEL}...")
         AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
         AutoModel.from_pretrained(EMBEDDING_MODEL)
         pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
-        
+        print("LLM models are accessible.")
         # Use requests to check Qdrant connection
+        print(f"Checking Qdrant health at {qdrant_url}...")
         qdrant_health_url = f"{qdrant_url}/health"
         response = requests.get(qdrant_health_url, verify=False)
-        response.raise_for_status()
-        
+        print(f"Qdrant health check response: {response.text}")
+        print(f"Qdrant health check status code: {response.status_code}")
+        response.raise_for_status()        
         print("Health check passed: LLM Service Endpoint, Qdrant, and LLM Models are all accessible.")
         return {"status": "ok"}
     except Exception as e:
