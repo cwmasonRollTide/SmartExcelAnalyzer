@@ -55,16 +55,18 @@ public static class ConfigurationExtensions
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddHealthChecks();
         
-        // Allow only the frontend origin
         var frontendUrl = builder.Configuration["FrontendUrl"];
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
             {
-                builder.WithOrigins(frontendUrl)
-                       .AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowCredentials();
+                if (!string.IsNullOrEmpty(frontendUrl))
+                {
+                    builder.WithOrigins(frontendUrl)
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                }
             });
         });
 

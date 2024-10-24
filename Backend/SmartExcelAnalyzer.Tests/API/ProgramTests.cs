@@ -89,8 +89,7 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
     public void MediatR_ShouldBeConfigured()
     {
         var services = _factory.Services;
-        var mediator = services.GetService<MediatR.IMediator>();
-
+        var mediator = services.GetService<IMediator>();
         mediator.Should().NotBeNull();
     }
 }

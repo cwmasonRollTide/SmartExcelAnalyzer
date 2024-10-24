@@ -79,8 +79,9 @@ public class AnalysisControllerTests
     public async Task UploadCommand_ReturnsServerError_WhenErrorUncaught()
     {
         var testFile = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("test file")), 0, 0, "file", "test.txt");
-        _mediatorMock.Setup(m => m.Send(It.Is<UploadFileCommand>(y => y.File == testFile), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Test exception"));
 
+        _mediatorMock.Setup(m => m.Send(It.Is<UploadFileCommand>(y => y.File == testFile), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Test exception"));
+        
         await Assert.ThrowsAsync<Exception>(async () => await Sut.UploadFile(file: testFile));
     }
 }
