@@ -259,7 +259,8 @@ public class QdrantDatabaseWrapperTests
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Test exception"));
 
-        await Assert.ThrowsAsync<Exception>(() => Sut.StoreVectorsAsync(rows));
+        var result = await Sut.StoreVectorsAsync(rows);
+        result.Should().BeNull();
     }
 
     [Fact]

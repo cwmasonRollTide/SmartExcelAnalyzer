@@ -13,6 +13,8 @@ services:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/production.yaml"
+    environment:
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
@@ -24,6 +26,7 @@ services:
     environment:
       - QDRANT_PORT=6333
       - QDRANT_HOST=qdrant
+      - QDRANT_USE_HTTPS=false
       - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - QDRANT_API_KEY=${QDRANT_API_KEY}
@@ -32,7 +35,7 @@ services:
       replicas: 3
     healthcheck:
       <<: *default-healthcheck
-      test: curl -f http://localhost:${PORT:-8000}/health
+      test: curl -f http://localhost:8000/health
     depends_on:
       - qdrant
 

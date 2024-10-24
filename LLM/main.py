@@ -2,6 +2,7 @@ import os
 import json
 import torch
 import logging
+import requests
 from enum import Enum
 from typing import List
 from pydantic import BaseModel
@@ -11,11 +12,16 @@ from qdrant_client import QdrantClient
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+# Disable SSL warnings
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class EnvironmentVariables(str, Enum):
     QDRANT_HOST = "QDRANT_HOST"
     QDRANT_PORT = "QDRANT_PORT"
     QDRANT_API_KEY = "QDRANT_API_KEY"
+    QDRANT_USE_HTTPS = "QDRANT_USE_HTTPS"
     EMBEDDING_MODEL = "EMBEDDING_MODEL"
     TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
 
@@ -40,6 +46,7 @@ default_embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 
 QDRANT_HOST = os.getenv(EnvironmentVariables.QDRANT_HOST.value, default_qdrant_host)
 QDRANT_PORT = int(os.getenv(EnvironmentVariables.QDRANT_PORT.value, default_qdrant_port))
+QDRANT_USE_HTTPS = os.getenv(EnvironmentVariables.QDRANT_USE_HTTPS.value, "false").lower() == "true"
 EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
 QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY.value)
@@ -52,7 +59,10 @@ logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
 embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL)
 model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
-qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, api_key=QDRANT_API_KEY)
+
+# Use http:// explicitly if QDRANT_USE_HTTPS is False
+qdrant_url = f"{'https' if QDRANT_USE_HTTPS else 'http'}://{QDRANT_HOST}:{QDRANT_PORT}"
+qdrant_client = QdrantClient(url=qdrant_url, api_key=QDRANT_API_KEY, prefer_grpc=False)
 
 @app.get("/health", response_model=dict)
 async def health():
@@ -61,7 +71,12 @@ async def health():
         AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
         AutoModel.from_pretrained(EMBEDDING_MODEL)
         pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
-        qdrant_client.get_collections()  # Check Qdrant connection
+        
+        # Use requests to check Qdrant connection
+        qdrant_health_url = f"{qdrant_url}/health"
+        response = requests.get(qdrant_health_url, verify=False)
+        response.raise_for_status()
+        
         print("Health check passed: LLM Service Endpoint, Qdrant, and LLM Models are all accessible.")
         return {"status": "ok"}
     except Exception as e:

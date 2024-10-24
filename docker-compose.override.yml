@@ -1,8 +1,8 @@
 services:
   llm-service:
-    command: sh -c 'export PORT=$((8000 + DOCKER_SERVICE_REPLICA_ID)) && uvicorn main:app --host 0.0.0.0 --port $${PORT}'
+    command: sh -c 'uvicorn main:app --host 0.0.0.0 --port 8000'
     ports:
-      - '${PORT_BASE:-8000}-${PORT_MAX:-8005}:8000-8005'
+      - '8000'
 
   backend:
     volumes:

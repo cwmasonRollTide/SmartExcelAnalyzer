@@ -55,9 +55,31 @@ public class QdrantDatabaseWrapper(
         CancellationToken cancellationToken = default
     )
     {   
+        _logger.LogInformation("Starting StoreVectorsAsync with {RowCount} rows", rows.Count());
         documentId ??= NewDocumentId();
+        _logger.LogInformation("Document ID: {DocumentId}", documentId);
+
         var points = await CreateRowsInParallelAsync(rows, documentId, cancellationToken);
-        if (points.Any()) await InsertRowsInBatchesAsync(points, cancellationToken);
+        _logger.LogInformation("Created {PointCount} points", points.Count());
+
+        if (points.Any()) 
+        {
+            try 
+            {
+                await InsertRowsInBatchesAsync(points, cancellationToken);
+                _logger.LogInformation("Successfully inserted all points");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to insert points");
+                return null;
+            }
+        }
+        else
+        {
+            _logger.LogWarning("No points to insert");
+        }
+
         return documentId;
     }
 
@@ -112,9 +134,9 @@ public class QdrantDatabaseWrapper(
         CancellationToken cancellationToken = default
     )
     {
-        var searchResult = await _client.SearchAsync(
+        var searchResult = await _client.SearchAsync(//Native Qdrant Vector Search
             collectionName: CollectionName,
-            vector: queryVector.AsMemory(),
+            vector: queryVector.AsMemory(),//Our Query as a vector interpreted by the LLM
             filter: MatchKeyword("document_id", documentId),
             limit: (ulong)topRelevantCount,
             cancellationToken: cancellationToken
