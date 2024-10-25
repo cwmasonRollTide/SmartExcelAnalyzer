@@ -13,7 +13,6 @@ from fastapi import FastAPI, HTTPException
 from urllib3.exceptions import InsecureRequestWarning
 from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
-##from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Disable SSL warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -50,9 +49,7 @@ QDRANT_PORT = int(os.getenv(EnvironmentVariables.QDRANT_PORT.value, default_qdra
 QDRANT_USE_HTTPS = os.getenv(EnvironmentVariables.QDRANT_USE_HTTPS.value, "false").lower() == "true"
 EMBEDDING_MODEL = os.getenv(EnvironmentVariables.EMBEDDING_MODEL.value, default_embedding_model)
 TEXT_GENERATION_MODEL = os.getenv(EnvironmentVariables.TEXT_GENERATION_MODEL.value, default_text_generation_model)
-QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY.value)
-if not QDRANT_API_KEY:
-    raise ValueError("QDRANT_API_KEY is not set in the environment variables")
+QDRANT_API_KEY = os.getenv(EnvironmentVariables.QDRANT_API_KEY.value, None)
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -65,7 +62,7 @@ model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
 qdrant_url = f"{'https' if QDRANT_USE_HTTPS else 'http'}://{QDRANT_HOST}:{QDRANT_PORT}"
 qdrant_client = QdrantClient(url=qdrant_url, api_key=QDRANT_API_KEY, prefer_grpc=False)
 
-app.get("/health", response_model=dict)
+@app.get("/health", response_model=dict)
 async def health():
     try:
         print("Performing health check...")

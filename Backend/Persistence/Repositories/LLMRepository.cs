@@ -66,11 +66,11 @@ public class LLMRepository(
             QUERY_URL, 
             new 
             {
-                    question,
-                    document_id
-                },
-                cancellationToken
-            );
+                question,
+                document_id
+            },
+            cancellationToken
+        );
 
     /// <summary>
     /// Compute the embedding of a given text

@@ -1,6 +1,7 @@
 # Smart Excel Analyzer
 
 ## Table of Contents
+
 1. [Introduction](#introduction)
 2. [Features](#features)
 3. [Technology Stack](#technology-stack)
@@ -63,29 +64,29 @@ This project aims to transform the way users interact with spreadsheet data by p
 
 ## Technology Stack
 
-- **Backend**: 
+- **Backend**:
   - ![C#](https://img.shields.io/badge/CSharp-239120?style=for-the-badge&logo=c-sharp&logoColor=white) [C# 12](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12)
   - ![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?style=for-the-badge&logo=.net&logoColor=white) [ASP.NET Core 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
-- **Frontend**: 
+- **Frontend**:
   - ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) [React with TypeScript](https://react.dev/learn/typescript)
   - ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) [Vite for build tooling](https://vite.dev/)
 
-- **Database**: 
+- **Database**:
   - ![Qdrant](https://img.shields.io/badge/Qdrant-F24E1E?style=for-the-badge&logo=vector&logoColor=white) [Qdrant Vector Database](https://try.qdrant.tech/high-performance-vector-search?utm_source=google&utm_medium=cpc&utm_campaign=21518712216&utm_content=163351119817&utm_term=qdrant%20vector%20database&hsa_acc=6907203950&hsa_cam=21518712216&hsa_grp=163351119817&hsa_ad=707722911577&hsa_src=g&hsa_tgt=kwd-2240456171437&hsa_kw=qdrant%20vector%20database&hsa_mt=e&hsa_net=adwords&hsa_ver=3&gad_source=1&gclid=CjwKCAjw1NK4BhAwEiwAVUHPUDZxy5-yERXvEGdq-Q58x1xzDrpdB3rj1norGq_P6JDlU9vI3yXnyhoCTIoQAvD_BwE)
 
 - **Machine Learning**:
   - ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white) [PyTorch](https://pytorch.org/)
   - ![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFDA4E?style=for-the-badge&logo=huggingface&logoColor=white) [Hugging Face Transformers](https://huggingface.co/docs/transformers/en/index)
 
-- **Containerization**: 
+- **Containerization**:
   - ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) [Docker](https://app.docker.com/)
   - ![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white) [Docker Compose](https://docs.docker.com/compose/)
 
-- **API Documentation**: 
+- **API Documentation**:
   - ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white) [Swagger / OpenAPI](https://swagger.io/docs/)
 
-- **Testing**: 
+- **Testing**:
   - ![xUnit](https://img.shields.io/badge/xUnit-5C2D91?style=for-the-badge&logo=xunit&logoColor=white) [xUnit](https://xunit.net/)
   - ![Moq](https://img.shields.io/badge/Moq-FF6F00?style=for-the-badge&logo=moq&logoColor=white) [Moq](https://github.com/devlooped/moq)
   - ![FluentAssertions](https://img.shields.io/badge/Fluent_Assertions-D2B48C?style=for-the-badge&logo=fluentassertions&logoColor=white) [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
@@ -99,16 +100,16 @@ This project aims to transform the way users interact with spreadsheet data by p
 
 The Smart Excel Analyzer follows a microservices architecture:
 
-1. **Frontend Service**: 
+1. **Frontend Service**:
    - React application for user interaction.
 
-2. **Backend Service**: 
+2. **Backend Service**:
    - ASP.NET Core API handling business logic and orchestration.
 
-3. **LLM Services**: 
+3. **LLM Services**:
    - Multiple instances of Python-based services for natural language processing and embedding generation.
 
-4. **Vector Database**: 
+4. **Vector Database**:
    - Qdrant for storing and querying vector embeddings.
 
 The application uses a CQRS (Command Query Responsibility Segregation) pattern with MediatR for efficient request handling.
@@ -120,12 +121,14 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 ## Setup and Installation
 
 1. **Clone the repository**:
+
     ```bash
     git clone https://github.com/cwmasonRollTide/SmartExcelAnalyzer
     cd SmartExcelAnalyzer
     ```
 
 2. **Ensure Docker and Docker Compose are installed on your system**:
+
     ```powershell
     # Download Docker Desktop Installer
     Invoke-WebRequest -Uri "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe" -OutFile "DockerDesktopInstaller.exe"
@@ -137,6 +140,7 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 3. **Create a `.env` file in the root directory and populate it with necessary environment variables** (refer to `.env.example`).
 
 4. **Build and run the Docker containers**:
+
     ```bash
     docker compose up --build -d
     ```
@@ -167,6 +171,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 ### Example API Requests
 
 - **Get Analysis**:
+
   ```json
   POST /api/analysis/query
   ```
@@ -178,35 +183,41 @@ POST /api/query
 }
 
 ## Development
+
 - To set up the development environment:
 
   - Backend:
+
     ```
     Install .NET 8 SDK
     Open the solution in Visual Studio or VS Code
     Run dotnet restore to install dependencies
     ```
-      
+
   - Frontend:
+
     ```
     Install Node.js and npm
     Navigate to the Frontend directory
     Run npm install to install dependencies
     Use npm run dev for development server
     ```
-    
+
   - LLM Services:
+
     ```
     Install Python 3.9+
     Navigate to the LLM directory
     Create a virtual environment: python -m venv venv
     Activate the virtual environment and install dependencies: pip install -r requirements.txt
     ```
-    
+
 ## Docker
+
 - All of our docker images will be published to this docker hub container registry:
 
 ## Docker Hub Repository
+
 - This process is kicked off in the file in this Github Action
 
   ```
@@ -214,13 +225,15 @@ POST /api/query
   ```
   
 ## Testing
+
 - Backend tests: Run dotnet test in the ./Backend/ directory.
   
 - Frontend tests: Run npm test in the ./Frontend/ directory.
   
 ## Contact
+
 - If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
 
-  - Connor Mason - connor.mason@fivemconsulting.com
+  - Connor Mason - <connor.mason@fivemconsulting.com>
 
   - [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
