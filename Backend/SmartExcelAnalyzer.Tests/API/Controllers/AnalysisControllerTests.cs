@@ -38,7 +38,9 @@ public class AnalysisControllerTests
     [Fact]
     public async Task GetQuery_ReturnsBadArgumentResult_WhenQueryIsNull()
     {
-        _mediatorMock.Setup(m => m.Send(It.Is<SubmitQuery>(q => q.Query == null), It.IsAny<CancellationToken>())).ThrowsAsync(new ValidationException("Query is required"));
+        _mediatorMock
+            .Setup(m => m.Send(It.Is<SubmitQuery>(q => q.Query == null), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException("Query is required"));
 
         await Assert.ThrowsAsync<ValidationException>(async () => await Sut.SubmitQuery(query: new SubmitQuery { Query = null!, DocumentId = "doc1" }));
     }
@@ -47,7 +49,9 @@ public class AnalysisControllerTests
     public async Task GetQuery_ReturnsServerError_WhenErrorUncaught()
     {
         var testQuery = "test query";
-        _mediatorMock.Setup(m => m.Send(It.Is<SubmitQuery>(y => y.Query == testQuery), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Test exception"));
+        _mediatorMock
+            .Setup(m => m.Send(It.Is<SubmitQuery>(y => y.Query == testQuery), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Test exception"));
 
         await Assert.ThrowsAsync<Exception>(async () => await Sut.SubmitQuery(query: new SubmitQuery { Query = testQuery, DocumentId = "doc1" }));
     }
@@ -70,7 +74,9 @@ public class AnalysisControllerTests
     [Fact]
     public async Task UploadCommand_ReturnsBadArgumentResult_WhenFileIsNull()
     {
-       _mediatorMock.Setup(m => m.Send(It.Is<UploadFileCommand>(y => y.File == null), It.IsAny<CancellationToken>())).ThrowsAsync(new ValidationException("File is required"));
+        _mediatorMock
+            .Setup(m => m.Send(It.Is<UploadFileCommand>(y => y.File == null), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException("File is required"));
 
         await Assert.ThrowsAsync<ValidationException>(async () => await Sut.UploadFile(file: null!));
     }

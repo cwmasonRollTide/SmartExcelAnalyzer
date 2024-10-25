@@ -139,7 +139,9 @@ public static class ConfigurationExtensions
     {
         if (app.Environment.IsDevelopment()) app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
 
-        app.UseCors().UseRouting().UseMiddleware<ExceptionMiddleware>();
+        app.UseCors()
+           .UseRouting()
+           .UseMiddleware<ExceptionMiddleware>();
         app.MapControllers();
         app.MapHealthChecks("/health");
         return app;
@@ -150,7 +152,6 @@ public static class ConfigurationExtensions
     {
         app.MapHub<ProgressHub>("/progressHub");
 
-        // Configure CORS for SignalR
         app.UseCors(builder =>
         {
             builder.WithOrigins("http://localhost:3000")
