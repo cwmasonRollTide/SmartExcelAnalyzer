@@ -280,8 +280,8 @@ FN:307,System.String Application.Services.ExcelFileService::ComputeHash(System.S
 FNDA:627,System.String Application.Services.ExcelFileService::ComputeHash(System.String)
 DA:308,627
 FN:52,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
-FNDA:19,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
-DA:53,19
+FNDA:17,System.Void Application.Services.ExcelFileService/<>c::<PrepareExcelFileForLLMAsync>b__3_0(System.ValueTuple`2<System.Double,System.Double>)
+DA:53,17
 FN:178,ExcelDataReader.ExcelDataTableConfiguration Application.Services.ExcelFileService/<>c::<LoadExcelDataAsync>b__9_1(ExcelDataReader.IExcelDataReader)
 FNDA:5,ExcelDataReader.ExcelDataTableConfiguration Application.Services.ExcelFileService/<>c::<LoadExcelDataAsync>b__9_1(ExcelDataReader.IExcelDataReader)
 DA:179,5
@@ -322,25 +322,25 @@ BRDA:290,42,1,18
 BRDA:291,74,0,18
 BRDA:291,74,1,18
 FN:73,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
-FNDA:9,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
-DA:74,9
-DA:75,9
-DA:76,9
-DA:77,18
-DA:78,9
-DA:79,9
-DA:80,8
-DA:81,8
-DA:82,8
-DA:83,8
-DA:84,9
-DA:85,13
-BRDA:77,54,0,12
-BRDA:77,54,1,6
-BRDA:77,70,0,9
-BRDA:79,90,0,8
-BRDA:79,90,1,9
-BRDA:77,70,1,9
+FNDA:8,System.Void Application.Services.ExcelFileService/<>c__DisplayClass3_0::<PrepareExcelFileForLLMAsync>b__1(System.ValueTuple`2<System.Double,System.Double>)
+DA:74,8
+DA:75,8
+DA:76,8
+DA:77,15
+DA:78,7
+DA:79,7
+DA:80,7
+DA:81,7
+DA:82,7
+DA:83,7
+DA:84,7
+DA:85,12
+BRDA:77,54,0,10
+BRDA:77,54,1,5
+BRDA:77,70,0,7
+BRDA:79,90,0,7
+BRDA:79,90,1,7
+BRDA:77,70,1,8
 FN:121,System.Void Application.Services.ExcelFileService/<>c__DisplayClass7_0::<ProcessRowsAsync>b__0()
 FNDA:3,System.Void Application.Services.ExcelFileService/<>c__DisplayClass7_0::<ProcessRowsAsync>b__0()
 DA:122,3
@@ -358,9 +358,9 @@ DA:133,9
 DA:134,9
 DA:135,9
 DA:136,9
-DA:137,9
-DA:138,9
-DA:139,9
+DA:137,8
+DA:138,8
+DA:139,8
 DA:140,9
 DA:141,9
 DA:142,3
@@ -1177,8 +1177,8 @@ FNH:23
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\VectorRepository.cs
 FN:421,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
-FNDA:6,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
-DA:422,6
+FNDA:7,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
+DA:422,7
 FN:37,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
 FNDA:19,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
 DA:38,19
@@ -1194,8 +1194,8 @@ DA:76,19
 DA:77,19
 DA:78,19
 FN:381,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-FNDA:28,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-DA:382,28
+FNDA:38,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
+DA:382,38
 FN:226,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 FNDA:124,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 DA:227,124
@@ -1218,22 +1218,22 @@ BRDA:232,200,1,124
 BRDA:238,414,0,124
 BRDA:238,414,1,124
 FN:274,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-FNDA:6,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
-DA:275,6
+FNDA:7,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
+DA:275,7
 FN:386,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-FNDA:23,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-DA:387,23
-DA:388,23
-DA:389,23
-DA:390,45
+FNDA:32,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
+DA:387,32
+DA:388,32
+DA:389,32
+DA:390,63
 DA:391,1
-DA:393,23
-DA:394,23
-DA:395,23
-BRDA:390,77,0,22
+DA:393,32
+DA:394,32
+DA:395,32
+BRDA:390,77,0,31
 BRDA:390,77,1,1
-BRDA:394,190,0,23
-BRDA:394,190,1,23
+BRDA:394,190,0,32
+BRDA:394,190,1,32
 FN:264,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
 FNDA:8,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
 DA:265,8
@@ -1241,20 +1241,20 @@ DA:266,8
 DA:267,8
 DA:269,8
 DA:270,8
-DA:271,32
-DA:272,6
-DA:273,6
-DA:274,6
-DA:276,5
-DA:277,5
-DA:278,5
-DA:279,5
-DA:280,5
-DA:281,5
-DA:282,5
-DA:283,5
+DA:271,34
+DA:272,7
+DA:273,7
+DA:274,7
+DA:276,6
+DA:277,6
+DA:278,6
+DA:279,6
+DA:280,6
+DA:281,6
+DA:282,6
+DA:283,6
 DA:285,0
-DA:286,5
+DA:286,6
 DA:287,6
 DA:288,1
 DA:289,1
@@ -1268,11 +1268,11 @@ DA:297,8
 DA:298,8
 DA:299,8
 DA:300,8
-BRDA:271,926,1,6
+BRDA:271,926,1,7
 BRDA:275,289,0,6
-BRDA:275,289,1,6
-BRDA:278,545,0,5
-BRDA:282,714,0,4
+BRDA:275,289,1,7
+BRDA:278,545,0,6
+BRDA:282,714,0,5
 BRDA:282,714,1,1
 BRDA:278,545,1,0
 BRDA:271,926,0,6
@@ -1288,7 +1288,7 @@ DA:224,7
 DA:225,7
 DA:226,7
 DA:240,7
-DA:242,12
+DA:242,13
 DA:243,7
 DA:244,1
 DA:245,1
@@ -1302,43 +1302,43 @@ DA:253,8
 DA:254,8
 DA:255,8
 DA:256,8
-BRDA:242,368,0,5
+BRDA:242,368,0,6
 BRDA:242,368,1,7
 FN:375,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-FNDA:5,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-DA:376,5
-DA:377,5
-DA:378,5
-DA:379,5
-DA:380,5
-DA:381,5
-DA:383,5
-DA:384,5
-DA:385,5
-DA:386,5
-DA:392,5
-DA:396,5
-DA:397,5
+FNDA:6,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
+DA:376,6
+DA:377,6
+DA:378,6
+DA:379,6
+DA:380,6
+DA:381,6
+DA:383,6
+DA:384,6
+DA:385,6
+DA:386,6
+DA:392,6
+DA:396,6
+DA:397,6
 FN:350,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-FNDA:5,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-DA:351,5
-DA:352,5
-DA:353,5
-DA:355,5
-DA:356,5
-DA:357,5
-DA:358,5
-DA:359,5
-DA:360,5
-DA:361,5
-DA:362,5
-DA:365,5
-DA:366,5
-DA:367,5
-DA:368,5
-BRDA:351,16,0,5
-BRDA:351,16,1,10
-BRDA:361,528,0,4
+FNDA:6,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
+DA:351,6
+DA:352,6
+DA:353,6
+DA:355,6
+DA:356,6
+DA:357,6
+DA:358,6
+DA:359,6
+DA:360,6
+DA:361,6
+DA:362,6
+DA:365,6
+DA:366,6
+DA:367,6
+DA:368,6
+BRDA:351,16,0,6
+BRDA:351,16,1,12
+BRDA:361,528,0,5
 BRDA:361,528,1,1
 FN:131,System.Void Persistence.Repositories.VectorRepository/<QueryVectorData>d__31::MoveNext()
 FNDA:9,System.Void Persistence.Repositories.VectorRepository/<QueryVectorData>d__31::MoveNext()
@@ -1396,29 +1396,29 @@ BRDA:154,602,1,2
 BRDA:154,622,0,2
 BRDA:154,622,1,2
 FN:403,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-FNDA:5,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-DA:404,5
-DA:405,5
-DA:406,5
+FNDA:6,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
+DA:404,6
+DA:405,6
+DA:406,6
 DA:407,0
 DA:408,0
 DA:409,0
-DA:411,5
+DA:411,6
 DA:412,5
 DA:413,5
 DA:414,5
-DA:415,0
-DA:416,0
-DA:417,0
-DA:418,0
-DA:419,5
-DA:420,5
+DA:415,1
+DA:416,1
+DA:417,1
+DA:418,1
+DA:419,6
+DA:420,6
 BRDA:406,176,0,0
-BRDA:406,176,1,5
+BRDA:406,176,1,6
 BRDA:411,241,0,5
-BRDA:411,241,1,0
-BRDA:415,280,0,0
-BRDA:415,280,1,5
+BRDA:411,241,1,1
+BRDA:415,280,0,1
+BRDA:415,280,1,6
 FN:94,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 FNDA:10,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 DA:95,10
@@ -1478,17 +1478,17 @@ DA:312,8
 DA:313,8
 DA:315,8
 DA:316,8
-DA:317,31
-DA:318,5
-DA:319,5
-DA:320,5
-DA:321,5
-DA:322,5
-DA:323,5
-DA:324,5
-DA:325,5
-DA:326,5
-DA:327,5
+DA:317,33
+DA:318,6
+DA:319,6
+DA:320,6
+DA:321,6
+DA:322,6
+DA:323,6
+DA:324,6
+DA:325,6
+DA:326,6
+DA:327,6
 DA:328,7
 DA:329,1
 DA:330,1
@@ -1500,14 +1500,14 @@ DA:335,0
 DA:336,0
 DA:337,8
 DA:338,8
-BRDA:317,455,1,5
+BRDA:317,455,1,6
 BRDA:317,455,0,7
 BRDA:337,742,0,3
 BRDA:337,742,1,8
 LF:236
-LH:217
+LH:221
 BRF:62
-BRH:55
+BRH:57
 FNF:15
 FNH:15
 end_of_record
