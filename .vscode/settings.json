@@ -8,4 +8,11 @@
     "coverage-gutters.partialHighlightDark": "rgba(121, 86, 10, 0.2)",
     "dotnet-test-explorer.testProjectPath": "**/SmartExcelAnalyzer.Tests.csproj",
     "coverage-gutters.highlightDark": "rgba(45, 121, 10, 0.2)",
+    "azureFunctions.deploySubpath": ".",
+    "azureFunctions.scmDoBuildDuringDeployment": true,
+    "azureFunctions.pythonVenv": ".venv",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectLanguageModel": 2,
 }
