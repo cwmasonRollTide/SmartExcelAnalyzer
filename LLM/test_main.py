@@ -1,6 +1,18 @@
 import pytest
 from fastapi.testclient import TestClient
 from main import app
+from dotenv import load_dotenv
+import os
+
+load_dotenv(dotenv_path='./.env', override=True)
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+if not QDRANT_API_KEY:
+       raise ValueError("QDRANT_API_KEY is not set in the environment variables")
+
+@pytest.fixture(autouse=True)
+def load_env():
+    """Automatically load environment variables before each test"""
+    load_dotenv(dotenv_path='.env', override=True)
 
 client = TestClient(app)
 

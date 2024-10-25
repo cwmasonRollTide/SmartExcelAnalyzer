@@ -10,9 +10,10 @@ from transformers import pipeline
 from qdrant_client.http import models
 from qdrant_client import QdrantClient
 from fastapi import FastAPI, HTTPException
+from urllib3.exceptions import InsecureRequestWarning
 from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+##from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Disable SSL warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -21,8 +22,8 @@ class EnvironmentVariables(str, Enum):
     QDRANT_HOST = "QDRANT_HOST"
     QDRANT_PORT = "QDRANT_PORT"
     QDRANT_API_KEY = "QDRANT_API_KEY"
-    QDRANT_USE_HTTPS = "QDRANT_USE_HTTPS"
     EMBEDDING_MODEL = "EMBEDDING_MODEL"
+    QDRANT_USE_HTTPS = "QDRANT_USE_HTTPS"
     TEXT_GENERATION_MODEL = "TEXT_GENERATION_MODEL"
 
 class Query(BaseModel):

@@ -20,7 +20,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = null!, DocumentId = "doc1" };
             var result = _validator.TestValidate(query);
-            result.ShouldHaveValidationErrorFor(x => x.Query)
+            result
+                .ShouldHaveValidationErrorFor(x => x.Query)
                 .WithErrorMessage("Query is required.");
         }
 
@@ -29,7 +30,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = "", DocumentId = "doc1" };
             var result = _validator.TestValidate(query);
-            result.ShouldHaveValidationErrorFor(x => x.Query)
+            result
+                .ShouldHaveValidationErrorFor(x => x.Query)
                 .WithErrorMessage("Query is required.");
         }
 
@@ -38,7 +40,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = "test", DocumentId = null! };
             var result = _validator.TestValidate(query);
-            result.ShouldHaveValidationErrorFor(x => x.DocumentId)
+            result
+                .ShouldHaveValidationErrorFor(x => x.DocumentId)
                 .WithErrorMessage("DocumentId is required.");
         }
 
@@ -47,7 +50,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = "test", DocumentId = "" };
             var result = _validator.TestValidate(query);
-            result.ShouldHaveValidationErrorFor(x => x.DocumentId)
+            result
+                .ShouldHaveValidationErrorFor(x => x.DocumentId)
                 .WithErrorMessage("DocumentId is required.");
         }
 
@@ -56,7 +60,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = "test", DocumentId = "doc1", RelevantRowsCount = -1 };
             var result = _validator.TestValidate(query);
-            result.ShouldHaveValidationErrorFor(x => x.RelevantRowsCount)
+            result
+                .ShouldHaveValidationErrorFor(x => x.RelevantRowsCount)
                 .WithErrorMessage("RelevantRowsCount must be greater than or equal to 0.");
         }
 
@@ -88,7 +93,8 @@ public class SubmitQueryTests
         public async Task Handle_WhenLLMQueryFails_ShouldReturnNull()
         {
             var query = new SubmitQuery { Query = "test", DocumentId = "doc1" };
-            _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _llmRepositoryMock
+                .Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((QueryAnswer)null!);
 
             var result = await Sut.Handle(query, CancellationToken.None);
@@ -109,7 +115,8 @@ public class SubmitQueryTests
         {
             var query = new SubmitQuery { Query = "test", DocumentId = "doc1" };
             var expectedAnswer = new QueryAnswer { Answer = "Test answer" };
-            _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _llmRepositoryMock
+                .Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedAnswer);
 
             var result = await Sut.Handle(query, CancellationToken.None);
@@ -154,11 +161,14 @@ public class SubmitQueryTests
             var row = new ConcurrentDictionary<string, object>();
             row.TryAdd("col1", "value1");
             var expectedRelevantRows = new ConcurrentBag<ConcurrentDictionary<string, object>> { row };
-            _llmRepositoryMock.Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _llmRepositoryMock
+                .Setup(x => x.QueryLLM(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedAnswer);
-            _llmRepositoryMock.Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _llmRepositoryMock
+                .Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync([1.0f, 2.0f, 3.0f]);
-            _vectorDbRepositoryMock.Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _vectorDbRepositoryMock
+                .Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SummarizedExcelData { Rows = expectedRelevantRows });
 
             var result = await Sut.Handle(query, CancellationToken.None);

@@ -134,25 +134,4 @@ public class ProgramExtensionsTests
         excelFileService.Should().NotBeNull();
         webRepository.Should().NotBeNull();
     }
-
-    // [Fact]
-    // public async Task ConfigureSwagger_ShouldConfigureSwagger()
-    // {
-    //     var builder = WebApplication.CreateBuilder();
-    //     builder = ConfigurationExtensions.ConfigureSwagger(builder);
-
-    //     var serviceProvider = builder.Services.BuildServiceProvider();
-    //     var swaggerGenerator = serviceProvider.GetService<IAsyncSwaggerProvider>();
-
-    //     swaggerGenerator.Should().NotBeNull();
-    // }
-
-    // [Fact]
-    // public void ConfigureMiddleware_ShouldConfigureMiddleware()
-    // {
-    //     var builder = WebApplication.CreateBuilder();
-    //     var app = builder.Build();
-    //     app = ConfigurationExtensions.ConfigureMiddleware(app);
-    //     app.Should().NotBeNull();
-    // }
 }

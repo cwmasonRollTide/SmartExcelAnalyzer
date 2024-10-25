@@ -32,35 +32,16 @@ public interface ILLMRepository
 ///     Web repository for computing the embeddings of text - specifically the /compute_embedding endpoint
 /// </param>
 public class LLMRepository(
-    ILLMServiceLoadBalancer llmServiceLoadBalancer,
-    IWebRepository<float[]?> computeService, 
-    IWebRepository<IEnumerable<float[]?>> batchComputeService, 
-    IWebRepository<QueryAnswer> queryService
+    ILLMServiceLoadBalancer _llmServiceLoadBalancer,
+    IWebRepository<float[]?> _computeService, 
+    IWebRepository<IEnumerable<float[]?>> _batchComputeService, 
+    IWebRepository<QueryAnswer> _queryService
 ) : ILLMRepository
 {
     #region Service URLs
     private string QUERY_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/query";
     private string COMPUTE_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/compute_embedding";
     private string COMPUTE_BATCH_URL => _llmServiceLoadBalancer.GetServiceUrl() + "/compute_batch_embedding";
-    #endregion
-
-    #region Dependencies
-    /// <summary>
-    /// Web repository for querying the LLM model
-    /// </summary>
-    private readonly IWebRepository<QueryAnswer> _queryService = queryService;
-    /// <summary>
-    /// Web repository for calling the compute function of the LLM model
-    /// </summary>
-    private readonly IWebRepository<float[]?> _computeService = computeService;
-        /// <summary>
-    /// Load balancer for the LLM service URLs 
-    /// </summary>
-    private readonly ILLMServiceLoadBalancer _llmServiceLoadBalancer = llmServiceLoadBalancer;
-    /// <summary>
-    /// Web repository for calling the batch compute function of the LLM model
-    /// </summary>
-    private readonly IWebRepository<IEnumerable<float[]?>> _batchComputeService = batchComputeService;
     #endregion
 
     #region Public Methods
@@ -80,8 +61,16 @@ public class LLMRepository(
     /// <returns>
     ///     QueryAnswer. The answer to the question as interpreted by the LLM model
     /// </returns>
-    public async Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default) =>    
-        await _queryService.PostAsync(QUERY_URL, new { document_id, question }, cancellationToken);
+    public async Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default) => 
+        await _queryService.PostAsync(
+            QUERY_URL, 
+            new 
+            {
+                    question,
+                    document_id
+                },
+                cancellationToken
+            );
 
     /// <summary>
     /// Compute the embedding of a given text
@@ -94,7 +83,14 @@ public class LLMRepository(
     /// Vector representing the text or data
     /// </returns>
     public async Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default) => 
-        await _computeService.PostAsync(COMPUTE_URL, new { text }, cancellationToken);
+        await _computeService.PostAsync(
+            COMPUTE_URL, 
+            new 
+            { 
+                text 
+            }, 
+            cancellationToken
+        );
 
     /// <summary>
     /// Compute the embeddings of a batch of texts
@@ -105,7 +101,14 @@ public class LLMRepository(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default) => 
-        await _batchComputeService.PostAsync(COMPUTE_BATCH_URL, new { texts = texts.ToList() }, cancellationToken);
+        await _batchComputeService.PostAsync(
+            COMPUTE_BATCH_URL, 
+            new 
+            { 
+                texts = texts.ToList()     
+            }, 
+            cancellationToken
+        );
     #endregion
 }
 
