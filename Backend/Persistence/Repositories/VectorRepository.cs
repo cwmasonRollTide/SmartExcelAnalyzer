@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Diagnostics;
 using Persistence.Database;
 using Domain.Persistence.DTOs;
 using System.Threading.Channels;
@@ -225,7 +226,6 @@ public class VectorRepository(
                 async (row, ct) =>
                 {
                     ct.ThrowIfCancellationRequested();
-                    await Task.Yield();
                     batch.Add(row);
                     Interlocked.Increment(ref processedRows);
                     progress?.Report((processedRows / (double)totalRows, 0));
@@ -235,6 +235,7 @@ public class VectorRepository(
                         batch.Clear();
                         await writer.WriteAsync(batchToWrite, cancellationToken);
                     }
+                    await Task.Yield();
                 }
             );
 
@@ -270,7 +271,7 @@ public class VectorRepository(
             await foreach (var batch in reader.ReadAllAsync(cancellationToken))
             {
                 _logger.LogInformation(LOG_START_COMPUTE, batch.Count());
-                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                var stopwatch = Now;
                 var embeddings = await _llmRepository.ComputeBatchEmbeddings(batch.Select(row => JsonSerializer.Serialize(row, serializerOptions)), cancellationToken);
                 stopwatch.Stop();
                 _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
@@ -385,12 +386,12 @@ public class VectorRepository(
             async (pair, ct) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await Task.Yield();
                 var (row, embedding) = pair;
                 if (embedding is not null) row["embedding"] = embedding;
                 else _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
 
                 batchesToStore.Add(row);
+                await Task.Yield();
             }
         );
     }
@@ -417,5 +418,7 @@ public class VectorRepository(
         }
         return documentId;
     }
+
+    private static Stopwatch Now => Stopwatch.StartNew();
     #endregion
 }

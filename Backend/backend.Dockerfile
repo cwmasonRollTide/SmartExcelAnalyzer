@@ -25,9 +25,9 @@ COPY . .
 
 # Expose ports
 EXPOSE 80
-# EXPOSE 443
-# EXPOSE 5000
-# EXPOSE 5001
+EXPOSE 443
+EXPOSE 5000
+EXPOSE 5001
 
 # Set the entrypoint to find the project, restore, and run
 # ENTRYPOINT ["/bin/sh", "-c", "\
