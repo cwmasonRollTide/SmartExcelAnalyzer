@@ -70,11 +70,11 @@ public class DatabaseOptionsTests
 
         Assert.False(options.USE_HTTPS);
         Assert.Equal(10, options.MAX_CONNECTION_COUNT);
-        Assert.Equal(string.Empty, options.HOST);
-        Assert.Equal(string.Empty, options.DatabaseName);
-        Assert.Equal(string.Empty, options.QDRANT_API_KEY);
-        Assert.Equal(string.Empty, options.CollectionName);
-        Assert.Equal(string.Empty, options.ConnectionString);
-        Assert.Equal(string.Empty, options.CollectionNameTwo);
+        Assert.Equal(" ", options.HOST);
+        Assert.Equal(" ", options.DatabaseName);
+        Assert.Equal(" ", options.QDRANT_API_KEY);
+        Assert.Equal(" ", options.CollectionName);
+        Assert.Equal(" ", options.ConnectionString);
+        Assert.Equal(" ", options.CollectionNameTwo);
     }
 }

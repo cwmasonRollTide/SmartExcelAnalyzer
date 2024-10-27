@@ -14,10 +14,10 @@ public class DatabaseOptions
     public int MAX_RETRY_COUNT { get; set; }
     public bool USE_HTTPS { get; set; } = false;
     public int MAX_CONNECTION_COUNT { get; set; } = 10;
-    public string HOST { get; set; } = string.Empty;
-    public string DatabaseName { get; set; } = string.Empty;
-    public string QDRANT_API_KEY { get; set; } = string.Empty;
-    public string CollectionName { get; set; } = string.Empty;
-    public string ConnectionString { get; set; } = string.Empty;    
-    public string CollectionNameTwo { get; set; } = string.Empty;
+    public string HOST { get; set; } = " ";
+    public string DatabaseName { get; set; } = " ";
+    public string QDRANT_API_KEY { get; set; } = " ";
+    public string CollectionName { get; set; } = " ";
+    public string ConnectionString { get; set; } = " ";    
+    public string CollectionNameTwo { get; set; } = " ";
 }

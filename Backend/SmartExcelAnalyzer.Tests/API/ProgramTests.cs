@@ -28,6 +28,10 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
             .Should()
             .NotBeNull();
         services
+            .GetService<IVectorDbRepository>()
+            .Should()
+            .NotBeNull();
+        services
             .GetService<IProgressHubWrapper>()
             .Should()
             .NotBeNull();
