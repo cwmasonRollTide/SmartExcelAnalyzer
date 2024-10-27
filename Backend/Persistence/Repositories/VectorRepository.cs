@@ -108,7 +108,11 @@ public class VectorRepository(
         }
         if (vectorSpreadsheetData.Summary is not null)
         {
-            var summarySuccess = await _database.StoreSummaryAsync(documentId, vectorSpreadsheetData.Summary, cancellationToken);
+            var summarySuccess = await _database.StoreSummaryAsync(
+                documentId, 
+                vectorSpreadsheetData.Summary, 
+                cancellationToken
+            );
             if (summarySuccess is < 0) _logger.LogWarning(LOG_FAIL_SAVE_SUMMARY, documentId);
         }
         _logger.LogInformation(LOG_SUCCESS_SAVE, documentId);
