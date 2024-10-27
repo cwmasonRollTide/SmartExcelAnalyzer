@@ -1,7 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Text.Json;
-using Persistence.Database;
 using System.Threading.Channels;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 
-namespace Persistence.Repositories;
+namespace Persistence.Database;
 
 /// <summary>
 /// MongoDatabaseWrapper wraps the MongoDB database and provides methods to interact with it.
@@ -55,7 +54,7 @@ public class MongoDatabaseWrapper(
         var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(20) { FullMode = BoundedChannelFullMode.Wait });
         var producerTask = ProduceBatchesAsync(rows, batchChannel.Writer, cancellationToken);
         var consumerTask = ConsumeAndStoreBatchesAsync(batchChannel.Reader, collection, documentId, cancellationToken);
-        await Task.WhenAll(producerTask, consumerTask);    
+        await Task.WhenAll(producerTask, consumerTask);
         return documentId;
     }
 
@@ -144,7 +143,7 @@ public class MongoDatabaseWrapper(
         var rowsToAdd = batch.Select(row => new BsonDocument
         {
             { "content", BsonDocument.Parse(JsonSerializer.Serialize(row)) },
-            { "embedding", new BsonArray((row["embedding"] as float[]) ?? []) }
+            { "embedding", new BsonArray(row["embedding"] as float[] ?? []) }
         });
         var update = updateBuilder.PushEach("rows", rowsToAdd);
         return (filter, update);

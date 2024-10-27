@@ -1,17 +1,16 @@
 using System.Text.Json;
 using Qdrant.Client.Grpc;
-using Persistence.Database;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 using static Qdrant.Client.Grpc.Conditions;
 
-namespace Persistence.Repositories;
+namespace Persistence.Database;
 
 public class QdrantDatabaseWrapper(
     IQdrantClient _client,
-    IOptions<DatabaseOptions> options, 
+    IOptions<DatabaseOptions> options,
     ILogger<QdrantDatabaseWrapper> _logger
 ) : IDatabaseWrapper
 {
@@ -24,14 +23,14 @@ public class QdrantDatabaseWrapper(
             Random.NextBytes(RandomBytes);
             return RandomBytes;
         }
-    } 
+    }
     private static Random Random => new();
     private static byte[] RandomBytes => new byte[4];
     private int BatchSize => options.Value.SAVE_BATCH_SIZE;
     private readonly Vectors _dummyVector = new(new float[] { 0.0f });
     private string DocumentCollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
-    private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;    
+    private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
     #endregion
 
     #region Public Methods
@@ -48,15 +47,15 @@ public class QdrantDatabaseWrapper(
         string? documentId = null,
         CancellationToken cancellationToken = default
     )
-    {   
+    {
         _logger.LogInformation("Starting StoreVectorsAsync with {RowCount} rows", rows.Count());
         documentId ??= NewDocumentId();
         _logger.LogInformation("Document ID: {DocumentId}", documentId);
         var points = await CreateRowsInParallelAsync(documentId, rows, cancellationToken);
         _logger.LogInformation("Created {PointCount} points", points.Count());
-        if (points.Any()) 
+        if (points.Any())
         {
-            try 
+            try
             {
                 await InsertRowsInBatchesAsync(points, cancellationToken);
                 _logger.LogInformation("Successfully inserted all points");
@@ -83,8 +82,8 @@ public class QdrantDatabaseWrapper(
     /// <param name="cancellationToken"></param>
     /// <returns>Greater than 0 if success</returns>
     public async Task<int?> StoreSummaryAsync(
-        string documentId, 
-        ConcurrentDictionary<string, object> summary, 
+        string documentId,
+        ConcurrentDictionary<string, object> summary,
         CancellationToken cancellationToken = default
     )
     {
@@ -117,9 +116,9 @@ public class QdrantDatabaseWrapper(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<IEnumerable<ConcurrentDictionary<string, object>>> GetRelevantDocumentsAsync(
-        string documentId, 
+        string documentId,
         float[] queryVector,
-        int topRelevantCount, 
+        int topRelevantCount,
         CancellationToken cancellationToken = default
     )
     {
@@ -132,14 +131,14 @@ public class QdrantDatabaseWrapper(
         );
         return searchResult?
             .Select(point => point.Payload)
-            .Select(point => point.TryGetValue("content", out var contentValue) 
-                ? contentValue.StringValue 
+            .Select(point => point.TryGetValue("content", out var contentValue)
+                ? contentValue.StringValue
                 : null)
-            .Select(content => content is not null 
-                ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions) 
+            .Select(content => content is not null
+                ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions)
                 : null)
             .Where(content => content is not null) // Filter out null values
-            .Select(content => content!) 
+            .Select(content => content!)
         ?? [];
     }
 
@@ -178,8 +177,8 @@ public class QdrantDatabaseWrapper(
         var parallelOptions = CreateParallelOptions(cancellationToken);
         var points = new ConcurrentBag<PointStruct>();
         await Parallel.ForEachAsync(
-            rows, 
-            parallelOptions, 
+            rows,
+            parallelOptions,
             async (row, ct) =>
             {
                 points.Add(await CreateRow(documentId!, row));
@@ -191,21 +190,21 @@ public class QdrantDatabaseWrapper(
 
     private async Task<PointStruct> CreateRow(string? documentId, ConcurrentDictionary<string, object> row)
     {
-        var point = new PointStruct 
-        { 
-            Id = new PointId(), 
-            Vectors = row.TryGetValue("embedding", out var embedding) 
-                ? (embedding as Vectors) ?? Array.Empty<float>() 
+        var point = new PointStruct
+        {
+            Id = new PointId(),
+            Vectors = row.TryGetValue("embedding", out var embedding)
+                ? embedding as Vectors ?? Array.Empty<float>()
                 : Array.Empty<float>()
         };
         if (documentId is not null) point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
-        point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions)});
+        point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions) });
         await Task.Yield();
         return point;
     }
 
     private async Task InsertRowsInBatchesAsync(
-        IEnumerable<PointStruct> points, 
+        IEnumerable<PointStruct> points,
         CancellationToken cancellationToken = default
     )
     {
@@ -216,7 +215,7 @@ public class QdrantDatabaseWrapper(
             {
                 await _client.UpsertAsync(
                     points: batch,
-                    collectionName: DocumentCollectionName, 
+                    collectionName: DocumentCollectionName,
                     cancellationToken: cancellationToken
                 );
                 totalInserted += batch.Length;
@@ -230,7 +229,7 @@ public class QdrantDatabaseWrapper(
         }
     }
 
-    private ParallelOptions CreateParallelOptions(CancellationToken cancellationToken = default) => 
+    private ParallelOptions CreateParallelOptions(CancellationToken cancellationToken = default) =>
         new()
         {
             CancellationToken = cancellationToken,

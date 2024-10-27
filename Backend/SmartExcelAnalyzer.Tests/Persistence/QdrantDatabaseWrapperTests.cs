@@ -4,12 +4,12 @@ using System.Text.Json;
 using FluentAssertions;
 using Qdrant.Client.Grpc;
 using Application.Services;
-using Persistence.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 using SmartExcelAnalyzer.Tests.TestUtilities;
+using Persistence.Database;
 
 namespace SmartExcelAnalyzer.Tests.Persistence;
 

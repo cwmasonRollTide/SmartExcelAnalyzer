@@ -1,4 +1,4 @@
-using Persistence.Repositories;
+using Persistence.Database;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
