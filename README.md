@@ -12,7 +12,7 @@
   - [Setup and Installation](#setup-and-installation)
   - [Usage](#usage)
   - [API Documentation](#api-documentation)
-    - [Example API Requests Full Workflow](#example-api-requests-full-workflow)
+  - [Full Workflow Example](#full-workflow-example)
   - [Development](#development)
   - [Docker](#docker)
   - [Testing](#testing)
@@ -164,31 +164,33 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 API documentation is available via Swagger UI. After starting the backend service, navigate to:
 [http://localhost:5001/swagger](http://localhost:5001/swagger)
 
-### Example API Requests Full Workflow
+## Full Workflow Example
 
-#### 1. Upload Excel File
+### 1. Upload Excel File
 
-**Request:**
+  **Request:**
 
   ```http
   POST /api/analysis/upload
   Content-Type: multipart/form-data
   ```
 
-#### Response
+  **Response:**
 
-```json
-  "123456789012"
-```
+  ```json
+    "123456789012"
+  ```
 
-#### 2. Get Indexing Status
+### 2. Get the Status of an Upload
+
+**Request:**
 
   ```json
   GET /api/analysis/index/status/123456789012
   Content-Type: application/json
   ```
 
-#### RETURNS
+**Response:**
 
   ```json
   {
@@ -199,7 +201,9 @@ API documentation is available via Swagger UI. After starting the backend servic
   }
   ```
 
-#### 3. Ask a Question
+### 3. Ask a Question
+
+**Request:**
 
   ```json
   POST /api/analysis/api/query
@@ -209,17 +213,13 @@ API documentation is available via Swagger UI. After starting the backend servic
   }
   ```
 
-#### RETURNS
+**Response:**
 
   ```csharp
   {
-    [Optional]
-    Question: string,
-    [Required]
-    DocumentId: string,
-    [Required]
-    Answer: string,
-    [Optional]
+    DocumentId: "123456789012",
+    Question: "What are the total sales for Q1 2024?",
+    Answer: "one... BILLION dollars, Dr. Eveel.",
     RelevantRows: ConcurrentBag<ConcurrentDictionary<string, object>>
   }
   ```
