@@ -19,6 +19,8 @@ public class AnalysisController(
     IHubContext<ProgressHub> _hubContext
 ) : BaseController(mediator)
 {
+    private const string StatusTopicName = "ReceiveProgress";
+    
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -62,7 +64,7 @@ public class AnalysisController(
                             .Clients
                             .All
                             .SendAsync(
-                                "ReceiveProgress", 
+                                StatusTopicName, 
                                 parseProgress, 
                                 saveProgress
                             );

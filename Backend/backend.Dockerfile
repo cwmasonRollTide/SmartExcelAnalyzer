@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Copy everything
 COPY . .
-
+RUN dotnet restore
 # Expose ports
 EXPOSE 80
 EXPOSE 443
