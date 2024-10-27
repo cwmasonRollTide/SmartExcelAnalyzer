@@ -17,6 +17,7 @@ namespace API.Extensions;
 
 public static class ProgramExtensions
 {
+    private const string DefaultClientName = "DefaultClient";
     public static WebApplicationBuilder AddOurEnvironmentVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
@@ -38,10 +39,12 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureHttpClient(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient("DefaultClient", client =>
-        {
-            client.Timeout = TimeSpan.FromMinutes(30);
-        });
+        builder.Services.AddHttpClient(DefaultClientName, 
+            client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+            }
+        );
         return builder;
     }
 
@@ -52,7 +55,6 @@ public static class ProgramExtensions
         builder.Services.AddScoped<BaseController>();
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddHealthChecks();
-        
         var frontendUrl = builder.Configuration["FrontendUrl"];
         builder.Services.AddCors(options =>
         {
@@ -79,9 +81,9 @@ public static class ProgramExtensions
             .AddOptions<DatabaseOptions>()
             .Validate(options => options.PORT > 0, "Qdrant Port must be set.")
             .Validate(options => options.SAVE_BATCH_SIZE > 0, "Qdrant Save Batch Size must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.QDRANT_API_KEY), "Qdrant API Key must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.HOST), "Qdrant Host String must be set.")
             .Validate(options => options.MAX_CONNECTION_COUNT > 0, "Qdrant Max Connection Count must be set.")
+            .Validate(options => !string.IsNullOrEmpty(options.QDRANT_API_KEY), "Qdrant API Key must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), "Qdrant Database Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
@@ -146,7 +148,6 @@ public static class ProgramExtensions
     public static WebApplication ConfigureProgressHub(this WebApplication app)
     {
         app.MapHub<ProgressHub>("/progressHub");
-
         app.UseCors(builder =>
         {
             var frontendUrl = app.Configuration["FrontendUrl"];

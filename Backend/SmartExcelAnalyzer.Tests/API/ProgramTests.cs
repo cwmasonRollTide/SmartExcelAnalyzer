@@ -7,6 +7,7 @@ using Persistence.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using SmartExcelAnalyzer.Tests.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace SmartExcelAnalyzer.Tests.API;
 
@@ -77,10 +78,12 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
     public void EnvironmentVariables_ShouldBeLoaded()
     {
         var services = _factory.Services;
-        var configuration = services.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
+        var configuration = services.GetService<IConfiguration>();
 
         configuration.Should().NotBeNull();
         configuration!["LLMServiceOptions:LLM_SERVICE_URL"].Should().NotBeNullOrEmpty();
+        configuration["DatabaseOptions:QDRANT_HOST"].Should().NotBeNullOrEmpty();
+        configuration["DatabaseOptions:QDRANT_PORT"].Should().NotBeNullOrEmpty();
         configuration["DatabaseOptions:HOST"].Should().NotBeNullOrEmpty();
     }
 

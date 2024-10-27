@@ -1,11 +1,6 @@
 {
     "dotnet-test-explorer.autoWatch": true,
     "dotnet.defaultSolution": "Backend/SmartExcelAnalyzer.sln",
-    "coverage-gutters.lcovname": "Backend/SmartExcelAnalyzer/lcov.info",
-    "gutter.enabled": true,
-    "coverage-gutters.showCoverageBadge": true,
-    "coverage-gutters.showLineCoverage": true,
-    "gutter.showRelativePath": true,
     "dotnet-test-explorer.testProjectPath": "**/SmartExcelAnalyzer.Tests.csproj",
     "azureFunctions.deploySubpath": "LLM",
     "azureFunctions.scmDoBuildDuringDeployment": true,

@@ -25,7 +25,7 @@ public class AnalysisController(
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
     /// </summary>
-    /// <param name="query"></param>
+    /// <param name="queryAboutExcelDocument"></param>
     /// <returns>
     ///     string Answer
     ///     string Question
@@ -36,7 +36,7 @@ public class AnalysisController(
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query) => Ok(await _mediator.Send(query));
+    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument) => Ok(await _mediator.Send(queryAboutExcelDocument));
 
     /// <summary>
     /// Uploads an excel file to the vector database and returns the documentId. 
@@ -45,17 +45,17 @@ public class AnalysisController(
     /// Computes each row's embedding with the LLM and stores it in the database.
     /// So when a query is submitted, the LLM can be used to compute the embedding of the query and compare it to the embeddings of the rows.
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="fileToUpload"></param>
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file) => 
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload) => 
         Ok(await _mediator.Send(
             new UploadFileCommand
             {
-                File = file,
+                File = fileToUpload,
                 Progress = new Progress<(double, double)>(
                     async progressTuple =>
                     {
