@@ -12,8 +12,11 @@ public interface IWebRepository<T>
     );
 }
 
-public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebRepository<T>
+public class WebRepository<T>(
+    IHttpClientFactory httpClientFactory
+) : IWebRepository<T>
 {
+    private const string DefaultClientName = "DefaultClient";
     /// <summary>
     /// PostAsync sends a POST request to the specified endpoint with the given payload.
     /// The payload is serialized to the given type T.
@@ -28,9 +31,17 @@ public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebReposi
         CancellationToken cancellationToken = default
     )
     {
-        var client = httpClientFactory.CreateClient("DefaultClient");
-        var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync(endpoint, content, cancellationToken);
+        var client = httpClientFactory.CreateClient(DefaultClientName);
+        var content = new StringContent(
+            JsonConvert.SerializeObject(payload), 
+            Encoding.UTF8, 
+            "application/json"
+        );
+        var response = await client.PostAsync(
+            endpoint, 
+            content, 
+            cancellationToken
+        );
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadAsStringAsync(cancellationToken);
         return JsonConvert.DeserializeObject<T>(result)!;
