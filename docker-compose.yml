@@ -12,7 +12,7 @@ services:
     command:
       - "./qdrant"
       - "--config-path"
-      - "/qdrant/config/production.yaml"
+      - "/qdrant/config/qdrant_config.yaml"
     environment:
       - QDRANT_API_KEY=${QDRANT_API_KEY}
     healthcheck:

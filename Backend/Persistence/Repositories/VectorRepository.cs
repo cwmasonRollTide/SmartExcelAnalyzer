@@ -96,7 +96,11 @@ public class VectorRepository(
             return null!;
         }
         _logger.LogInformation(LOG_START_SAVE);
-        var documentId = await SaveDocumentDataAsync(vectorSpreadsheetData.Rows ?? [], progress, cancellationToken);
+        var documentId = await SaveDocumentDataAsync(
+            vectorSpreadsheetData.Rows ?? [], 
+            progress, 
+            cancellationToken
+        );
         if (documentId is null)
         {
             _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
@@ -278,8 +282,7 @@ public class VectorRepository(
                     processedRows += batch.Count();
                     progress?.Report((1, processedRows / (double)totalRows));
                 }
-                else
-                    _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
+                else _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
             }
         }
         catch (OperationCanceledException)
