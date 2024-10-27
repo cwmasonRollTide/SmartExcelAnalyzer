@@ -8,6 +8,7 @@ public class ExceptionMiddleware(
     ILogger<ExceptionMiddleware> _logger
 )
 {
+    private const string ContentType = "application/json";
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -52,7 +53,7 @@ public class ExceptionMiddleware(
         HttpStatusCode statusCode = HttpStatusCode.InternalServerError
     )
     {
-        context.Response.ContentType = "application/json";
+        context.Response.ContentType = ContentType;
         context.Response.StatusCode = (int)statusCode;
         return context.Response.WriteAsJsonAsync(new
         {

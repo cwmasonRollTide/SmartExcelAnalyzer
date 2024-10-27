@@ -5,19 +5,6 @@
       <DataCollector friendlyName="Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[*]Program.cs</Exclude>
-          <ExcludeByFile>**/*Program.cs</ExcludeByFile>
-          <ExcludeByFile>./Program.cs</ExcludeByFile>
-          <ExcludeByFile>**/Program.cs</ExcludeByFile>
-          <ExcludeByFile>**/Program.cs</ExcludeByFile>
-          <ExcludeByFile>**_\\src/**/*.cs</ExcludeByFile>
-          <Exclude>Program.cs</Exclude>
-          <Exclude>[*]Tests.cs</Exclude>
-          <ExcludeByFile>**/*Tests.cs</ExcludeByFile>
-          <Exclude>_\src</Exclude>
-          <Include>[Backend.API]*</Include>
-          <ExcludeByFile>**/_\src/**/*.cs</ExcludeByFile>
-          <ExcludeByFile>**/FluentValidation/**/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

@@ -5,9 +5,9 @@ using Application.Services;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using SmartExcelAnalyzer.Tests.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 
 namespace SmartExcelAnalyzer.Tests.API;
 
