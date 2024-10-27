@@ -1,13 +1,11 @@
 using Persistence.Database;
 
-namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
+namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
 public class MongoDatabaseWrapperTests
 {
     [Fact]
-#pragma warning disable CA1041 // Provide ObsoleteAttribute message
-    [Obsolete]
-#pragma warning restore CA1041 // Provide ObsoleteAttribute message
+    [Obsolete("This test has been deprecated in favor of more robust testing strategies. It will be removed in a future release.")]
     public void MongoDatabaseWrapper_IsObsolete()
     {
         // This test exists to acknowledge the presence of the MongoDatabaseWrapper class
