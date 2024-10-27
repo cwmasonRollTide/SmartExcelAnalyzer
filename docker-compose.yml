@@ -33,8 +33,6 @@ services:
     deploy:
       mode: replicated
       replicas: 3
-    ports:
-      - "8000:8002"
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health

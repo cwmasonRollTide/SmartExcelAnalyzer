@@ -4,14 +4,14 @@ using System.Text.Json;
 using FluentAssertions;
 using Qdrant.Client.Grpc;
 using Application.Services;
+using Persistence.Database;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 using SmartExcelAnalyzer.Tests.TestUtilities;
-using Persistence.Database;
 
-namespace SmartExcelAnalyzer.Tests.Persistence;
+namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
 public class QdrantDatabaseWrapperTests
 {
@@ -129,38 +129,38 @@ public class QdrantDatabaseWrapperTests
         var queryVector = new float[] { 1.0f, 2.0f };
         var topRelevantCount = 5;
         var excelData = TestDataGenerator.GenerateLargeDataSet(3, ["key"]).ToList();
-        var mockSearchResult = excelData.Select(data => new ScoredPoint 
-        { 
-            Id = new PointId(), 
+        var mockSearchResult = excelData.Select(data => new ScoredPoint
+        {
+            Id = new PointId(),
             Vectors = queryVector,
             Payload = { ["content"] = new Value { StringValue = JsonSerializer.Serialize(data) } }
         }).ToList();
 
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
-                    It.IsAny<string>(), 
-                    It.IsAny<ReadOnlyMemory<float>>(), 
-                    It.IsAny<Filter?>(), 
-                    It.IsAny<SearchParams?>(), 
-                    It.IsAny<ulong>(), 
-                    It.IsAny<ulong>(), 
-                    It.IsAny<WithPayloadSelector?>(), 
-                    It.IsAny<WithVectorsSelector?>(), 
-                    It.IsAny<float?>(), 
-                    It.IsAny<string?>(), 
-                    It.IsAny<ReadConsistency?>(), 
-                    It.IsAny<ShardKeySelector?>(), 
-                    It.IsAny<ReadOnlyMemory<uint>?>(), 
-                    It.IsAny<TimeSpan?>(), 
-                    It.IsAny<CancellationToken>())) 
+                    It.IsAny<string>(),
+                    It.IsAny<ReadOnlyMemory<float>>(),
+                    It.IsAny<Filter?>(),
+                    It.IsAny<SearchParams?>(),
+                    It.IsAny<ulong>(),
+                    It.IsAny<ulong>(),
+                    It.IsAny<WithPayloadSelector?>(),
+                    It.IsAny<WithVectorsSelector?>(),
+                    It.IsAny<float?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<ReadConsistency?>(),
+                    It.IsAny<ShardKeySelector?>(),
+                    It.IsAny<ReadOnlyMemory<uint>?>(),
+                    It.IsAny<TimeSpan?>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(mockSearchResult);
 
         var result = await Sut.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount);
 
         result.Should().NotBeEmpty();
         result.Count().Should().Be(3);
-        result.Should().AllSatisfy(dict => 
+        result.Should().AllSatisfy(dict =>
         {
             dict.Should().ContainKey("key");
         });
@@ -172,9 +172,9 @@ public class QdrantDatabaseWrapperTests
         var documentId = "testDocId";
         var SummaryCollectionName = "testSummaryCollection";
         var summaryContent = new ConcurrentDictionary<string, object> { ["key"] = "\"value\"" };
-        var point = new ScoredPoint 
-        { 
-            Id = new PointId(), 
+        var point = new ScoredPoint
+        {
+            Id = new PointId(),
             Vectors = new float[1],
             Payload = { ["content"] = new Value { StringValue = JsonSerializer.Serialize(summaryContent) }, ["document_id"] = new Value { StringValue = documentId } }
 
@@ -186,7 +186,7 @@ public class QdrantDatabaseWrapperTests
             CollectionNameTwo = SummaryCollectionName
         });
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.Is<string>(s => s == SummaryCollectionName),
                     It.Is<ReadOnlyMemory<float>>(v => v.Length == 1),
@@ -218,7 +218,7 @@ public class QdrantDatabaseWrapperTests
         var mockSearchResult = new List<ScoredPoint>();
 
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.IsAny<string>(),
                     It.IsAny<ReadOnlyMemory<float>>(),
@@ -351,7 +351,7 @@ public class QdrantDatabaseWrapperTests
         var topRelevantCount = 5;
 
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.IsAny<string>(),
                     It.IsAny<ReadOnlyMemory<float>>(),
@@ -387,7 +387,7 @@ public class QdrantDatabaseWrapperTests
             CollectionName = collectionName
         });
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.Is<string>(s => s == collectionName),
                     It.Is<ReadOnlyMemory<float>>(v => v.ToArray().SequenceEqual(queryVector)),
@@ -406,7 +406,7 @@ public class QdrantDatabaseWrapperTests
                     It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Test exception"));
 
-        await Assert.ThrowsAsync<Exception>(() => 
+        await Assert.ThrowsAsync<Exception>(() =>
             Sut.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount));
     }
 
@@ -416,10 +416,10 @@ public class QdrantDatabaseWrapperTests
         var documentId = "testDocId";
         var point = new ScoredPoint { Id = new PointId(), Vectors = new float[1] };
         point.Payload.Add("content", new Value { StringValue = "Invalid JSON" });
-        var mockSearchResult = new List<ScoredPoint>{point};
+        var mockSearchResult = new List<ScoredPoint> { point };
 
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.IsAny<string>(),
                     It.IsAny<ReadOnlyMemory<float>>(),
@@ -449,10 +449,10 @@ public class QdrantDatabaseWrapperTests
         var documentId = "testDocId";
         var point = new ScoredPoint { Id = new PointId(), Vectors = new float[1] };
         point.Payload.Add("other_key", new Value { StringValue = "Some value" });
-        var mockSearchResult = new List<ScoredPoint>{point};
+        var mockSearchResult = new List<ScoredPoint> { point };
 
         _mockClient
-            .Setup(c => 
+            .Setup(c =>
                 c.SearchAsync(
                     It.IsAny<string>(),
                     It.IsAny<ReadOnlyMemory<float>>(),

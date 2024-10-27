@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 
-namespace SmartExcelAnalyzer.Tests.Persistence;
+namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
-public class VectorDbRepositoryTests
+public class VectorRepositoryTests
 {
     private const int SAVE_BATCH_SIZE = 10;
     private const int COMPUTE_BATCH_SIZE = 10;
@@ -26,7 +26,7 @@ public class VectorDbRepositoryTests
 
     private static readonly float[] singleArray = [1.0f];
 
-    public VectorDbRepositoryTests()
+    public VectorRepositoryTests()
     {
         _llmOptionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
         _databaseOptionsMock.Setup(o => o.Value).Returns(new DatabaseOptions { SAVE_BATCH_SIZE = SAVE_BATCH_SIZE });

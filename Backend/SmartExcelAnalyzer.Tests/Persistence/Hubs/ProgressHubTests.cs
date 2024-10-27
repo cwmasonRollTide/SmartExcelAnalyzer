@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.SignalR;
 using Moq;
 using Persistence.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
 
 public class ProgressHubTestsTest
 {
-    private readonly Mock<IProgressHubWrapper> _hubContextMock = new();
     private ProgressHub Sut => new(_hubContextMock.Object);
+    private readonly Mock<IProgressHubWrapper> _hubContextMock = new();
 
     public ProgressHubTestsTest()
     {
@@ -29,8 +29,8 @@ public class ProgressHubTestsTest
 
 public class ProgressHubWrapperTests
 {
-    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
     private readonly Mock<IClientProxy> _clientProxyMock = new();
+    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
     private ProgressHubWrapper Sut => new(_hubContextMock.Object);
 
     public ProgressHubWrapperTests()
