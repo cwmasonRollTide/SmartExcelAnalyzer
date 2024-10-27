@@ -52,11 +52,9 @@ public class ExcelFileService : IExcelFileService
     {
         progress ??= new Progress<(double, double)>(_ => { });
         var parallelOptions = CreateParallelOptions(cancellationToken);
-        progress.Report((0, 0));
-        
+        progress.Report((0, 0));        
         var table = await LoadExcelTableAsync(file);
         progress.Report((LOADING_WEIGHT, 0));
-        
         if (table.Rows.Count is 0)
         {
             progress.Report((1.0, 0));
@@ -66,7 +64,6 @@ public class ExcelFileService : IExcelFileService
                 Summary = await CalculateSummaryStatisticsAsync(table, parallelOptions)
             };
         }
-        
         var columns = GetTableColumns(table);
         var currentProgress = LOADING_WEIGHT;
         var progressQueue = new ConcurrentQueue<double>();
@@ -83,7 +80,6 @@ public class ExcelFileService : IExcelFileService
                 }
             }
         });
-        
         var rowsTask = ProcessRowsAsync(table, columns, parallelOptions, scaledProgress);
         progress.Report((LOADING_WEIGHT + SUMMARIZING_WEIGHT, 0));
         var summaryTask = CalculateSummaryStatisticsAsync(table, parallelOptions);
@@ -95,13 +91,6 @@ public class ExcelFileService : IExcelFileService
             Summary = await summaryTask
         };
     }
-
-    private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken) =>
-        new()
-        {
-            CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = Environment.ProcessorCount - 4
-        };
 
     private static async Task<DataTable> LoadExcelTableAsync(IFormFile file) =>
         (await LoadExcelDataAsync(file)).Tables[0] ?? new DataTable();
@@ -306,4 +295,11 @@ public class ExcelFileService : IExcelFileService
     ///     The SHA256 hash of the input
     /// </returns>
     private static string ComputeHash(string input) => string.Concat(SHA256.HashData(Encoding.UTF8.GetBytes(input)).Select(b => b.ToString("x2")));
+
+    private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken) =>
+        new()
+        {
+            CancellationToken = cancellationToken,
+            MaxDegreeOfParallelism = Environment.ProcessorCount - 4
+        };
 }

@@ -170,40 +170,59 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 **Request:**
 
-```http
-POST: http://localhost:5001/api/analysis/upload
-Content-Type: multipart/form-data
+  ```http
+  POST /api/analysis/upload
+  Content-Type: multipart/form-data
+  ```
+
+#### Response
+
+```json
+  "123456789012"
 ```
 
-**RETURNS**
-"123456789012"
-
-- **Get Index Status**:
+#### 2. Get Indexing Status
 
   ```json
-  GET /api/analysis/index/status/12345
+  GET /api/analysis/index/status/123456789012
+  Content-Type: application/json
   ```
 
-GET http://localhost:5001/api/analysis/status/12345
-Returns:
-{
-  "isIndexing": true,
-  "indexedDocumentCount": 10,
-  "totalDocumentCount": 100,
-  "error": null
-}
-
-- **Get Analysis**:
+#### RETURNS
 
   ```json
-  POST /api/analysis/query
+  {
+    "isIndexing": true,
+    "indexedDocumentCount": 10,
+    "totalDocumentCount": 100,
+    "error": null
+  }
   ```
 
-POST http://localhost:5001/api/analysis/api/query
-{
-  "query": "What are the total sales for Q1 2024?",
-  "documentId": "12345"
-}
+#### 3. Ask a Question
+
+  ```json
+  POST /api/analysis/api/query
+  {
+    "query": "What are the total sales for Q1 2024?",
+    "documentId": "123456789012"
+  }
+  ```
+
+#### RETURNS
+
+  ```csharp
+  {
+    [Optional]
+    Question: string,
+    [Required]
+    DocumentId: string,
+    [Required]
+    Answer: string,
+    [Optional]
+    RelevantRows: ConcurrentBag<ConcurrentDictionary<string, object>>
+  }
+  ```
 
 ## Development
 
@@ -255,11 +274,7 @@ POST http://localhost:5001/api/analysis/api/query
 
   - [LLM Service](https://hub.docker.com/repository/docker/fivemowner/smart-excel-analyzer-llm/general)
 
-- This process is kicked off in the file in this Github Action
-
-  ```powershell
-  ~/.github/workflows/docker-build-push.yml
-  ```
+- This process is kicked off in the [GitHub Action File](.github/workflows/docker-build-push.yml)
   
 ## Testing
 
