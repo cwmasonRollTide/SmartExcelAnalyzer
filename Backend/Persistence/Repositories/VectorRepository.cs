@@ -36,9 +36,9 @@ public interface IVectorDbRepository
 /// <param name="llmOptions"></param>
 /// <param name="databaseOptions"></param>
 public class VectorRepository(
-    IDatabaseWrapper databaseWrapper,
-    ILogger<VectorRepository> logger,
-    ILLMRepository llmRepository,
+    IDatabaseWrapper _database,
+    ILogger<VectorRepository> _logger,
+    ILLMRepository _llmRepository,
     IOptions<LLMServiceOptions> llmOptions,
     IOptions<DatabaseOptions> databaseOptions
 ) : IVectorDbRepository
@@ -71,9 +71,6 @@ public class VectorRepository(
     #endregion
 
     #region Dependencies
-    private readonly ILogger<VectorRepository> _logger = logger;
-    private readonly IDatabaseWrapper _database = databaseWrapper;
-    private readonly ILLMRepository _llmRepository = llmRepository;
     private readonly int _computeEmbeddingBatchSize = llmOptions.Value.COMPUTE_BATCH_SIZE;
     private readonly int _maxConcurrentTasks = databaseOptions.Value.MAX_CONNECTION_COUNT;
     #endregion
@@ -356,7 +353,7 @@ public class VectorRepository(
             cancellationToken.ThrowIfCancellationRequested();
             var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
             await ProcessBatchAsync(message.Embeddings, message.Batch, batchesToStore, cancellationToken);
-            documentId = await SaveBatchOfRowEmbeddings(batchesToStore, documentId, cancellationToken);
+            documentId = await SaveBatchOfRowEmbeddings(documentId, batchesToStore, cancellationToken);
             processedRows += message.Batch.Count();
             progress?.Report((1, processedRows / (double)totalRows));
             return documentId;
@@ -397,8 +394,8 @@ public class VectorRepository(
     }
 
     private async ValueTask<string> SaveBatchOfRowEmbeddings(
-        ConcurrentBag<ConcurrentDictionary<string, object>> batchOfRowsToSave, 
         string documentId,
+        ConcurrentBag<ConcurrentDictionary<string, object>> batchOfRowsToSave, 
         CancellationToken cancellationToken = default
     )
     {
@@ -408,14 +405,8 @@ public class VectorRepository(
             _logger.LogWarning(LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT, documentId);
             return documentId;
         }
-        if (documentId is null)
-        {
-            documentId = batchDocumentId;
-        }
-        else if (documentId != batchDocumentId)
-        {
-            _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
-        }
+        if (documentId is null) documentId = batchDocumentId;
+        else if (documentId != batchDocumentId) _logger.LogWarning(LOG_INCONSISTENT_IDS, documentId, batchDocumentId);
         return documentId;
     }
 

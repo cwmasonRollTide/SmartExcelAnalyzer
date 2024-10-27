@@ -10,18 +10,13 @@ using static Qdrant.Client.Grpc.Conditions;
 namespace Persistence.Repositories;
 
 public class QdrantDatabaseWrapper(
-    IQdrantClient client,
+    IQdrantClient _client,
     IOptions<DatabaseOptions> options, 
-    ILogger<QdrantDatabaseWrapper> logger
+    ILogger<QdrantDatabaseWrapper> _logger
 ) : IDatabaseWrapper
 {
-    #region Dependencies
-    private readonly IQdrantClient _client = client;
-    private readonly ILogger<QdrantDatabaseWrapper> _logger = logger;
-    private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
-    #endregion
-
     #region Fields
+    private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     private static byte[] NextRandomBytes
     {
         get
@@ -58,7 +53,7 @@ public class QdrantDatabaseWrapper(
         documentId ??= NewDocumentId();
         _logger.LogInformation("Document ID: {DocumentId}", documentId);
 
-        var points = await CreateRowsInParallelAsync(rows, documentId, cancellationToken);
+        var points = await CreateRowsInParallelAsync(documentId, rows, cancellationToken);
         _logger.LogInformation("Created {PointCount} points", points.Count());
 
         if (points.Any()) 
@@ -78,7 +73,6 @@ public class QdrantDatabaseWrapper(
         {
             _logger.LogWarning("No points to insert");
         }
-
         return documentId;
     }
 
@@ -178,8 +172,8 @@ public class QdrantDatabaseWrapper(
     private static string NewDocumentId() => BitConverter.ToString(NextRandomBytes).Replace("-", "");
 
     private async Task<IEnumerable<PointStruct>> CreateRowsInParallelAsync(
-        IEnumerable<ConcurrentDictionary<string, object>> rows,
         string? documentId,
+        IEnumerable<ConcurrentDictionary<string, object>> rows,
         CancellationToken cancellationToken = default
     )
     {
@@ -190,15 +184,14 @@ public class QdrantDatabaseWrapper(
             parallelOptions, 
             async (row, ct) =>
             {
+                points.Add(await CreateRow(documentId!, row));
                 await Task.Yield();
-                var point = CreateRow(row, documentId!);
-                points.Add(point);
             }
         );
         return points;
     }
 
-    private PointStruct CreateRow(ConcurrentDictionary<string, object> row, string? documentId)
+    private async Task<PointStruct> CreateRow(string? documentId, ConcurrentDictionary<string, object> row)
     {
         var point = new PointStruct 
         { 
@@ -207,11 +200,9 @@ public class QdrantDatabaseWrapper(
                 ? (embedding as Vectors) ?? Array.Empty<float>() 
                 : Array.Empty<float>()
         };
-        if (documentId is not null)
-        {
-            point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
-        }
+        if (documentId is not null) point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
         point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions)});
+        await Task.Yield();
         return point;
     }
 

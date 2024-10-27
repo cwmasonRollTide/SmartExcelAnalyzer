@@ -3,7 +3,10 @@ using FluentValidation;
 
 namespace API.Middleware;
 
-public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
+public class ExceptionMiddleware(
+    RequestDelegate _next, 
+    ILogger<ExceptionMiddleware> _logger
+)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -43,7 +46,11 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception, HttpStatusCode statusCode = HttpStatusCode.InternalServerError)
+    private static Task HandleExceptionAsync(
+        HttpContext context, 
+        Exception exception, 
+        HttpStatusCode statusCode = HttpStatusCode.InternalServerError
+    )
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;

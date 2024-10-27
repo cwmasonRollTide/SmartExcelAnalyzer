@@ -4,12 +4,14 @@ namespace API;
 
 public class Program
 {
-    public static void Main(string[] _) => ConfigureSmartExcelAnalyzer()
+    public static void Main(string[] _) => 
+        ConfigureSmartExcelAnalyzer()
         .ConfigureMiddleware() 
         .ConfigureProgressHub()
         .Run();
 
-    public static WebApplication ConfigureSmartExcelAnalyzer() => WebApplication.CreateBuilder()
+    public static WebApplication ConfigureSmartExcelAnalyzer() => 
+        WebApplication.CreateBuilder()
         .ConfigureEnvironmentVariables()
         .ConfigureLogging()
         .ConfigureMediatR()

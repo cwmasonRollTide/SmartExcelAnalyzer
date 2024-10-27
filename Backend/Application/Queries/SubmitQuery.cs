@@ -62,11 +62,7 @@ public class SubmitQueryHandler(
     ) 
     {
         var result = await QueryLLMAsync(request, cancellationToken);
-        if (result is null) 
-        {
-            _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
-            return null;
-        }
+        if (result is null) return null;
         if (ShouldEnrichResponse(request.RelevantRowsCount)) await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
         _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;

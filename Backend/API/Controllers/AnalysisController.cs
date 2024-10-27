@@ -14,7 +14,10 @@ namespace API.Controllers;
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
-public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hubContext) : BaseController(mediator)
+public class AnalysisController(
+    IMediator mediator, 
+    IHubContext<ProgressHub> _hubContext
+) : BaseController(mediator)
 {
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
@@ -31,7 +34,7 @@ public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hu
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query) =>  Ok(await _mediator.Send(query));
+    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query) => Ok(await _mediator.Send(query));
 
     /// <summary>
     /// Uploads an excel file to the vector database and returns the documentId. 
@@ -46,9 +49,9 @@ public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hu
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadFile(
-        [FromForm] IFormFile file
-    ) => Ok(await _mediator.Send(new UploadFileCommand
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile file) => 
+        Ok(await _mediator.Send(
+            new UploadFileCommand
             {
                 File = file,
                 Progress = new Progress<(double, double)>(
@@ -58,5 +61,6 @@ public class AnalysisController(IMediator mediator, IHubContext<ProgressHub> _hu
                         await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
                     }
                 )
-            }));
+            }
+        ));
 }
