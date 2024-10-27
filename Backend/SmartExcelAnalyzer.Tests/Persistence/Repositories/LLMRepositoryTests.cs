@@ -5,7 +5,7 @@ using Persistence.Repositories;
 using Microsoft.Extensions.Options;
 using Domain.Persistence.Configuration;
 
-namespace SmartExcelAnalyzer.Tests.Persistence;
+namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
 public class LLMRepositoryTests
 {
@@ -39,7 +39,7 @@ public class LLMRepositoryTests
         result.Should().BeEquivalentTo(expectedAnswer);
         _queryServiceMock.Verify(q => q.PostAsync(
             It.Is<string>(y => y == $"{url}/query"),
-            It.Is<object>(o => 
+            It.Is<object>(o =>
                 o!.GetType()!.GetProperty("question")!.GetValue(o)!.ToString() == question
             ),
             It.IsAny<CancellationToken>()),

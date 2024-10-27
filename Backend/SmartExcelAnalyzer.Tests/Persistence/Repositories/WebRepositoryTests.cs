@@ -4,9 +4,9 @@ using System.Text;
 using Moq.Protected;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Persistence.Repositories.API;
+using Persistence.Repositories;
 
-namespace SmartExcelAnalyzer.Tests.Persistence.Repositories.API;
+namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
 public class WebRepositoryTests
 {
