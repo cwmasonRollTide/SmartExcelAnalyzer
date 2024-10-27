@@ -4,7 +4,7 @@ from main import app
 from dotenv import load_dotenv
 import os
 
-load_dotenv(dotenv_path='./.env', override=True)
+load_dotenv(dotenv_path='.env', override=True)
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 if not QDRANT_API_KEY:
        raise ValueError("QDRANT_API_KEY is not set in the environment variables")

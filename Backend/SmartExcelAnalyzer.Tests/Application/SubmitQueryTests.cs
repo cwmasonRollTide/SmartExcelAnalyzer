@@ -107,7 +107,7 @@ public class SubmitQueryTests
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to query LLM")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-                Times.Once);
+                Times.Exactly(2));
         }
 
         [Fact]
@@ -150,7 +150,7 @@ public class SubmitQueryTests
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-                Times.Once);
+                Times.Exactly(2));
         }
 
         [Fact]

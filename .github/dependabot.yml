@@ -8,4 +8,4 @@ updates:
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/Frontend/package.json" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"

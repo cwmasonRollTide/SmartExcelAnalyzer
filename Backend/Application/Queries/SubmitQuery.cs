@@ -29,9 +29,9 @@ public class SubmitQuery : IRequest<QueryAnswer?>
 /// <param name="logger"></param>
 /// <param name="vectorDbRepository"></param>
 public class SubmitQueryHandler(
-    ILLMRepository llmRepository,
-    ILogger<SubmitQueryHandler> logger,
-    IVectorDbRepository vectorDbRepository
+    ILLMRepository _llmRepository,
+    ILogger<SubmitQueryHandler> _logger,
+    IVectorDbRepository _vectorDbRepository
 ) : IRequestHandler<SubmitQuery, QueryAnswer?>
 {
     #region Log Message Constants
@@ -42,12 +42,6 @@ public class SubmitQueryHandler(
     private const string LogFailedToQueryLLM = "Failed to query LLM for query {Query} and documentId {DocumentId}.";
     private const string LogQueryingVectorDb = "Querying VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
     private const string LogFailedToQueryVectorDb = "Failed to query VectorDb for the most relevant rows for query {Query} and documentId {DocumentId}.";
-    #endregion
-
-    #region Dependencies
-    private readonly ILogger<SubmitQueryHandler> _logger = logger;
-    private readonly ILLMRepository _llmRepository = llmRepository;
-    private readonly IVectorDbRepository _vectorDbRepository = vectorDbRepository;
     #endregion
 
     #region Handle
@@ -68,22 +62,37 @@ public class SubmitQueryHandler(
     ) 
     {
         var result = await QueryLLMAsync(request, cancellationToken);
-        if (result is null) return null;
-
-        if (ShouldEnrichResponse(request.RelevantRowsCount))
-            await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
-
+        if (result is null) 
+        {
+            _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
+            return null;
+        }
+        if (ShouldEnrichResponse(request.RelevantRowsCount)) await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
         _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;
     }
-    
+
+    /// <summary>
+    /// Queries the LLM for the answer to the query and returns the result.     
+    /// If the LLM returns null, it logs a warning.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     QueryAnswer. The answer to the query
+    /// </returns>
+                
     private async Task<QueryAnswer?> QueryLLMAsync(
         SubmitQuery request, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation(LogQueryingLLM, request.Query, request.DocumentId);
-        var result = await _llmRepository.QueryLLM(document_id: request.DocumentId, question: request.Query, cancellationToken);
+        var result = await _llmRepository.QueryLLM(
+            document_id: request.DocumentId, 
+            question: request.Query, 
+            cancellationToken
+        );
         if (result is null)
             _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
         return result;
@@ -94,7 +103,7 @@ public class SubmitQueryHandler(
     private async Task EnrichWithRelevantRowsAsync(
         SubmitQuery request, 
         QueryAnswer result, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
@@ -108,7 +117,7 @@ public class SubmitQueryHandler(
     private async Task<SummarizedExcelData?> QueryVectorDbAsync(
         SubmitQuery request, 
         float[] embedding, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation(LogQueryingVectorDb, request.Query, request.DocumentId);
@@ -124,7 +133,7 @@ public class SubmitQueryHandler(
 
     private async Task<float[]?> ComputeEmbeddingAsync(
         SubmitQuery request, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation(LogComputingEmbedding, request.Query);

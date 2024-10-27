@@ -2,17 +2,22 @@
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Technology Stack](#technology-stack)
-4. [Architecture](#architecture)
-5. [Setup and Installation](#setup-and-installation)
-6. [Usage](#usage)
-7. [API Documentation](#api-documentation)
-8. [Development](#development)
-9. [Docker](#docker)
-10. [Testing](#testing)
-11. [Contact](#contact)
+- [Smart Excel Analyzer](#smart-excel-analyzer)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Features](#features)
+    - [Detailed Features](#detailed-features)
+  - [Technology Stack](#technology-stack)
+  - [Architecture](#architecture)
+  - [Setup and Installation](#setup-and-installation)
+  - [Usage](#usage)
+  - [API Documentation](#api-documentation)
+    - [Example API Requests Full Workflow](#example-api-requests-full-workflow)
+  - [Development](#development)
+  - [Docker](#docker)
+  - [Docker Hub Repository](#docker-hub-repository)
+  - [Testing](#testing)
+  - [Contact](#contact)
 
 ## Introduction
 
@@ -75,7 +80,7 @@ This project aims to transform the way users interact with spreadsheet data by p
 - **Database**:
   - ![Qdrant](https://img.shields.io/badge/Qdrant-F24E1E?style=for-the-badge&logo=vector&logoColor=white) [Qdrant Vector Database](https://try.qdrant.tech/high-performance-vector-search?utm_source=google&utm_medium=cpc&utm_campaign=21518712216&utm_content=163351119817&utm_term=qdrant%20vector%20database&hsa_acc=6907203950&hsa_cam=21518712216&hsa_grp=163351119817&hsa_ad=707722911577&hsa_src=g&hsa_tgt=kwd-2240456171437&hsa_kw=qdrant%20vector%20database&hsa_mt=e&hsa_net=adwords&hsa_ver=3&gad_source=1&gclid=CjwKCAjw1NK4BhAwEiwAVUHPUDZxy5-yERXvEGdq-Q58x1xzDrpdB3rj1norGq_P6JDlU9vI3yXnyhoCTIoQAvD_BwE)
 
-- **Machine Learning**:
+- **LLM Services**:
   - ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white) [PyTorch](https://pytorch.org/)
   - ![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFDA4E?style=for-the-badge&logo=huggingface&logoColor=white) [Hugging Face Transformers](https://huggingface.co/docs/transformers/en/index)
 
@@ -95,7 +100,7 @@ This project aims to transform the way users interact with spreadsheet data by p
   - ![FluentValidation](https://img.shields.io/badge/FluentValidation-00C853?style=for-the-badge&logo=fluentvalidation&logoColor=white) [FluentValidation for request validation](https://github.com/FluentValidation/FluentValidation)
   - ![ExcelDataReader](https://img.shields.io/badge/ExcelDataReader-1D76DB?style=for-the-badge&logo=excel&logoColor=white) [ExcelDataReader for Fast Excel Data Loading](https://github.com/ExcelDataReader/ExcelDataReader)
   - ![MediatR](https://img.shields.io/badge/MediatR-FF6F00?style=for-the-badge&logo=mediatR&logoColor=white) [MediatR for CQRS pattern](https://github.com/jbogard/MediatR) **Only choice in my opinion**
-
+  
 ## Architecture
 
 The Smart Excel Analyzer follows a microservices architecture:
@@ -113,10 +118,6 @@ The Smart Excel Analyzer follows a microservices architecture:
    - Qdrant for storing and querying vector embeddings.
 
 The application uses a CQRS (Command Query Responsibility Segregation) pattern with MediatR for efficient request handling.
-
-### Architecture Diagram
-
-![Architecture Diagram](https://via.placeholder.com/800x400.png?text=Architecture+Diagram)
 
 ## Setup and Installation
 
@@ -159,16 +160,38 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 
 4. **View the results and insights** provided by the system.
 
-### Example Usage
-
-![Usage Example](https://via.placeholder.com/800x400.png?text=Usage+Example)
-
 ## API Documentation
 
 API documentation is available via Swagger UI. After starting the backend service, navigate to:
 [http://localhost:5001/swagger](http://localhost:5001/swagger)
 
-### Example API Requests
+### Example API Requests Full Workflow
+
+- **Upload Excel File**:
+
+  ```json
+  POST /api/analysis/upload
+  ```
+
+POST https://base-address:5001/api/analysis/upload
+{
+  "file": "path/to/excel/file.xlsx"
+}
+
+- **Get Index Status**:
+
+  ```json
+  GET /api/analysis/index/status
+  ```
+
+GET https://base-address:5001/api/analysis/index/status
+Returns:
+{
+  "isIndexing": true,
+  "indexedDocumentCount": 10,
+  "totalDocumentCount": 100,
+  "error": null
+}
 
 - **Get Analysis**:
 
@@ -176,7 +199,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   POST /api/analysis/query
   ```
 
-POST /api/query
+POST https://base-address:5001/api/analysis/api/query
 {
   "query": "What are the total sales for Q1 2024?",
   "documentId": "12345"
@@ -188,7 +211,7 @@ POST /api/query
 
   - Backend:
 
-    ```
+    ```powershell
     Install .NET 8 SDK
     Open the solution in Visual Studio or VS Code
     Run dotnet restore to install dependencies
@@ -196,7 +219,7 @@ POST /api/query
 
   - Frontend:
 
-    ```
+    ```powershell
     Install Node.js and npm
     Navigate to the Frontend directory
     Run npm install to install dependencies
@@ -205,11 +228,21 @@ POST /api/query
 
   - LLM Services:
 
-    ```
+    ```powershell
     Install Python 3.9+
     Navigate to the LLM directory
     Create a virtual environment: python -m venv venv
     Activate the virtual environment and install dependencies: pip install -r requirements.txt
+    ```
+
+  - Run the whole project:
+
+    ```powershell
+    cd SmartExcelAnalyzer
+    ```
+
+    ```powershell
+    docker compose up --build -d
     ```
 
 ## Docker
@@ -220,7 +253,7 @@ POST /api/query
 
 - This process is kicked off in the file in this Github Action
 
-  ```
+  ```powershell
   ~/.github/workflows/docker-build-push.yml
   ```
   
