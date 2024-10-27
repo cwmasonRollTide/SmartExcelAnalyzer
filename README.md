@@ -15,7 +15,6 @@
     - [Example API Requests Full Workflow](#example-api-requests-full-workflow)
   - [Development](#development)
   - [Docker](#docker)
-  - [Docker Hub Repository](#docker-hub-repository)
   - [Testing](#testing)
   - [Contact](#contact)
 
@@ -156,9 +155,9 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 
 2. **Wait for the file to be processed and indexed**.
 
-3. **Use the query interface** to ask questions about your data in natural language.
+3. **Use the query interface** to ask questions about your data, life in general, the nature of the universe, or just about your day.
 
-4. **View the results and insights** provided by the system.
+4. **View the results and insights** if you specify a number of rows, you will be given the option to save the results to a new excel file. Otherwise it will just try to answer your question.
 
 ## API Documentation
 
@@ -167,24 +166,25 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### Example API Requests Full Workflow
 
-- **Upload Excel File**:
+#### 1. Upload Excel File
 
-  ```json
-  POST /api/analysis/upload
-  ```
+**Request:**
 
-POST https://base-address:5001/api/analysis/upload
-{
-  "file": "path/to/excel/file.xlsx"
-}
+```http
+POST: http://localhost:5001/api/analysis/upload
+Content-Type: multipart/form-data
+```
+
+**RETURNS**
+"123456789012"
 
 - **Get Index Status**:
 
   ```json
-  GET /api/analysis/index/status
+  GET /api/analysis/index/status/12345
   ```
 
-GET https://base-address:5001/api/analysis/index/status
+GET http://localhost:5001/api/analysis/status/12345
 Returns:
 {
   "isIndexing": true,
@@ -199,7 +199,7 @@ Returns:
   POST /api/analysis/query
   ```
 
-POST https://base-address:5001/api/analysis/api/query
+POST http://localhost:5001/api/analysis/api/query
 {
   "query": "What are the total sales for Q1 2024?",
   "documentId": "12345"
@@ -247,9 +247,13 @@ POST https://base-address:5001/api/analysis/api/query
 
 ## Docker
 
-- All of our docker images will be published to this docker hub container registry:
+- All of our docker images will be published to these docker hub container registries:
 
-## Docker Hub Repository
+  - [Backend](https://hub.docker.com/repository/docker/fivemowner/smart-excel-analyzer-backend/general)
+
+  - [Frontend](https://hub.docker.com/repository/docker/fivemowner/smart-excel-analyzer-frontend/general)
+
+  - [LLM Service](https://hub.docker.com/repository/docker/fivemowner/smart-excel-analyzer-llm/general)
 
 - This process is kicked off in the file in this Github Action
 
