@@ -1,6 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Database;
 

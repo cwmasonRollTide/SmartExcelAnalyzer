@@ -93,7 +93,7 @@ public class ExcelFileService : IExcelFileService
     }
 
     private static async Task<DataTable> LoadExcelTableAsync(IFormFile file) =>
-        (await LoadExcelDataAsync(file)).Tables[0] ?? new DataTable();
+        (await LoadExcelDataAsync(file)).Tables[0] ?? new();
 
     private static DataColumn[] GetTableColumns(DataTable table) => table.Columns.Cast<DataColumn>().ToArray();
 

@@ -1,7 +1,7 @@
 
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Logging;
 using Moq;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SmartExcelAnalyzer.Tests.TestUtilities;
 

@@ -15,7 +15,6 @@ public class QdrantDatabaseWrapper(
 ) : IDatabaseWrapper
 {
     #region Fields
-    private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     private static byte[] NextRandomBytes
     {
         get
@@ -31,6 +30,7 @@ public class QdrantDatabaseWrapper(
     private string DocumentCollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
     private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;
+    private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
     #endregion
 
     #region Public Methods
@@ -137,7 +137,7 @@ public class QdrantDatabaseWrapper(
             .Select(content => content is not null
                 ? JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(content, _serializerOptions)
                 : null)
-            .Where(content => content is not null) // Filter out null values
+            .Where(content => content is not null)
             .Select(content => content!)
         ?? [];
     }
@@ -147,7 +147,10 @@ public class QdrantDatabaseWrapper(
     /// <param name="documentId"></param>
     /// <param name="cancellationToken"></param>    
     /// <returns></returns>
-    public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(string documentId, CancellationToken cancellationToken = default)
+    public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(
+        string documentId, 
+        CancellationToken cancellationToken = default
+    )
     {
         var searchResult = await _client.SearchAsync(
             collectionName: SummaryCollectionName,
@@ -156,11 +159,9 @@ public class QdrantDatabaseWrapper(
             limit: 1,
             cancellationToken: cancellationToken
         );
-        if (searchResult is null || searchResult.Count is 0) return new ConcurrentDictionary<string, object>();
+        if (searchResult is null || searchResult.Count is 0) return new();
 
-        var summary = searchResult[0];
-        if (!summary!.Payload.TryGetValue("content", out Value? value)) return new ConcurrentDictionary<string, object>();
-
+        if (!searchResult[0]!.Payload.TryGetValue("content", out Value? value)) return new();
         return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(value.StringValue, _serializerOptions)!;
     }
     #endregion
@@ -182,13 +183,16 @@ public class QdrantDatabaseWrapper(
             async (row, ct) =>
             {
                 points.Add(await CreateRow(documentId!, row));
-                await Task.Yield();
+                await Task.CompletedTask;
             }
         );
         return points;
     }
 
-    private async Task<PointStruct> CreateRow(string? documentId, ConcurrentDictionary<string, object> row)
+    private async Task<PointStruct> CreateRow(
+        string? documentId, 
+        ConcurrentDictionary<string, object> row
+    )
     {
         var point = new PointStruct
         {
@@ -199,7 +203,7 @@ public class QdrantDatabaseWrapper(
         };
         if (documentId is not null) point.Payload.Add("document_id", new Value { StringValue = documentId.ToString() });
         point.Payload.Add("content", new Value { StringValue = JsonSerializer.Serialize(row, _serializerOptions) });
-        await Task.Yield();
+        await Task.CompletedTask;
         return point;
     }
 

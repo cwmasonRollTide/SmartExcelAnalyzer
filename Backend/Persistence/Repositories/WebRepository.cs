@@ -16,6 +16,7 @@ public class WebRepository<T>(
     IHttpClientFactory httpClientFactory
 ) : IWebRepository<T>
 {
+    private const string ContentType = "application/json";
     private const string DefaultClientName = "DefaultClient";
     /// <summary>
     /// PostAsync sends a POST request to the specified endpoint with the given payload.
@@ -35,7 +36,7 @@ public class WebRepository<T>(
         var content = new StringContent(
             JsonConvert.SerializeObject(payload), 
             Encoding.UTF8, 
-            "application/json"
+            ContentType
         );
         var response = await client.PostAsync(
             endpoint, 

@@ -236,7 +236,7 @@ public class VectorRepository(
                         batch.Clear();
                         await writer.WriteAsync(batchToWrite, cancellationToken);
                     }
-                    await Task.Yield();
+                    await Task.CompletedTask;
                 }
             );
 
@@ -391,7 +391,7 @@ public class VectorRepository(
                 else _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
 
                 batchesToStore.Add(row);
-                await Task.Yield();
+                await Task.CompletedTask;
             }
         );
     }

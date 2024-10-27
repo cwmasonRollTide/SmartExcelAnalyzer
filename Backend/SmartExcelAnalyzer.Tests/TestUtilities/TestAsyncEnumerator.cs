@@ -15,14 +15,12 @@ public class TestAsyncEnumerator<T>(IEnumerator<T> inner) : IAsyncEnumerator<T>
         }
     }
 
-    public ValueTask<bool> MoveNextAsync()
-    {
-        return new ValueTask<bool>(_inner.MoveNext());
-    }
+    public ValueTask<bool> MoveNextAsync() => new(_inner.MoveNext());
 
     public ValueTask DisposeAsync()
     {
         _inner.Dispose();
+        GC.SuppressFinalize(this);
         return new ValueTask();
     }
 }

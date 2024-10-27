@@ -1,6 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using Moq;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SmartExcelAnalyzer.Tests.TestUtilities;
 

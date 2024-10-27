@@ -86,16 +86,16 @@ public class MongoDatabaseWrapper(
             batch.Add(row);
             if (batch.Count == BatchSize)
             {
-                await Task.Yield();
                 yield return batch;
                 batch = new List<ConcurrentDictionary<string, object>>(BatchSize);
+                await Task.CompletedTask;
             }
         }
         if (batch.Count > 0)
         {
-            await Task.Yield();
             yield return batch;
         }
+        await Task.CompletedTask;
     }
 
     private async Task ConsumeAndStoreBatchesAsync(

@@ -7,9 +7,20 @@ public interface IProgressHubWrapper
     public Task SendProgress(double parseProgress, double saveProgress);
 }
 
-public class ProgressHubWrapper(IHubContext<ProgressHub> hubContext) : IProgressHubWrapper
+public class ProgressHubWrapper(
+    IHubContext<ProgressHub> hubContext
+) : IProgressHubWrapper
 {
-    public async Task SendProgress(double parseProgress, double saveProgress) => await hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
+    private const string SignalRMethod = "ReceiveProgress";
+    public async Task SendProgress(double parseProgress, double saveProgress) => 
+        await hubContext
+            .Clients
+            .All
+            .SendAsync(
+                SignalRMethod, 
+                parseProgress, 
+                saveProgress
+            );
 }
 
 public class ProgressHub(IProgressHubWrapper progressHubWrapper) : Hub
