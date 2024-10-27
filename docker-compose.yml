@@ -1,7 +1,7 @@
 x-healthcheck: &default-healthcheck
   interval: 120s
   timeout: 10s
-  retries: 3
+  retries: 20
   start_period: 40s
 
 services:
@@ -33,6 +33,8 @@ services:
     deploy:
       mode: replicated
       replicas: 3
+    ports:
+      - "8000:8002"
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
@@ -49,9 +51,6 @@ services:
     depends_on:
       - qdrant
       - llm-service
-    environment:
-      - ASPNETCORE_URLS=http://+:80
-      - ASPNETCORE_ENVIRONMENT=Development
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
