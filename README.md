@@ -7,7 +7,7 @@
   - [Introduction](#introduction)
   - [Features](#features)
     - [Detailed Features](#detailed-features)
-  - [Technology Stack](#technology-stack)
+  - [Tech Stack](#tech-stack)
   - [Architecture](#architecture)
   - [Setup and Installation](#setup-and-installation)
   - [Usage](#usage)
@@ -67,7 +67,7 @@ This project aims to transform the way users interact with spreadsheet data by p
   - Provides instant responses to queries.
   - Optimized for quick data processing.
 
-## Technology Stack
+## Tech Stack
 
 - **Backend**:
   - ![C#](https://img.shields.io/badge/CSharp-239120?style=for-the-badge&logo=c-sharp&logoColor=white) [C# 12](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12)

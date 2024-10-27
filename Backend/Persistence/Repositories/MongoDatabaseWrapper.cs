@@ -24,22 +24,18 @@ namespace Persistence.Repositories;
 [Obsolete("This class is not used in the current implementation. It is kept for reference purposes.")]
 [ExcludeFromCodeCoverage]
 public class MongoDatabaseWrapper(
-    IMongoDatabase database,
-    IOptions<DatabaseOptions> options,
-    ILogger<MongoDatabaseWrapper> logger
+    IMongoDatabase _database,
+    IOptions<DatabaseOptions> _options,
+    ILogger<MongoDatabaseWrapper> _logger
 ) : IDatabaseWrapper
 {
     #region Database Options
     private int MaxRetries => _options.Value.MAX_RETRY_COUNT;
     private int BatchSize => _options.Value.SAVE_BATCH_SIZE;
+    private string DocumentsCollection => _options.Value.CollectionName;
+    private string SummariesCollection => _options.Value.CollectionNameTwo;
     #endregion
-
-    #region Dependencies
-    private readonly IMongoDatabase _database = database;
-    private readonly IOptions<DatabaseOptions> _options = options;
-    private readonly ILogger<MongoDatabaseWrapper> _logger = logger;
     private readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
-    #endregion
 
     /// <summary>
     /// StoreVectorsAsync stores the vectors in the database in batches.
@@ -51,35 +47,27 @@ public class MongoDatabaseWrapper(
     public async Task<string?> StoreVectorsAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
         string? docId = default,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var collection = _database.GetCollection<BsonDocument>("documents");
         var documentId = docId ?? ObjectId.GenerateNewId().ToString();
         var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(20) { FullMode = BoundedChannelFullMode.Wait });
         var producerTask = ProduceBatchesAsync(rows, batchChannel.Writer, cancellationToken);
         var consumerTask = ConsumeAndStoreBatchesAsync(batchChannel.Reader, collection, documentId, cancellationToken);
-        await Task.WhenAll(producerTask, consumerTask);
-    
-        // Introduce inconsistency for testing purposes
-        if (new Random().Next(0, 2) == 0)
-        {
-            documentId = ObjectId.GenerateNewId().ToString();
-        }
-    
+        await Task.WhenAll(producerTask, consumerTask);    
         return documentId;
     }
 
     private async Task ProduceBatchesAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
         ChannelWriter<IEnumerable<ConcurrentDictionary<string, object>>> writer,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            await foreach (var batch in CreateBatchesAsync(rows, cancellationToken))
-            {
-                await writer.WriteAsync(batch, cancellationToken);
-            }
+            await foreach (var batch in CreateBatchesAsync(rows, cancellationToken)) await writer.WriteAsync(batch, cancellationToken);
         }
         finally
         {
@@ -89,7 +77,8 @@ public class MongoDatabaseWrapper(
 
     private async IAsyncEnumerable<IEnumerable<ConcurrentDictionary<string, object>>> CreateBatchesAsync(
         IEnumerable<ConcurrentDictionary<string, object>> rows,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         var batch = new List<ConcurrentDictionary<string, object>>(BatchSize);
         foreach (var row in rows)
@@ -114,7 +103,8 @@ public class MongoDatabaseWrapper(
         ChannelReader<IEnumerable<ConcurrentDictionary<string, object>>> reader,
         IMongoCollection<BsonDocument> collection,
         string documentId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var tasks = new List<Task>();
         var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
@@ -146,7 +136,8 @@ public class MongoDatabaseWrapper(
 
     private static (FilterDefinition<BsonDocument> Filter, UpdateDefinition<BsonDocument> Update) CreateBatchUpdate(
         IEnumerable<ConcurrentDictionary<string, object>> batch,
-        string documentId)
+        string documentId
+    )
     {
         var filter = Builders<BsonDocument>.Filter.Eq("_id", documentId);
         var updateBuilder = Builders<BsonDocument>.Update;
@@ -162,7 +153,8 @@ public class MongoDatabaseWrapper(
     private async Task UpdateBatchWithRetryAsync(
         IMongoCollection<BsonDocument> collection,
         (FilterDefinition<BsonDocument> Filter, UpdateDefinition<BsonDocument> Update) batchUpdate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var retryCount = 0;
         while (retryCount < MaxRetries)
@@ -230,7 +222,7 @@ public class MongoDatabaseWrapper(
     /// <returns></returns>
     public async Task<IEnumerable<ConcurrentDictionary<string, object>>> GetRelevantDocumentsAsync(string documentId, float[] queryVector, int topRelevantCount, CancellationToken cancellationToken = default)
     {
-        var collection = _database.GetCollection<BsonDocument>("documents");
+        var collection = _database.GetCollection<BsonDocument>(DocumentsCollection);
         var pipeline = new BsonDocument[]
         {
             new("$match", new BsonDocument("_id", documentId)),
@@ -256,7 +248,7 @@ public class MongoDatabaseWrapper(
     /// <returns></returns>
     public async Task<ConcurrentDictionary<string, object>> GetSummaryAsync(string documentId, CancellationToken cancellationToken = default)
     {
-        var collection = _database.GetCollection<BsonDocument>("summaries");
+        var collection = _database.GetCollection<BsonDocument>(SummariesCollection);
         var filter = Builders<BsonDocument>.Filter.Eq("_id", documentId);
         var result = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
         if (result is null) return new ConcurrentDictionary<string, object>();

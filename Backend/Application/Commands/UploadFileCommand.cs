@@ -72,15 +72,17 @@ public class UploadFileCommandHandler(
                         cancellationToken: cancellationToken
                     )
         );
-
-        var summarizedExcelData = await PrepareExcelFileAsync(request.File!, progress, cancellationToken);
+        var summarizedExcelData = await PrepareExcelFileAsync(
+            file: request.File!, 
+            progress: progress, 
+            cancellationToken: cancellationToken
+        );
         if (summarizedExcelData is null) return null;
-        
         return await SaveToVectorDatabaseAsync(
-            summarizedExcelData, 
-            request.File!.FileName, 
-            progress, 
-            cancellationToken
+            data: summarizedExcelData, 
+            fileName: request.File!.FileName, 
+            progress: progress, 
+            cancellationToken: cancellationToken
         );
     }
 
@@ -93,16 +95,13 @@ public class UploadFileCommandHandler(
         _logger.LogTrace(LogPreparingExcelFile, file.FileName);
         var stopwatch = Now;
         var summarizedExcelData = await _excelService.PrepareExcelFileForLLMAsync(
-            file, 
-            progress, 
-            cancellationToken
+            file: file, 
+            progress: progress, 
+            cancellationToken: cancellationToken
         );
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
-
-        if (summarizedExcelData is null)
-            _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
-
+        if (summarizedExcelData is null) _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
         return summarizedExcelData;
     }
 
@@ -110,7 +109,7 @@ public class UploadFileCommandHandler(
         SummarizedExcelData data, 
         string fileName, 
         IProgress<(double, double)> progress, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _logger.LogTrace(LogSavingDocument, fileName);

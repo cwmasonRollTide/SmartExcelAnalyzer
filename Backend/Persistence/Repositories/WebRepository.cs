@@ -1,13 +1,13 @@
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Persistence.Repositories.API;
+namespace Persistence.Repositories;
 
 public interface IWebRepository<T>
 {
     Task<T> PostAsync(
-        string endpoint, 
-        object payload, 
+        string endpoint,
+        object payload,
         CancellationToken cancellationToken = default
     );
 }
@@ -23,8 +23,8 @@ public class WebRepository<T>(IHttpClientFactory httpClientFactory) : IWebReposi
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<T> PostAsync(
-        string endpoint, 
-        object payload, 
+        string endpoint,
+        object payload,
         CancellationToken cancellationToken = default
     )
     {

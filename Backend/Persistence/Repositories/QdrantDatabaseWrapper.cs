@@ -28,8 +28,8 @@ public class QdrantDatabaseWrapper(
     private static Random Random => new();
     private static byte[] RandomBytes => new byte[4];
     private int BatchSize => options.Value.SAVE_BATCH_SIZE;
-    private string CollectionName => options.Value.CollectionName;
     private readonly Vectors _dummyVector = new(new float[] { 0.0f });
+    private string DocumentCollectionName => options.Value.CollectionName;
     private string SummaryCollectionName => options.Value.CollectionNameTwo;
     private int MaxDegreeOfParallelism => options.Value.MAX_CONNECTION_COUNT;    
     #endregion
@@ -52,10 +52,8 @@ public class QdrantDatabaseWrapper(
         _logger.LogInformation("Starting StoreVectorsAsync with {RowCount} rows", rows.Count());
         documentId ??= NewDocumentId();
         _logger.LogInformation("Document ID: {DocumentId}", documentId);
-
         var points = await CreateRowsInParallelAsync(documentId, rows, cancellationToken);
         _logger.LogInformation("Created {PointCount} points", points.Count());
-
         if (points.Any()) 
         {
             try 
@@ -126,7 +124,7 @@ public class QdrantDatabaseWrapper(
     )
     {
         var searchResult = await _client.SearchAsync(// Native Qdrant Vector Search
-            collectionName: CollectionName,
+            collectionName: DocumentCollectionName,
             vector: queryVector.AsMemory(),// Our Query as a vector interpreted by the LLM
             filter: MatchKeyword("document_id", documentId), // On our specific excel file
             limit: (ulong)topRelevantCount, // Number of results the user is interested in
@@ -206,7 +204,10 @@ public class QdrantDatabaseWrapper(
         return point;
     }
 
-    private async Task InsertRowsInBatchesAsync(IEnumerable<PointStruct> points, CancellationToken cancellationToken = default)
+    private async Task InsertRowsInBatchesAsync(
+        IEnumerable<PointStruct> points, 
+        CancellationToken cancellationToken = default
+    )
     {
         int totalInserted = 0;
         foreach (var batch in points.Chunk(BatchSize))
@@ -215,7 +216,7 @@ public class QdrantDatabaseWrapper(
             {
                 await _client.UpsertAsync(
                     points: batch,
-                    collectionName: CollectionName, 
+                    collectionName: DocumentCollectionName, 
                     cancellationToken: cancellationToken
                 );
                 totalInserted += batch.Length;

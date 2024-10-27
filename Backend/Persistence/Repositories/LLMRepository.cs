@@ -1,8 +1,7 @@
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
-using Persistence.Repositories.API;
-using Domain.Persistence.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 

@@ -3,12 +3,12 @@ using Application.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Builder;
-using Persistence.Repositories.API;
 using Domain.Persistence.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ConfigurationExtensions = API.Extensions.ConfigurationExtensions;
 using Domain.Persistence.DTOs;
+using Persistence.Repositories;
 
 namespace SmartExcelAnalyzer.Tests.API.Extensions;
 

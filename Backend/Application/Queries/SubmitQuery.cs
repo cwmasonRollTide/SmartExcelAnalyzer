@@ -89,12 +89,11 @@ public class SubmitQueryHandler(
             question: request.Query, 
             cancellationToken
         );
-        if (result is null)
-            _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
+        if (result is null) _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
         return result;
     }
 
-    private static bool ShouldEnrichResponse(int? relevantRowsCount) => relevantRowsCount.HasValue && relevantRowsCount > 10;
+    private static bool ShouldEnrichResponse(int? relevantRowsCount) => relevantRowsCount.HasValue;
 
     private async Task EnrichWithRelevantRowsAsync(
         SubmitQuery request, 
@@ -104,10 +103,8 @@ public class SubmitQueryHandler(
     {
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
         if (embedding is null) return;
-
         var vectorResponse = await QueryVectorDbAsync(request, embedding, cancellationToken);
-        if (vectorResponse is not null)
-            result.RelevantRows = vectorResponse.Rows!;
+        if (vectorResponse is not null) result.RelevantRows = vectorResponse.Rows!;
     }
 
     private async Task<SummarizedExcelData?> QueryVectorDbAsync(

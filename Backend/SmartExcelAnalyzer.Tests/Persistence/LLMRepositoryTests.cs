@@ -2,7 +2,6 @@ using Moq;
 using FluentAssertions;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
-using Persistence.Repositories.API;
 using Microsoft.Extensions.Options;
 using Domain.Persistence.Configuration;
 
