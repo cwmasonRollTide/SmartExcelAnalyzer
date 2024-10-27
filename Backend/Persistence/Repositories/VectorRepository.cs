@@ -85,7 +85,7 @@ public class VectorRepository(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<string?> SaveDocumentAsync(
-        SummarizedExcelData vectorSpreadsheetData, 
+        SummarizedExcelData? vectorSpreadsheetData = null, 
         IProgress<(double, double)>? progress = null, 
         CancellationToken cancellationToken = default
     )
@@ -101,7 +101,7 @@ public class VectorRepository(
             progress, 
             cancellationToken
         );
-        if (documentId is null)
+        if (string.IsNullOrWhiteSpace(documentId))
         {
             _logger.LogWarning(LOG_FAIL_SAVE_VECTORS);
             return null!;
@@ -135,7 +135,7 @@ public class VectorRepository(
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrEmpty(documentId))
+        if (string.IsNullOrWhiteSpace(documentId))
         {
             _logger.LogWarning(LOG_NULL_DOCUMENT_ID);
             return null!;
@@ -148,7 +148,12 @@ public class VectorRepository(
         _logger.LogInformation(LOG_START_QUERY, documentId);
         try
         {
-            var relevantDocuments = await _database.GetRelevantDocumentsAsync(documentId, queryVector, topRelevantCount, cancellationToken);
+            var relevantDocuments = await _database.GetRelevantDocumentsAsync(
+                documentId, 
+                queryVector, 
+                topRelevantCount, 
+                cancellationToken
+            );
             if (relevantDocuments is null || !relevantDocuments.Any())
             {
                 _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
@@ -192,7 +197,7 @@ public class VectorRepository(
     private async Task<string> SaveDocumentDataAsync(
         ConcurrentBag<ConcurrentDictionary<string, object>> rows, 
         IProgress<(double, double)>? progress, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Environment.ProcessorCount - 4)
@@ -204,9 +209,26 @@ public class VectorRepository(
             FullMode = BoundedChannelFullMode.Wait
         });
         var totalRows = rows.Count;
-        var createBatchesTask = CreateBatchesAsync(rows, batchChannel.Writer, progress, totalRows, cancellationToken);
-        var computeEmbeddingsTask = ComputeEmbeddingsAsync(batchChannel.Reader, embeddingChannel.Writer, progress, totalRows, cancellationToken);
-        var storeEmbeddingsTask = StoreEmbeddingsAsync(embeddingChannel.Reader, progress, totalRows, cancellationToken);
+        var createBatchesTask = CreateBatchesAsync(
+            rows, 
+            batchChannel.Writer, 
+            progress, 
+            totalRows, 
+            cancellationToken
+        );
+        var computeEmbeddingsTask = ComputeEmbeddingsAsync(
+            batchChannel.Reader, 
+            embeddingChannel.Writer, 
+            progress, 
+            totalRows, 
+            cancellationToken
+        );
+        var storeEmbeddingsTask = StoreEmbeddingsAsync(
+            embeddingChannel.Reader, 
+            progress, 
+            totalRows, 
+            cancellationToken
+        );
         await createBatchesTask;
         await computeEmbeddingsTask;
         return await storeEmbeddingsTask;
@@ -277,7 +299,12 @@ public class VectorRepository(
             {
                 _logger.LogInformation(LOG_START_COMPUTE, batch.Count());
                 var stopwatch = Now;
-                var embeddings = await _llmRepository.ComputeBatchEmbeddings(batch.Select(row => JsonSerializer.Serialize(row, serializerOptions)), cancellationToken);
+                var embeddings = await _llmRepository.ComputeBatchEmbeddings(
+                    batch.Select(
+                        row => JsonSerializer.Serialize(row, serializerOptions)
+                    ),
+                    cancellationToken
+                );
                 stopwatch.Stop();
                 _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
                 if (embeddings is not null)
@@ -359,8 +386,17 @@ public class VectorRepository(
         {
             cancellationToken.ThrowIfCancellationRequested();
             var batchesToStore = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-            await ProcessBatchAsync(message.Embeddings, message.Batch, batchesToStore, cancellationToken);
-            documentId = await SaveBatchOfRowEmbeddings(documentId, batchesToStore, cancellationToken);
+            await ProcessBatchAsync(
+                message.Embeddings, 
+                message.Batch, 
+                batchesToStore, 
+                cancellationToken
+            );
+            documentId = await SaveBatchOfRowEmbeddings(
+                documentId, 
+                batchesToStore, 
+                cancellationToken
+            );
             processedRows += message.Batch.Count();
             progress?.Report((1, processedRows / (double)totalRows));
             return documentId;
@@ -406,7 +442,11 @@ public class VectorRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var batchDocumentId = await _database.StoreVectorsAsync(batchOfRowsToSave, documentId, cancellationToken);
+        var batchDocumentId = await _database.StoreVectorsAsync(
+            batchOfRowsToSave, 
+            documentId, 
+            cancellationToken
+        );
         if (batchDocumentId is null)
         {
             _logger.LogWarning(LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT, documentId);

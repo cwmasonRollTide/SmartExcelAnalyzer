@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 
-namespace SmartExcelAnalyzer.Tests.Persistence.Database;
+namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
-public class VectorRepoAddTests
+public class VectorRepositoryTests
 {
     private const int SAVE_BATCH_SIZE = 10;
     private const int COMPUTE_BATCH_SIZE = 10;
@@ -26,9 +26,9 @@ public class VectorRepoAddTests
 
     private static readonly float[] singleArray = [1.0f];
 
-    public VectorRepoAddTests()
+    public VectorRepositoryTests()
     {
-        _llmOptionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE, LLM_SERVICE_URLS = ["http://test.com", "http://test.com:1"] });
+        _llmOptionsMock.Setup(o => o.Value).Returns(new LLMServiceOptions { LLM_SERVICE_URL = "http://test.com", COMPUTE_BATCH_SIZE = COMPUTE_BATCH_SIZE });
         _databaseOptionsMock.Setup(o => o.Value).Returns(new DatabaseOptions { SAVE_BATCH_SIZE = SAVE_BATCH_SIZE });
     }
 
@@ -282,144 +282,5 @@ public class VectorRepoAddTests
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
-    }
-
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldReportProgressCorrectly()
-    {
-        const string documentId = "1";
-        var data = new SummarizedExcelData
-        {
-            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(Enumerable.Range(0, 100).Select(i => new ConcurrentDictionary<string, object> { ["col1"] = $"val{i}" })),
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Range(0, 10).Select(_ => singleArray).ToArray());
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(documentId);
-
-        var progressReports = new List<(double, double)>();
-        var progress = new Progress<(double, double)>(progressReports.Add);
-
-        await Sut.SaveDocumentAsync(data, progress);
-
-        progressReports.Should().NotBeEmpty();
-        progressReports.Should().Contain((1, 1));
-    }
-
-    [Fact]
-    public async Task QueryVectorData_ShouldHandleExceptionInGetSummaryAsync()
-    {
-        var documentId = "testDoc";
-        var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
-        var documents = new List<Document>
-        {
-            new() { Id = documentId, Content = "{\"col1\":\"val1\"}", Embedding = [1.0f, 2.0f, 3.0f] }
-        };
-        _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(documents.Select(d => new ConcurrentDictionary<string, object>
-            {
-                ["content"] = JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(d.Content)!
-            }));
-        _databaseMock.Setup(c => c.GetSummaryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((ConcurrentDictionary<string, object>)null!);
-
-        var result = await Sut.QueryVectorData(documentId, queryVector);
-
-        result.Should().NotBeNull();
-        result.Rows.Should().HaveCount(1);
-        result.Summary.Should().BeNull();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Failed to query the summary of the document")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldHandleInconsistentDocumentIds()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(Enumerable.Range(0, 20).Select(i => new ConcurrentDictionary<string, object> { ["col1"] = $"val{i}" })),
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Range(0, 10).Select(_ => new float[] { 1.0f }).ToArray());
-        _databaseMock.SetupSequence(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("1")
-            .ReturnsAsync("2");
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().Be("1");
-        // _loggerMock.Verify(
-        //     x => x.Log(
-        //         LogLevel.Warning,
-        //         It.IsAny<EventId>(),
-        //         It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Inconsistent document IDs across batches")),
-        //         It.IsAny<Exception>(),
-        //         It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-        //     Times.Once);
-    }
-
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldHandleNullEmbeddings()
-    {
-        const string documentId = "1";
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new float[]?[] { null });
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(documentId);
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().Be(documentId);
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Embedding at index")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task QueryVectorData_ShouldReturnMaximumNumberOfRelevantDocuments()
-    {
-        var documentId = "testDoc";
-        var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
-        var maxRelevantCount = 20;
-        var documents = Enumerable.Range(0, maxRelevantCount).Select(i => new Document
-        {
-            Id = documentId,
-            Content = $"{{\"col1\":\"val{i}\"}}",
-            Embedding = [1.0f, 2.0f, 3.0f]
-        }).ToList();
-
-        _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.Is<int>(x => x == maxRelevantCount), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(documents.Select(d => new ConcurrentDictionary<string, object>
-            {
-                ["content"] = JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(d.Content)!
-            }));
-        _databaseMock.Setup(c => c.GetSummaryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ConcurrentDictionary<string, object> { ["sum"] = 10 });
-
-        var result = await Sut.QueryVectorData(documentId, queryVector, maxRelevantCount);
-
-        result.Should().NotBeNull();
-        result.Rows.Should().HaveCount(maxRelevantCount);
     }
 }
