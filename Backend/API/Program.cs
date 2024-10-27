@@ -12,7 +12,7 @@ public class Program
 
     public static WebApplication ConfigureSmartExcelAnalyzer() => 
         WebApplication.CreateBuilder()
-        .ConfigureEnvironmentVariables()
+        .AddOurEnvironmentVariables()
         .ConfigureLogging()
         .ConfigureMediatR()
         .ConfigureSwagger()

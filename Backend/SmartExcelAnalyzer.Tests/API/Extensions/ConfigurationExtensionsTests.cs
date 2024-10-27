@@ -14,7 +14,7 @@ public class ConfigurationExtensionsTests
     {
         var builder = WebApplication.CreateBuilder();
 
-        var exception = Record.Exception(() => builder.ConfigureEnvironmentVariables());
+        var exception = Record.Exception(() => builder.AddOurEnvironmentVariables());
         exception.Should().BeNull();
     }
 

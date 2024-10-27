@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Domain.Persistence.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ConfigurationExtensions = API.Extensions.ConfigurationExtensions;
+using ProgramExtensions = API.Extensions.ProgramExtensions;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 
@@ -18,7 +18,7 @@ public class ProgramExtensionsTests
     public void ConfigureEnvironmentVariables_ShouldAddEnvironmentVariables()
     {
         var builder = WebApplication.CreateBuilder();
-        builder = ConfigurationExtensions.ConfigureEnvironmentVariables(builder);
+        builder = ProgramExtensions.AddOurEnvironmentVariables(builder);
 
         builder.Configuration["LLMServiceOptions:LLM_SERVICE_URL"].Should().NotBeNullOrEmpty();
     }
@@ -27,7 +27,7 @@ public class ProgramExtensionsTests
     public void ConfigureLogging_ShouldConfigureLogging()
     {
         var builder = WebApplication.CreateBuilder();
-        builder = ConfigurationExtensions.ConfigureLogging(builder);
+        builder = ProgramExtensions.ConfigureLogging(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
@@ -39,7 +39,7 @@ public class ProgramExtensionsTests
     public void ConfigureHttpClient_ShouldAddHttpClient()
     {
         var builder = WebApplication.CreateBuilder();
-        builder = ConfigurationExtensions.ConfigureHttpClient(builder);
+        builder = ProgramExtensions.ConfigureHttpClient(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
@@ -66,7 +66,7 @@ public class ProgramExtensionsTests
             .Build();
 
         builder.Configuration.AddConfiguration(configuration);
-        builder = ConfigurationExtensions.ConfigureDatabase(builder);
+        builder = ProgramExtensions.ConfigureDatabase(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var options = serviceProvider.GetService<IOptions<DatabaseOptions>>();
@@ -96,7 +96,7 @@ public class ProgramExtensionsTests
             .Build();
 
         builder.Configuration.AddConfiguration(configuration);
-        builder = ConfigurationExtensions.ConfigureLLMService(builder);
+        builder = ProgramExtensions.ConfigureLLMService(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var options = serviceProvider.GetService<IOptions<LLMServiceOptions>>();
@@ -112,7 +112,7 @@ public class ProgramExtensionsTests
     public void ConfigureMediatR_ShouldConfigureMediatR()
     {
         var builder = WebApplication.CreateBuilder();
-        builder = ConfigurationExtensions.ConfigureMediatR(builder);
+        builder = ProgramExtensions.ConfigureMediatR(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var mediator = serviceProvider.GetService<MediatR.IMediator>();
@@ -125,7 +125,7 @@ public class ProgramExtensionsTests
     {
         var builder = WebApplication.CreateBuilder();
         builder.Services.AddHttpClient();
-        builder = ConfigurationExtensions.ConfigureServices(builder);
+        builder = ProgramExtensions.ConfigureServices(builder);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
         var excelFileService = serviceProvider.GetService<IExcelFileService>();

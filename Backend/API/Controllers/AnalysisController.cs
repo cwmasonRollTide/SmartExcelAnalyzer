@@ -32,8 +32,8 @@ public class AnalysisController(
     /// </returns>
     [HttpPost("query")]
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery query) => Ok(await _mediator.Send(query));
 
     /// <summary>
@@ -47,8 +47,8 @@ public class AnalysisController(
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile([FromForm] IFormFile file) => 
         Ok(await _mediator.Send(
             new UploadFileCommand
@@ -57,8 +57,15 @@ public class AnalysisController(
                 Progress = new Progress<(double, double)>(
                     async progressTuple =>
                     {
-                        var (parseProgress, saveProgress) = progressTuple;
-                        await _hubContext.Clients.All.SendAsync("ReceiveProgress", parseProgress, saveProgress);
+                        var ( parseProgress, saveProgress ) = progressTuple;
+                        await _hubContext
+                            .Clients
+                            .All
+                            .SendAsync(
+                                "ReceiveProgress", 
+                                parseProgress, 
+                                saveProgress
+                            );
                     }
                 )
             }

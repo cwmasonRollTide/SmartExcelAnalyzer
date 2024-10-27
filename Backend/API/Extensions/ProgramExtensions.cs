@@ -10,15 +10,14 @@ using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
-using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace API.Extensions;
 
-public static class ConfigurationExtensions
+public static class ProgramExtensions
 {
-    public static WebApplicationBuilder ConfigureEnvironmentVariables(this WebApplicationBuilder? builder)
+    public static WebApplicationBuilder AddOurEnvironmentVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
         builder.Configuration.AddEnvironmentVariables();
@@ -122,7 +121,6 @@ public static class ConfigurationExtensions
         return builder;
     }
 
-    [ExcludeFromCodeCoverage]
     public static WebApplicationBuilder ConfigureSwagger(this WebApplicationBuilder builder)
     {
         builder.Services.AddSwaggerGen(c =>
@@ -133,7 +131,6 @@ public static class ConfigurationExtensions
         return builder;
     }
 
-    [ExcludeFromCodeCoverage]
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
         if (app.Environment.IsDevelopment()) app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
@@ -146,17 +143,21 @@ public static class ConfigurationExtensions
         return app;
     }
 
-    [ExcludeFromCodeCoverage]
     public static WebApplication ConfigureProgressHub(this WebApplication app)
     {
         app.MapHub<ProgressHub>("/progressHub");
 
         app.UseCors(builder =>
         {
-            builder.WithOrigins("http://localhost:3000")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .AllowCredentials();
+            var frontendUrl = app.Configuration["FrontendUrl"];
+            var frontendUrlString = frontendUrl?.ToString();
+            if (!string.IsNullOrEmpty(frontendUrlString))
+            {
+                builder.WithOrigins(frontendUrlString)
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+            }
         });
 
         return app;
