@@ -192,12 +192,12 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 **Response:**
 
-  ```json
+  ```csharp
   {
-    "isIndexing": true,
-    "indexedDocumentCount": 10,
-    "totalDocumentCount": 100,
-    "error": null
+    IsIndexing: true,
+    IndexingDocumentNbr: 10,
+    TotalDocumentCount: 100,
+    Error: string?
   }
   ```
 
