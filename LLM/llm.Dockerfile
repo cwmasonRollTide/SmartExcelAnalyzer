@@ -19,4 +19,6 @@ RUN python -c "from transformers import AutoTokenizer, AutoModel, pipeline; \
 
 COPY . .
 
-EXPOSE ${PORT}
+EXPOSE 8000
+
+CMD ["uvicorn", "llm:app", "--host", "0.0.0.0", "--port", "8000"]

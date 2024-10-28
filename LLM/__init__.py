@@ -1,1 +1,1 @@
-from .main import app, compute_embedding
+from .main import app, compute_embedding, compute_batch_embedding, health, process_query
