@@ -57,7 +57,7 @@ public class UploadFileCommandHandler(
     /// </returns>
     public async Task<string?> Handle(
         UploadFileCommand request, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         var progress = new Progress<(double, double)>(
@@ -89,7 +89,7 @@ public class UploadFileCommandHandler(
     private async Task<SummarizedExcelData?> PrepareExcelFileAsync(
         IFormFile file, 
         IProgress<(double, double)> progress, 
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _logger.LogTrace(LogPreparingExcelFile, file.FileName);

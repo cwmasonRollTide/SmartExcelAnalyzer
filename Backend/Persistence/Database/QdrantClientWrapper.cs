@@ -35,7 +35,9 @@ public interface IQdrantClient
 }
 
 [ExcludeFromCodeCoverage]
-public class QdrantClientWrapper(QdrantClient client) : IQdrantClient
+public class QdrantClientWrapper(
+    QdrantClient client
+) : IQdrantClient
 {
     private readonly QdrantClient _client = client;
 

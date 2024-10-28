@@ -22,6 +22,7 @@ public static class ProgramExtensions
     {
         builder ??= WebApplication.CreateBuilder();
         builder.Configuration.AddEnvironmentVariables();
+        // TODO: KEYVAULT when in Azure
         builder!.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
         return builder;
@@ -29,6 +30,7 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
+        // TODO: APP INSIGHTS when in Azure
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         builder.Logging.ClearProviders();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
@@ -51,11 +53,11 @@ public static class ProgramExtensions
     public static WebApplicationBuilder ConfigureApiAccess(this WebApplicationBuilder builder)
     {
         builder.Services.AddSignalR();
-        builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
-        builder.Services.AddScoped<BaseController>();
-        builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddHealthChecks();
+        builder.Services.AddScoped<BaseController>();
         var frontendUrl = builder.Configuration["FrontendUrl"];
+        builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
+        builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
@@ -88,7 +90,14 @@ public static class ProgramExtensions
             .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
         var options = databaseOptions.Get<DatabaseOptions>();
-        builder.Services.AddSingleton(sp => new QdrantClient(options!.HOST, options!.PORT, options!.USE_HTTPS, options!.QDRANT_API_KEY, grpcTimeout: TimeSpan.FromMinutes(30)));
+        builder.Services.AddSingleton(sp => new QdrantClient(
+            options!.HOST, 
+            options!.PORT, 
+            options!.USE_HTTPS, 
+            options!.QDRANT_API_KEY, 
+            grpcTimeout: TimeSpan.FromMinutes(30)
+            )
+        );
         builder.Services.AddSingleton<IQdrantClient, QdrantClientWrapper>();
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
         builder.Services.AddScoped<IVectorDbRepository, VectorRepository>();
@@ -99,7 +108,8 @@ public static class ProgramExtensions
     {
         builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMLoadBalancer>();
         builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
-        builder.Services.AddOptions<LLMServiceOptions>()
+        builder.Services
+            .AddOptions<LLMServiceOptions>()
             .Validate(options => options.LLM_SERVICE_URLS.Count > 0, "LLM_SERVICE_URLS must be set.")
             .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
         builder.Services.AddScoped<ILLMRepository, LLMRepository>();
@@ -160,7 +170,6 @@ public static class ProgramExtensions
                        .AllowCredentials();
             }
         });
-
         return app;
     }
 }

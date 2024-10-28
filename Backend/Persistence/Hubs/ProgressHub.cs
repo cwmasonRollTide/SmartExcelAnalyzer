@@ -23,7 +23,10 @@ public class ProgressHubWrapper(
             );
 }
 
-public class ProgressHub(IProgressHubWrapper progressHubWrapper) : Hub
+public class ProgressHub(
+    IProgressHubWrapper progressHubWrapper
+) : Hub
 {
-    public async Task SendProgress(double parseProgress, double saveProgress) => await progressHubWrapper.SendProgress(parseProgress, saveProgress);
+    public async Task SendProgress(double parseProgress, double saveProgress) => 
+        await progressHubWrapper.SendProgress(parseProgress, saveProgress);
 }

@@ -1,7 +1,7 @@
 x-healthcheck: &default-healthcheck
   interval: 120s
   timeout: 10s
-  retries: 20
+  retries: 200
   start_period: 40s
 
 services:
@@ -21,15 +21,6 @@ services:
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
-    env_file:
-      - .env
-    environment:
-      - QDRANT_PORT=6333
-      - QDRANT_HOST=qdrant
-      - QDRANT_USE_HTTPS=false
-      - TEXT_GENERATION_MODEL=facebook/bart-large-cnn
-      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - QDRANT_API_KEY=${QDRANT_API_KEY}
     deploy:
       mode: replicated
       replicas: 3
@@ -48,7 +39,6 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     depends_on:
       - qdrant
-      - llm-service
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -60,3 +50,4 @@ services:
 volumes:
   model_cache:
   qdrant_data:
+  llm_cache:
