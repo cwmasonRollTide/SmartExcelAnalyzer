@@ -285,6 +285,35 @@ public class VectorRepoAddTests
     }
 
     [Fact]
+    public async Task SaveDocumentAsync_ShouldHandle_GeneralException()
+    {
+        var data = new SummarizedExcelData
+        {
+            Rows =
+            [
+                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
+            ],
+            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
+        };
+        var cts = new CancellationTokenSource();
+        _databaseMock
+            .Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        var result = await Sut.SaveDocumentAsync(data, cancellationToken: cts.Token);
+
+        result.Should().BeNullOrEmpty();
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Exactly(1));
+    }
+
+    [Fact]
     public async Task SaveDocumentAsync_ShouldReportProgressCorrectly()
     {
         const string documentId = "1";
@@ -409,7 +438,8 @@ public class VectorRepoAddTests
             Embedding = [1.0f, 2.0f, 3.0f]
         }).ToList();
 
-        _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.Is<int>(x => x == maxRelevantCount), It.IsAny<CancellationToken>()))
+        _databaseMock
+            .Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.Is<int>(x => x == maxRelevantCount), It.IsAny<CancellationToken>()))
             .ReturnsAsync(documents.Select(d => new ConcurrentDictionary<string, object>
             {
                 ["content"] = JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(d.Content)!
