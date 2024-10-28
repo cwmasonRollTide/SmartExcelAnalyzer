@@ -2,6 +2,93 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Attach",
+            "type": "python",
+            "request": "attach",
+            "port": 5678,
+            "host": "localhost"
+        },
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "enter-your-module-name-here",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Django",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "--noreload"
+            ],
+            "django": true
+        },
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "${workspaceFolder}/app.py",
+                "FLASK_ENV": "development"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Python: Pyramid",
+            "type": "python",
+            "request": "launch",
+            "module": "pserve",
+            "args": [
+                "${workspaceFolder}/development.ini"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Python: Watson",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/watson.py",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Python: Watson (external)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/watson.py",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Python: Watson (integrated terminal)",
+            "type": "python",
+            "request": "launch",
+        },
+        {
             "name": "Attach to Python Functions",
             "type": "debugpy",
             "request": "attach",
