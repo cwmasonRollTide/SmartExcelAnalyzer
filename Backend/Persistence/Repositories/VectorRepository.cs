@@ -18,7 +18,7 @@ public interface IVectorDbRepository
         CancellationToken cancellationToken = default
     );
 
-    Task<SummarizedExcelData> QueryVectorData(
+    Task<SummarizedExcelData> QueryVectorDataAsync(
         string documentId, 
         float[] queryVector, 
         int topRelevantCount = 10, 
@@ -128,7 +128,7 @@ public class VectorRepository(
     /// <param name="topRelevantCount"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<SummarizedExcelData> QueryVectorData(
+    public async Task<SummarizedExcelData> QueryVectorDataAsync(
         string documentId, 
         float[] queryVector, 
         int topRelevantCount = 10, 

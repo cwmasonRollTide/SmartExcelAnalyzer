@@ -14,7 +14,7 @@ public class ConfigurationExtensionsTests
     {
         var builder = WebApplication.CreateBuilder();
 
-        var exception = Record.Exception(() => builder.AddOurEnvironmentVariables());
+        var exception = Record.Exception(() => builder.AddSmartExcelFileAnalyzerVariables());
         exception.Should().BeNull();
     }
 

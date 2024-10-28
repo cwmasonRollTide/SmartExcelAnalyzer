@@ -18,7 +18,7 @@ public class ProgramExtensionsTests
     public void ConfigureEnvironmentVariables_ShouldAddEnvironmentVariables()
     {
         var builder = WebApplication.CreateBuilder();
-        builder = ProgramExtensions.AddOurEnvironmentVariables(builder);
+        builder = ProgramExtensions.AddSmartExcelFileAnalyzerVariables(builder);
 
         builder.Configuration["LLMServiceOptions:LLM_SERVICE_URL"].Should().NotBeNullOrEmpty();
     }

@@ -1,37 +1,16 @@
 using Moq;
 using Persistence.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
-
-public class ProgressHubTestsTest
-{
-    private ProgressHub Sut => new(_hubContextMock.Object);
-    private readonly Mock<IProgressHubWrapper> _hubContextMock = new();
-
-    public ProgressHubTestsTest()
-    {
-        _hubContextMock
-            .Setup(h => h.SendProgress(It.IsAny<double>(), It.IsAny<double>()))
-            .Returns(Task.CompletedTask);
-    }
-
-    [Fact]
-    public async Task SendProgressUpdate_ShouldInvokeClientMethod()
-    {
-        var progress = 50;
-
-        await Sut.SendProgress(progress, progress);
-
-        _hubContextMock.Verify(h => h.SendProgress(progress, progress), Times.Once);
-    }
-}
 
 public class ProgressHubWrapperTests
 {
     private readonly Mock<IClientProxy> _clientProxyMock = new();
+    private readonly Mock<ILogger<ProgressHub>> _loggerMock = new();
     private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
-    private ProgressHubWrapper Sut => new(_hubContextMock.Object);
+    private ProgressHub Sut => new(_loggerMock.Object, _hubContextMock.Object);
 
     public ProgressHubWrapperTests()
     {
@@ -51,16 +30,17 @@ public class ProgressHubWrapperTests
     public async Task SendProgressUpdate_ShouldInvokeClientMethod()
     {
         var progress = 50;
+        var total = 100;
 
-        await Sut.SendProgress(progress, progress);
+        await Sut.SendProgress(progress, total);
 
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
-                It.Is<object[]>(args => 
-                    args.Length == 2 && 
-                    (double)args[0] == progress && 
-                    (double)args[1] == progress),
+                It.Is<object[]>(args =>
+                    args.Length == 2 &&
+                    (double)args[0] == progress &&
+                    (double)args[1] == total),
                 It.IsAny<CancellationToken>()),
             Times.Once
         );

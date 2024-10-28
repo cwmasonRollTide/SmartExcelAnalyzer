@@ -103,18 +103,18 @@ public class SubmitQueryHandler(
     {
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
         if (embedding is null) return;
-        var vectorResponse = await QueryVectorDbAsync(request, embedding, cancellationToken);
+        var vectorResponse = await QueryVectorDatabaseAsync(request, embedding, cancellationToken);
         if (vectorResponse is not null) result.RelevantRows = vectorResponse.Rows!;
     }
 
-    private async Task<SummarizedExcelData?> QueryVectorDbAsync(
+    private async Task<SummarizedExcelData?> QueryVectorDatabaseAsync(
         SubmitQuery request, 
         float[] embedding, 
         CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation(LogQueryingVectorDb, request.Query, request.DocumentId);
-        var vectorResponse = await _vectorDbRepository.QueryVectorData(
+        var vectorResponse = await _vectorDbRepository.QueryVectorDataAsync(
             queryVector: embedding,
             documentId: request.DocumentId,
             cancellationToken: cancellationToken,

@@ -137,7 +137,7 @@ public class SubmitQueryTests
                 .Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync([1.0f, 2.0f, 3.0f]);
             _vectorDbRepositoryMock
-                .Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))!
+                .Setup(x => x.QueryVectorDataAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))!
                 .ReturnsAsync((SummarizedExcelData?)null);
 
             var result = await Sut.Handle(query, CancellationToken.None);
@@ -168,7 +168,7 @@ public class SubmitQueryTests
                 .Setup(x => x.ComputeEmbedding(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync([1.0f, 2.0f, 3.0f]);
             _vectorDbRepositoryMock
-                .Setup(x => x.QueryVectorData(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.QueryVectorDataAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SummarizedExcelData { Rows = expectedRelevantRows });
 
             var result = await Sut.Handle(query, CancellationToken.None);

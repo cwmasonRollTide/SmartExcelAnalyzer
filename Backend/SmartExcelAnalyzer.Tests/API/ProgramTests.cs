@@ -83,10 +83,8 @@ public class ProgramTests(CustomWebApplicationFactory _factory) : IClassFixture<
     {
         var services = _factory.Services;
         var configuration = services.GetService<IConfiguration>();
-
         configuration.Should().NotBeNull();
-        configuration!["LLMServiceOptions:LLM_SERVICE_URL"].Should().NotBeNullOrEmpty();
-        configuration["DatabaseOptions:QDRANT_HOST"].Should().NotBeNullOrEmpty();
+        configuration!["DatabaseOptions:QDRANT_HOST"].Should().NotBeNullOrEmpty();
         configuration["DatabaseOptions:QDRANT_PORT"].Should().NotBeNullOrEmpty();
         configuration["DatabaseOptions:HOST"].Should().NotBeNullOrEmpty();
     }

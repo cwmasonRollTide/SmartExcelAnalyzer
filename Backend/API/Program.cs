@@ -5,7 +5,7 @@ namespace API;
 public class Program
 {
     public static void Main(string[] _) => WebApplication.CreateBuilder()
-        .AddOurEnvironmentVariables()
+        .AddSmartExcelFileAnalyzerVariables()
         .ConfigureLogging()
         .ConfigureMediatR()
         .ConfigureSwagger()

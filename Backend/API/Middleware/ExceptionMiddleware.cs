@@ -8,7 +8,14 @@ public class ExceptionMiddleware(
     ILogger<ExceptionMiddleware> _logger
 )
 {
-    private const string ContentType = "application/json";
+    private const string CONTENT_TYPE = "application/json";
+    private const string TASK_CANCELED = "A task was canceled.";
+    private const string TIMEOUT_EXCEPTION = "A timeout occurred.";
+    private const string OPERATION_CANCELED = "An operation was canceled.";
+    private const string HTTP_EXCEPTION = "An HTTP request exception occurred.";
+    private const string UNHANDLED_EXCEPTION = "An unhandled exception occurred.";
+    private const string VALIDATION_EXCEPTION = "A validation exception occurred.";    
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -17,32 +24,32 @@ public class ExceptionMiddleware(
         }
         catch (ValidationException validationException)
         {
-            _logger.LogError(validationException, "A validation exception occurred.");
+            _logger.LogError(validationException, VALIDATION_EXCEPTION);
             await HandleExceptionAsync(context, validationException, HttpStatusCode.BadRequest);
         }
         catch (TaskCanceledException taskCanceledException)
         {
-            _logger.LogError(taskCanceledException, "A task was canceled.");
+            _logger.LogError(taskCanceledException, TASK_CANCELED);
             await HandleExceptionAsync(context, taskCanceledException, HttpStatusCode.RequestTimeout);
         }
         catch (TimeoutException timeoutException)
         {
-            _logger.LogError(timeoutException, "A timeout occurred.");
+            _logger.LogError(timeoutException, TIMEOUT_EXCEPTION);
             await HandleExceptionAsync(context, timeoutException, HttpStatusCode.RequestTimeout);
         }
         catch (HttpRequestException httpRequestException)
         {
-            _logger.LogError(httpRequestException, "An HTTP request exception occurred.");
+            _logger.LogError(httpRequestException, HTTP_EXCEPTION);
             await HandleExceptionAsync(context, httpRequestException, httpRequestException.StatusCode!.Value);
         }
         catch (OperationCanceledException operationCanceledException)
         {
-            _logger.LogError(operationCanceledException, "An operation was canceled.");
+            _logger.LogError(operationCanceledException, OPERATION_CANCELED);
             await HandleExceptionAsync(context, operationCanceledException, HttpStatusCode.RequestTimeout);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred.");
+            _logger.LogError(ex, UNHANDLED_EXCEPTION);
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -53,7 +60,7 @@ public class ExceptionMiddleware(
         HttpStatusCode statusCode = HttpStatusCode.InternalServerError
     )
     {
-        context.Response.ContentType = ContentType;
+        context.Response.ContentType = CONTENT_TYPE;
         context.Response.StatusCode = (int)statusCode;
         return context.Response.WriteAsJsonAsync(new
         {

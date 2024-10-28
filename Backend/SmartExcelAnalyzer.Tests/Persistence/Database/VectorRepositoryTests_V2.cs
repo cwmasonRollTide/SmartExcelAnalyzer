@@ -94,7 +94,7 @@ public class VectorRepositoryTests_V2
             {
                 ["content"] = contentDict
             });
-        var result = await Sut.QueryVectorData(documentId, queryVector);
+        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
 
         result.Should().NotBeNull();
         result.Rows.Should().HaveCount(1);
@@ -110,7 +110,7 @@ public class VectorRepositoryTests_V2
         _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-        var result = await Sut.QueryVectorData(documentId, queryVector);
+        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
 
         result.Should().BeNull();
     }
@@ -132,7 +132,7 @@ public class VectorRepositoryTests_V2
         _databaseMock.Setup(c => c.GetSummaryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((ConcurrentDictionary<string, object>)null!);
 
-        var result = await Sut.QueryVectorData(documentId, queryVector);
+        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
 
         result.Should().NotBeNull();
         result.Rows.Should().HaveCount(1);
@@ -145,7 +145,7 @@ public class VectorRepositoryTests_V2
     {
         var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
 
-        var result = await Sut.QueryVectorData(string.Empty, queryVector);
+        var result = await Sut.QueryVectorDataAsync(string.Empty, queryVector);
 
         result.Should().BeNull();
     }
@@ -155,7 +155,7 @@ public class VectorRepositoryTests_V2
     {
         var documentId = "testDoc";
 
-        var result = await Sut.QueryVectorData(documentId, null!);
+        var result = await Sut.QueryVectorDataAsync(documentId, null!);
 
         result.Should().BeNull();
     }
@@ -166,7 +166,7 @@ public class VectorRepositoryTests_V2
         var documentId = "testDoc";
         var emptyQueryVector = Array.Empty<float>();
 
-        var result = await Sut.QueryVectorData(documentId, emptyQueryVector);
+        var result = await Sut.QueryVectorDataAsync(documentId, emptyQueryVector);
 
         result.Should().BeNull();
     }
@@ -208,7 +208,7 @@ public class VectorRepositoryTests_V2
         _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Test exception"));
 
-        var result = await Sut.QueryVectorData(documentId, queryVector);
+        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
 
         result.Should().BeNull();
         _loggerMock.Verify(

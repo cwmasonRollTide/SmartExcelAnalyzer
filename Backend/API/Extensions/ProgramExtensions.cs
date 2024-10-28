@@ -18,7 +18,7 @@ namespace API.Extensions;
 public static class ProgramExtensions
 {
     private const string DefaultClientName = "DefaultClient";
-    public static WebApplicationBuilder AddOurEnvironmentVariables(this WebApplicationBuilder? builder)
+    public static WebApplicationBuilder AddSmartExcelFileAnalyzerVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
         builder.Configuration.AddEnvironmentVariables();
@@ -30,12 +30,12 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
-        // TODO: APP INSIGHTS when in Azure
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         builder.Logging.AddConsole();
         builder.Services.AddLogging();
+        builder.Logging.ClearProviders();
+        builder.Services.AddApplicationInsightsTelemetry();
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         return builder;
     }
 
