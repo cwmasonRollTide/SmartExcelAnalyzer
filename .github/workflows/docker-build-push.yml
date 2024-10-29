@@ -36,7 +36,7 @@ jobs:
         run: dotnet build Backend/SmartExcelAnalyzerBackend.sln --no-restore
 
       - name: Run tests
-        run: dotnet test Backend/SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj --no-build --verbosity normal --logger trx --results-directory ./TestResults --collect "Code Coverage"
+        run: dotnet test Backend/SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj -c Backend/SmartExcelAnalyzer.Tests/xunit.runner.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
