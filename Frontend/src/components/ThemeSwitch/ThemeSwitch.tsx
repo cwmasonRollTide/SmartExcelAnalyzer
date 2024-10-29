@@ -18,17 +18,12 @@ const ThemeSwitch = (
     setThemeMode: (themeMode: ThemeMode) => void
   }
 ) => {
-  
-  const handleThemeChange = (checked: boolean) => {
-    setThemeMode({mode: checked ? 'dark' : 'light'});
-  };
-
   return ( 
     <MaterialUISwitch 
       sx={{ m: 1 }} 
-      defaultChecked={themeMode.mode === 'dark'}
+      checked={themeMode.mode === 'dark'}
       onChange={(_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        return handleThemeChange(checked);
+        setThemeMode({mode: checked ? 'dark' : 'light'});
       }}
     /> 
   );
