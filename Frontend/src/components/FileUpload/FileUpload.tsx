@@ -100,10 +100,25 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
       </Typography>
       {(parseProgress > 0 || saveProgress > 0) && (
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body2">Parsing Progress:</Typography>
-          <LinearProgress variant="determinate" value={parseProgress} />
-          <Typography variant="body2" sx={{ mt: 1 }}>Saving Progress:</Typography>
-          <LinearProgress variant="determinate" value={saveProgress} />
+          <Typography 
+            variant="body2"
+          >
+            Parsing Progress:
+          </Typography>
+          <LinearProgress 
+            variant="determinate" 
+            value={parseProgress} 
+          />
+          <Typography 
+            variant="body2" 
+            sx={{ mt: 1 }}
+          >
+            Saving Progress:
+          </Typography>
+          <LinearProgress 
+            variant="determinate" 
+            value={saveProgress} 
+          />
         </Box>
       )}
     </Box>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
-import { uploadFile, submitQuery, QueryResponse } from './services/api';
+import { uploadFile, submitQuery } from './services/api';
+import { SubmitQueryResponse } from './services/SubmitQueryResponse';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';
@@ -31,7 +32,7 @@ function App() {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
+  const [queryResult, setQueryResult] = useState<SubmitQueryResponse | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
 
