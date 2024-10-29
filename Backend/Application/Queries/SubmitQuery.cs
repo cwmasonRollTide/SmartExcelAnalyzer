@@ -62,8 +62,13 @@ public class SubmitQueryHandler(
     ) 
     {
         var result = await QueryLLMAsync(request, cancellationToken);
-        if (result is null) return null;
-        if (ShouldEnrichResponse(request.RelevantRowsCount)) await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
+
+        if (result is null) 
+            return null;
+
+        if (ShouldEnrichResponse(request.RelevantRowsCount)) 
+            await EnrichWithRelevantRowsAsync(request, result, cancellationToken);
+
         _logger.LogInformation(LogQueryLLMSuccess, request.Query, result.Answer);
         return result;
     }
@@ -89,7 +94,10 @@ public class SubmitQueryHandler(
             question: request.Query, 
             cancellationToken
         );
-        if (result is null) _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
+
+        if (result is null) 
+            _logger.LogWarning(LogFailedToQueryLLM, request.Query, request.DocumentId);
+
         return result;
     }
 
@@ -104,7 +112,8 @@ public class SubmitQueryHandler(
         var embedding = await ComputeEmbeddingAsync(request, cancellationToken);
         if (embedding is null) return;
         var vectorResponse = await QueryVectorDatabaseAsync(request, embedding, cancellationToken);
-        if (vectorResponse is not null) result.RelevantRows = vectorResponse.Rows!;
+        if (vectorResponse is not null) 
+            result.RelevantRows = vectorResponse.Rows!;
     }
 
     private async Task<SummarizedExcelData?> QueryVectorDatabaseAsync(
@@ -120,7 +129,9 @@ public class SubmitQueryHandler(
             cancellationToken: cancellationToken,
             topRelevantCount: (int)request.RelevantRowsCount!
         );
-        if (vectorResponse is null) _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
+        if (vectorResponse is null) 
+            _logger.LogWarning(LogFailedToQueryVectorDb, request.Query, request.DocumentId);
+
         return vectorResponse;
     }
 

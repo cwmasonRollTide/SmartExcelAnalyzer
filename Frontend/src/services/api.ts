@@ -19,7 +19,7 @@ export const submitQuery = async (
 ): Promise<SubmitQueryResponse> => {
   const response = await axios.post<SubmitQueryResponse>('/analysis/query', {
     query,
-    document_id: documentId,
+    documentId,
   });
   return response.data;
 };

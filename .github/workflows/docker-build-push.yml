@@ -36,16 +36,9 @@ jobs:
         run: dotnet build --no-restore
 
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal --logger trx --results-directory ./TestResults --configuration Debug --collect "Code Coverage"
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./TestResults/**/*.xml
-          flags: unittests
-          name: code-coverage-report
-          fail_ci_if_error: true
+        run: dotnet test --no-build --verbosity normal --logger trx --results-directory ./TestResults --collect "Code Coverage"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   backend-build:
     needs: run-tests

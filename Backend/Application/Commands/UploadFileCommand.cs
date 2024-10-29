@@ -34,7 +34,7 @@ public class UploadFileCommandHandler(
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants
-    private const string SignalRMethod = "ReceiveProgress";
+    private const string ReceiveProgress = "ReceiveProgress";
     private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
     private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
     private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
@@ -60,30 +60,36 @@ public class UploadFileCommandHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var progress = new Progress<(double, double)>(
+        var progress = new Progress<(
+            double ParseProgress, 
+            double SaveProgress
+        )>(
             async report =>
                 await _hubContext
                     .Clients
                     .All
                     .SendAsync(
-                        method: SignalRMethod, 
-                        report.Item1, 
-                        report.Item2, 
+                        method: ReceiveProgress, 
+                        report.ParseProgress, 
+                        report.SaveProgress, 
                         cancellationToken: cancellationToken
                     )
         );
+
         var summarizedExcelData = await PrepareExcelFileAsync(
             file: request.File!, 
             progress: progress, 
             cancellationToken: cancellationToken
         );
-        if (summarizedExcelData is null) return null;
-        return await SaveToVectorDatabaseAsync(
-            data: summarizedExcelData, 
-            fileName: request.File!.FileName, 
-            progress: progress, 
-            cancellationToken: cancellationToken
-        );
+
+        return summarizedExcelData is null 
+            ? null 
+            : await SaveToVectorDatabaseAsync(
+                data: summarizedExcelData, 
+                fileName: request.File!.FileName, 
+                progress: progress, 
+                cancellationToken: cancellationToken
+            );
     }
 
     private async Task<SummarizedExcelData?> PrepareExcelFileAsync(
