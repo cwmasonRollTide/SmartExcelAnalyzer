@@ -26,17 +26,26 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
       <Typography 
         variant="body1"
       >
-        <strong>Question:</strong> {question}
+        <strong>
+          Question:
+        </strong> 
+        {question}
       </Typography>
       <Typography 
         variant="body1"
       >
-        <strong>Answer:</strong> {answer}
+        <strong>
+          Answer:
+        </strong> 
+        {answer}
       </Typography>
       <Typography 
         variant="body2"
       >
-        <strong>Document ID:</strong> {documentId}
+        <strong>
+          Document ID:
+        </strong> 
+        {documentId}
       </Typography>
 
       {relevantRows && relevantRows.length > 0 ? (
