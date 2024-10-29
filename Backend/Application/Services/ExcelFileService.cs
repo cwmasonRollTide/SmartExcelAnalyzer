@@ -336,6 +336,6 @@ public class ExcelFileService : IExcelFileService
         new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = Environment.ProcessorCount - 4
+            MaxDegreeOfParallelism = Math.Max(-1, Environment.ProcessorCount - 4)
         };
 }

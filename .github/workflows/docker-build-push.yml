@@ -19,7 +19,7 @@ jobs:
           path: .
           retention-days: 1
   
-  run-tests:
+  restore:
     needs: checkout
     runs-on: ubuntu-latest
     steps:
@@ -32,8 +32,42 @@ jobs:
       - name: Restore
         run: dotnet restore Backend/SmartExcelAnalyzerBackend.sln
 
+      - name: Upload restored packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: restored-packages
+          path: .
+          retention-days: 1
+
+  build:
+    needs: restore
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download restored packages
+        uses: actions/download-artifact@v3
+        with:
+          name: restored-packages
+          path: .
+
       - name: Build
         run: dotnet build Backend/SmartExcelAnalyzerBackend.sln --no-restore
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: .
+          retention-days: 1
+
+  run-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: .
 
       - name: Run tests
         run: dotnet test Backend/SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj -c Backend/SmartExcelAnalyzer.Tests/xunit.runner.json
