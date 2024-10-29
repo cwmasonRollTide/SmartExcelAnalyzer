@@ -7,37 +7,86 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-push:
+  checkout:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      
+      - name: Upload repository
+        uses: actions/upload-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+          retention-days: 1
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+  backend-build:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/download-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
 
-    - name: Build and push Backend
-      uses: docker/build-push-action@v4
-      with:
-        context: ./Backend
-        file: ./Backend/backend.Dockerfile
-        push: true
-        tags: fivemowner/smart-excel-analyzer-backend:latest
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push Frontend
-      uses: docker/build-push-action@v4
-      with:
-        context: ./Frontend
-        file: ./Frontend/frontend.Dockerfile
-        push: true
-        tags: fivemowner/smart-excel-analyzer-frontend:latest
+      - name: Build and push Backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend
+          file: ./Backend/backend.Dockerfile
+          push: true
+          tags: fivemowner/smart-excel-analyzer-backend:latest
 
-    - name: Build and push LLM Service
-      uses: docker/build-push-action@v4
-      with:
-        context: ./LLM
-        file: ./LLM/llm.Dockerfile
-        push: true
-        tags: fivemowner/smart-excel-analyzer-llm:latest
+  frontend-build:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/download-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Frontend
+          file: ./Frontend/frontend.Dockerfile
+          push: true
+          tags: fivemowner/smart-excel-analyzer-frontend:latest
+
+  llm-build:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/download-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push LLM Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./LLM
+          file: ./LLM/llm.Dockerfile
+          push: true
+          tags: fivemowner/smart-excel-analyzer-llm:latest
