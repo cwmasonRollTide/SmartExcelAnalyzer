@@ -30,13 +30,13 @@ jobs:
           path: .
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Backend/SmartExcelAnalyzerBackend.sln
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build Backend/SmartExcelAnalyzerBackend.sln --no-restore
 
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal --logger trx --results-directory ./TestResults --collect "Code Coverage"
+        run: dotnet test Backend/SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj --no-build --verbosity normal --logger trx --results-directory ./TestResults --collect "Code Coverage"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
