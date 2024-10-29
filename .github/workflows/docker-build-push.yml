@@ -35,13 +35,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Backend
+      - name: 1.) Builds Project 2.) Runs Tests 3.) Builds Docker Image 4.) Pushes to Container Registry
         uses: docker/build-push-action@v4
         with:
           context: ./Backend
           file: ./Backend/backend.Dockerfile
-          push: true
-          tags: fivemowner/smart-excel-analyzer-backend:latest
 
   frontend-build:
     needs: checkout

@@ -17,7 +17,6 @@ public class ProgressHub(
 
     #region Log message templates
     private const string PROGRESS_ERROR = "Progress error: {Message}";
-    private const string PROGRESS_COMPLETE = "Progress complete: {Message}";
     private const string CLIENT_CONNECTED = "Client connected: {ConnectionId}";
     private const string PROGRESS_UPDATE = "Progress update: {Progress}/{Total}";
     private const string CLIENT_DISCONNECTED = "Client disconnected: {ConnectionId}";
@@ -34,18 +33,6 @@ public class ProgressHub(
                 RECEIVE_PROGRESS, 
                 progress, 
                 total
-            );
-    }
-
-    public async Task SendCompletion(string message)
-    {
-        logger.LogInformation(PROGRESS_COMPLETE, message);
-        await hubContext
-            .Clients
-            .All
-            .SendAsync(
-                RECEIVE_COMPLETION, 
-                message
             );
     }
 

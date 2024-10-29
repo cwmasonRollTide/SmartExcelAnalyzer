@@ -237,7 +237,7 @@ public class QdrantDatabaseWrapper(
         new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = MaxDegreeOfParallelism
+            MaxDegreeOfParallelism = Math.Max(-1, MaxDegreeOfParallelism)
         };
     #endregion
 }

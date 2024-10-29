@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Hubs;
 
+[ExcludeFromCodeCoverage]
 public class ProgressHubWrapper(
     IHubContext<ProgressHub> _hubContext, 
     ILogger<IProgressHubWrapper> _logger
@@ -10,7 +12,6 @@ public class ProgressHubWrapper(
 {
     private const string ReceiveErrorMethod = "ReceiveError";
     private const string ReceiveProgressMethod = "ReceiveProgress";
-    private const string ReceiveCompletionMethod = "ReceiveCompletion";
     private const string ProgressCompleteMessage = "Progress complete";
     private const string ProgressCompleteLogMessage = "Progress complete: {Message}";
     private const string ProgressUpdateMessage = "Progress update: {Progress}/{Total}";
@@ -33,6 +34,4 @@ public class ProgressHubWrapper(
     }
 
     public async Task SendError(string message) => await _hubContext.Clients.All.SendAsync(ReceiveErrorMethod, message);
-
-    public async Task SendCompletion(string message) => await _hubContext.Clients.All.SendAsync(ReceiveCompletionMethod, message);
 }
