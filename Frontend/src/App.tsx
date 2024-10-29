@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
-// import { startHealthCheck } from './utils/healthCheck';
 import { uploadFile, submitQuery, QueryResponse } from './services/api';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
@@ -18,7 +17,7 @@ const theme = createTheme({
       main: '#dc004e',
     },
     background: {
-      default: '#f0f4f8', // Light blue-gray background
+      default: '#f0f4f8',
     },
   },
 });
@@ -29,17 +28,12 @@ interface Document {
 }
 
 function App() {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
-
-  // useEffect(() => {
-  //   const healthCheckInterval = startHealthCheck();
-  //   return () => clearInterval(healthCheckInterval);
-  // }, []);
 
   const handleFileUpload = async (file: File) => {
     try {
@@ -80,9 +74,7 @@ function App() {
   };
 
   const handleToastClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setToastOpen(false);
   };
 

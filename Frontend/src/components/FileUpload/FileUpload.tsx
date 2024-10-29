@@ -17,7 +17,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl(`${SIGNALR_HUB_URL}`)  // Updated to use the full URL
+      .withUrl(`${SIGNALR_HUB_URL}`)
       .withAutomaticReconnect()
       .build();
 

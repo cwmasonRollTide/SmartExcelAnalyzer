@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { 
+  TextField, 
+  Button, 
+  Box 
+} from '@mui/material';
 
 interface QueryFormProps {
   onQuerySubmit: (question: string) => void;

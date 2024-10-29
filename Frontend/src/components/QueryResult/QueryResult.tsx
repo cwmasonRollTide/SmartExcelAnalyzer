@@ -1,5 +1,15 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  Typography, 
+  Box 
+} from '@mui/material';
 import { QueryResponse } from '../../services/api';
 
 interface QueryResultProps {
@@ -11,14 +21,36 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant="h6" gutterBottom>Query Result</Typography>
-      <Typography variant="body1"><strong>Question:</strong> {question}</Typography>
-      <Typography variant="body1"><strong>Answer:</strong> {answer}</Typography>
-      <Typography variant="body2"><strong>Document ID:</strong> {documentId}</Typography>
+      <Typography 
+        variant="h6" 
+        gutterBottom
+      >
+        Query Result
+      </Typography>
+      <Typography 
+        variant="body1"
+      >
+        <strong>Question:</strong> {question}
+      </Typography>
+      <Typography 
+        variant="body1"
+      >
+        <strong>Answer:</strong> {answer}
+      </Typography>
+      <Typography 
+        variant="body2"
+      >
+        <strong>Document ID:</strong> {documentId}
+      </Typography>
 
       {relevantRows && relevantRows.length > 0 ? (
         <Box sx={{ mt: 2 }}>
-          <Typography variant="h6" gutterBottom>Relevant Data</Typography>
+          <Typography 
+            variant="h6" 
+            gutterBottom
+          >
+            Relevant Data
+          </Typography>
           <Paper 
             elevation={3} 
             sx={{ 
@@ -33,7 +65,12 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
                 <TableHead>
                   <TableRow>
                     {Object.keys(relevantRows[0]).map((header) => (
-                      <TableCell key={header} sx={{ fontWeight: 'bold' }}>{header}</TableCell>
+                      <TableCell 
+                        key={header} 
+                        sx={{ fontWeight: 'bold' }}
+                      >
+                        {header}
+                      </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -41,7 +78,11 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
                   {relevantRows.map((row, index) => (
                     <TableRow key={index}>
                       {Object.entries(row).map(([key, value]) => (
-                        <TableCell key={`${index}-${key}`}>{value?.toString() || ''}</TableCell>
+                        <TableCell 
+                          key={`${index}-${key}`}
+                        >
+                          {value?.toString() || ''}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}
@@ -51,7 +92,12 @@ const QueryResult: React.FC<QueryResultProps> = ({ result }) => {
           </Paper>
         </Box>
       ) : (
-        <Typography variant="body2" sx={{ mt: 2 }}>No relevant data found.</Typography>
+        <Typography 
+          variant="body2" 
+          sx={{ mt: 2 }}
+        >
+          No relevant data found.
+        </Typography>
       )}
     </Box>
   );
