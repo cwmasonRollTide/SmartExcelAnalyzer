@@ -7,20 +7,14 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
 
 public class ProgressHubTests
 {
-    private readonly Mock<ILogger<ProgressHub>> _loggerMock;
-    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock;
-    private readonly Mock<IClientProxy> _clientProxyMock;
-    private readonly ProgressHub _progressHub;
+    private readonly Mock<IClientProxy> _clientProxyMock = new();
+    private readonly Mock<ILogger<ProgressHub>> _loggerMock = new();
+    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
+    private ProgressHub Sut => new(_loggerMock.Object, _hubContextMock.Object);
 
     public ProgressHubTests()
     {
-        _loggerMock = new Mock<ILogger<ProgressHub>>();
-        _hubContextMock = new Mock<IHubContext<ProgressHub>>();
-        _clientProxyMock = new Mock<IClientProxy>();
-
         _hubContextMock.Setup(h => h.Clients.All).Returns(_clientProxyMock.Object);
-
-        _progressHub = new ProgressHub(_loggerMock.Object, _hubContextMock.Object);
     }
 
     [Fact]
@@ -29,7 +23,7 @@ public class ProgressHubTests
         double progress = 50;
         double total = 100;
 
-        await _progressHub.SendProgress(progress, total);
+        await Sut.SendProgress(progress, total);
 
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
@@ -49,7 +43,7 @@ public class ProgressHubTests
         double progress = 0;
         double total = 100;
 
-        await _progressHub.SendProgress(progress, total);
+        await Sut.SendProgress(progress, total);
 
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
@@ -69,7 +63,7 @@ public class ProgressHubTests
         double progress = 100;
         double total = 100;
 
-        await _progressHub.SendProgress(progress, total);
+        await Sut.SendProgress(progress, total);
 
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
