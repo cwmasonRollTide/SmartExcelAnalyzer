@@ -8,6 +8,8 @@ import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';
 import QueryResult from './components/QueryResult/QueryResult.tsx';
 import { Document } from './interfaces/Document.tsx';
+import ThemeSwitch from './components/ThemeSwitch/ThemeSwitch.tsx';
+import { ThemeMode } from './interfaces/ThemeMode.tsx';
 
 const theme = createTheme({
   palette: {
@@ -21,6 +23,28 @@ const theme = createTheme({
     background: {
       default: '#f0f4f8',
     },
+    text: {
+      primary: '#000000',
+      secondary: '#6c6c6c',
+    },
+  },
+}, {
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#bb86fc',
+    },
+    secondary: {
+      main: '#03dac6',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#b0b0b0',
+    },
   },
 });
 
@@ -28,6 +52,7 @@ function App() {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [themeMode, setThemeMode] = useState<ThemeMode>({ mode: 'dark' });
   const [queryResult, setQueryResult] = useState<SubmitQueryResponse | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
@@ -110,17 +135,33 @@ function App() {
             }}
           >
             <FileUpload onFileUpload={handleFileUpload} />
-            <Box sx={{ mt: 2, width: '100%' }}>
+            <Box 
+              sx={{ 
+                mt: 2, 
+                width: '100%' 
+              }}
+            >
               <DocumentList
                 documents={documents}
                 selectedDocument={selectedDocument}
                 onSelectDocument={handleDocumentSelect}
               />
             </Box>
-            <Box sx={{ mt: 2, width: '100%' }}>
+            <Box 
+              sx={{ 
+                mt: 2, 
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
               <QueryForm
                 onQuerySubmit={handleQuerySubmit}
                 isDocumentSelected={!!selectedDocument}
+              />
+              <ThemeSwitch 
+                themeMode={themeMode} 
+                setThemeMode={setThemeMode} 
               />
             </Box>
           </Paper>

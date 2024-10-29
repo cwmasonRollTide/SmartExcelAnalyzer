@@ -18,9 +18,37 @@ jobs:
           name: repo-artifact
           path: .
           retention-days: 1
+  
+  run-tests:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/download-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal --logger trx --results-directory ./TestResults --configuration Debug --collect "Code Coverage"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./TestResults/**/*.xml
+          flags: unittests
+          name: code-coverage-report
+          fail_ci_if_error: true
 
   backend-build:
-    needs: checkout
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
@@ -40,11 +68,9 @@ jobs:
         with:
           context: ./Backend
           file: ./Backend/backend.Dockerfile
-          push: true
-          tags: fivemowner/smart-excel-analyzer-backend:latest
 
   frontend-build:
-    needs: checkout
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
@@ -68,7 +94,7 @@ jobs:
           tags: fivemowner/smart-excel-analyzer-frontend:latest
 
   llm-build:
-    needs: checkout
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
