@@ -37,18 +37,6 @@ public class ProgressHub(
             );
     }
 
-    public async Task SendCompletion(string message)
-    {
-        logger.LogInformation(PROGRESS_COMPLETE, message);
-        await hubContext
-            .Clients
-            .All
-            .SendAsync(
-                RECEIVE_COMPLETION, 
-                message
-            );
-    }
-
     public async Task SendError(string message)
     {
         logger.LogError(PROGRESS_ERROR, message);
