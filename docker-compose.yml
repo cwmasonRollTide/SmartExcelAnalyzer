@@ -13,8 +13,6 @@ services:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/qdrant_config.yaml"
-    environment:
-      - QDRANT_API_KEY=${QDRANT_API_KEY}
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
@@ -48,8 +46,3 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-
-volumes:
-  model_cache:
-  qdrant_data:
-  llm_cache:

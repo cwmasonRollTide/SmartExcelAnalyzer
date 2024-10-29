@@ -13,7 +13,23 @@
   - [Usage](#usage)
   - [API Documentation](#api-documentation)
   - [Full Workflow Example](#full-workflow-example)
+    - [1. Upload Excel File](#1-upload-excel-file)
+    - [2. Get the Status of an Upload](#2-get-the-status-of-an-upload)
+    - [3. Ask a Question](#3-ask-a-question)
   - [Development](#development)
+    - [Backend Setup](#backend-setup)
+      - [Windows (PowerShell)](#windows-powershell)
+      - [macOS](#macos)
+      - [Linux](#linux)
+    - [Frontend Setup](#frontend-setup)
+      - [Windows (PowerShell)](#windows-powershell-1)
+      - [macOS](#macos-1)
+      - [Linux](#linux-1)
+    - [LLM Services Setup](#llm-services-setup)
+      - [Windows (PowerShell)](#windows-powershell-2)
+      - [macOS](#macos-2)
+      - [Linux](#linux-2)
+    - [Run the whole project:](#run-the-whole-project)
   - [Docker](#docker)
   - [Testing](#testing)
   - [Contact](#contact)
@@ -185,7 +201,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 **Request:**
 
-  ```json
+  ```http
   GET /api/analysis/index/status/123456789012
   Content-Type: application/json
   ```
@@ -205,7 +221,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 **Request:**
 
-  ```json
+  ```http
   POST /api/analysis/api/query
   {
     "query": "What are the total sales for Q1 2024?",
@@ -226,43 +242,107 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ## Development
 
-- To set up the development environment:
+### Backend Setup
 
-  - Backend:
+#### Windows (PowerShell)
+```powershell
+# Install .NET 8 SDK from https://dotnet.microsoft.com/download/dotnet/8.0
+cd Backend
+dotnet restore
+```
 
-    ```powershell
-    Install .NET 8 SDK
-    Open the solution in Visual Studio or VS Code
-    Run dotnet restore to install dependencies
-    ```
+#### macOS
+```bash
+# Install .NET 8 SDK
+brew install dotnet@8
 
-  - Frontend:
+cd Backend
+dotnet restore
+```
 
-    ```powershell
-    Install Node.js and npm
-    Navigate to the Frontend directory
-    Run npm install to install dependencies
-    Use npm run dev for development server
-    ```
+#### Linux
+```bash
+# Install .NET 8 SDK (Ubuntu/Debian)
+wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+sudo apt-get update
+sudo apt-get install -y dotnet-sdk-8.0
 
-  - LLM Services:
+cd Backend
+dotnet restore
+```
 
-    ```powershell
-    Install Python 3.9+
-    Navigate to the LLM directory
-    Create a virtual environment: python -m venv venv
-    Activate the virtual environment and install dependencies: pip install -r requirements.txt
-    ```
+### Frontend Setup
 
-  - Run the whole project:
+#### Windows (PowerShell)
+```powershell
+# Install Node.js from https://nodejs.org/
+cd Frontend
+npm install
+npm run dev
+```
 
-    ```powershell
-    cd SmartExcelAnalyzer
-    ```
+#### macOS
+```bash
+# Install Node.js
+brew install node
 
-    ```powershell
-    docker compose up --build -d
-    ```
+cd Frontend
+npm install
+npm run dev
+```
+
+#### Linux
+```bash
+# Install Node.js (Ubuntu/Debian)
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+cd Frontend
+npm install
+npm run dev
+```
+
+### LLM Services Setup
+
+#### Windows (PowerShell)
+```powershell
+# Install Python 3.9+ from https://www.python.org/downloads/
+cd LLM
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+#### macOS
+```bash
+# Install Python 3.9+
+brew install python@3.9
+
+cd LLM
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+#### Linux
+```bash
+# Install Python 3.9+ (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install -y python3.9 python3.9-venv python3-pip
+
+cd LLM
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Run the whole project:
+
+```powershell
+cd SmartExcelAnalyzer
+docker compose up --build -d
+```
 
 ## Docker
 

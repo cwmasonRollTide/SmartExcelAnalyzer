@@ -1,4 +1,8 @@
 services:
+  qdrant:
+    env_file:
+      - .env
+
   llm-service:
     env_file:
       - .env
@@ -26,3 +30,8 @@ services:
     environment:
       - VITE_BASE_API_URL=http://localhost:5001/api
       - VITE_SIGNALR_HUB_URL=http://localhost:5001/progressHub
+
+volumes:
+  model_cache:
+  qdrant_data:
+  llm_cache:
