@@ -30,9 +30,9 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
+        builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
         builder.Services.AddLogging();
-        builder.Logging.ClearProviders();
         builder.Services.AddApplicationInsightsTelemetry();
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));

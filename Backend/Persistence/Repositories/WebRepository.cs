@@ -44,7 +44,6 @@ public class WebRepository<T>(
             cancellationToken
         );
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonConvert.DeserializeObject<T>(result)!;
+        return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync(cancellationToken))!;
     }
 }
