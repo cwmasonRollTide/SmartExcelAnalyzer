@@ -29,6 +29,9 @@ jobs:
           name: repo-artifact
           path: .
 
+      - name: Clear NuGet cache
+        run: dotnet nuget locals all --clear
+
       - name: Restore
         run: dotnet restore Backend/SmartExcelAnalyzerBackend.sln
 
@@ -36,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: restored-packages
-          path: .
+          path: ./**/obj
           retention-days: 1
 
   build:
@@ -56,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: .
+          path: ./**/bin
           retention-days: 1
 
   run-tests:
