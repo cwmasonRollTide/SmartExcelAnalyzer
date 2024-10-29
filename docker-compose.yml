@@ -21,6 +21,8 @@ services:
 
   llm-service-0:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -31,6 +33,8 @@ services:
 
   llm-service-1:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
     ports:
       - "8001:8000"
     depends_on:
@@ -41,6 +45,8 @@ services:
 
   llm-service-2:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
     ports:
       - "8002:8000"
     depends_on:

@@ -10,6 +10,6 @@
     "azureFunctions.projectLanguageModel": 2,
     "CodeGPT.apiKey": "Ollama",
     "files.associations": {
-        "docker-stack.yml": "yaml"
+        "docker-stack.yml": "dockercompose"
     }
 }

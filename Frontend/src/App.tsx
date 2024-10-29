@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
 import { uploadFile, submitQuery } from './services/api';
@@ -9,11 +9,11 @@ import QueryForm from './components/QueryForm/QueryForm';
 import QueryResult from './components/QueryResult/QueryResult.tsx';
 import { Document } from './interfaces/Document.tsx';
 import ThemeSwitch from './components/ThemeSwitch/ThemeSwitch.tsx';
-import { ThemeMode } from './interfaces/ThemeMode.tsx';
+import { ThemeMode, ThemeModeEnum } from './interfaces/ThemeMode.tsx';
 
 const theme = createTheme({
   palette: {
-    mode: 'light',
+    mode: ThemeModeEnum.LIGHT,
     primary: {
       main: '#1976d2',
     },
@@ -30,7 +30,7 @@ const theme = createTheme({
   },
 }, {
   palette: {
-    mode: 'dark',
+    mode: ThemeModeEnum.DARK,
     primary: {
       main: '#bb86fc',
     },
@@ -49,10 +49,14 @@ const theme = createTheme({
 });
 
 function App() {
+  const [theme, setTheme] = useState(createTheme({
+    palette: {
+      mode: ThemeModeEnum.DARK,
+    },
+  }));
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [themeMode, setThemeMode] = useState<ThemeMode>({ mode: 'dark' });
   const [queryResult, setQueryResult] = useState<SubmitQueryResponse | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
@@ -99,6 +103,16 @@ function App() {
     if (reason === 'clickaway') return;
     setToastOpen(false);
   };
+
+  const [themeMode, setThemeMode] = useState<ThemeMode>({ mode: ThemeModeEnum.DARK });
+
+  useEffect(() => {
+    setTheme(createTheme({
+      palette: {
+        mode: themeMode.mode,
+      },
+    }));
+  }, [themeMode]);
 
   return (
     <ThemeProvider theme={theme}>

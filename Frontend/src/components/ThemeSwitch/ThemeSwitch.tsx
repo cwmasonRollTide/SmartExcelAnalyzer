@@ -1,7 +1,7 @@
 import { ChangeEvent } from 'react';
 import Switch from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
-import { ThemeMode } from '../../interfaces/ThemeMode';
+import { ThemeMode, ThemeModeEnum } from '../../interfaces/ThemeMode';
 
 /**
  * A switch component to toggle the theme mode of the frontend application.
@@ -12,7 +12,8 @@ import { ThemeMode } from '../../interfaces/ThemeMode';
  */
 const ThemeSwitch = (
   {
-    themeMode, setThemeMode
+    themeMode, 
+    setThemeMode
   }: {
     themeMode: ThemeMode, 
     setThemeMode: (themeMode: ThemeMode) => void
@@ -21,9 +22,11 @@ const ThemeSwitch = (
   return ( 
     <MaterialUISwitch 
       sx={{ m: 1 }} 
-      checked={themeMode.mode === 'dark'}
-      onChange={(_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        setThemeMode({mode: checked ? 'dark' : 'light'});
+      checked={themeMode.mode === ThemeModeEnum.DARK}
+      onChange={(
+        _: ChangeEvent<HTMLInputElement>, checked: boolean
+      ) => {
+        setThemeMode({mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT});
       }}
     /> 
   );
