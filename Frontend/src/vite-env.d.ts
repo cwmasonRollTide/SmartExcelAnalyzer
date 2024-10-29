@@ -1,4 +1,10 @@
 /// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_BASE_API_URL: string;
+  readonly VITE_SIGNALR_HUB_URL: string;
+}
+
 interface ImportMeta {
-    readonly env: Record<string, string | undefined>;
-  }
+  readonly env: ImportMetaEnv;
+}

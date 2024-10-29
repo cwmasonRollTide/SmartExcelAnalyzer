@@ -1,5 +1,3 @@
-name: Smart Excel File Analyzer Docker Compose Network
-
 x-healthcheck: &default-healthcheck
   interval: 120s
   timeout: 10s
@@ -19,30 +17,13 @@ services:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
 
-  llm-service-0:
+  llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    deploy:
+      mode: replicated
+      replicas: 3
     ports:
       - "8000:8000"
-    depends_on:
-      - qdrant
-    healthcheck:
-      <<: *default-healthcheck
-      test: curl -f http://localhost:8000/health
-
-  llm-service-1:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    ports:
-      - "8001:8000"
-    depends_on:
-      - qdrant
-    healthcheck:
-      <<: *default-healthcheck
-      test: curl -f http://localhost:8000/health
-
-  llm-service-2:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    ports:
-      - "8002:8000"
     depends_on:
       - qdrant
     healthcheck:
@@ -65,3 +46,8 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+
+volumes:
+  model_cache:
+  qdrant_data:
+  llm_cache:

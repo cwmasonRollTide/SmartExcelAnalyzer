@@ -10,21 +10,28 @@ import { ThemeMode } from '../../interfaces/ThemeMode';
  * @param setThemeMode - The function to set the theme mode
  * @returns 
  */
-const ThemeSwitch = ({themeMode, setThemeMode}: {themeMode: ThemeMode, setThemeMode: (themeMode: ThemeMode) => void}) => {
+const ThemeSwitch = (
+  {
+    themeMode, setThemeMode
+  }: {
+    themeMode: ThemeMode, 
+    setThemeMode: (themeMode: ThemeMode) => void
+  }
+) => {
   
-    const handleThemeChange = (checked: boolean) => {
-        setThemeMode({mode: checked ? 'dark' : 'light'});
-    };
+  const handleThemeChange = (checked: boolean) => {
+    setThemeMode({mode: checked ? 'dark' : 'light'});
+  };
 
-    return ( 
-      <MaterialUISwitch 
-        sx={{ m: 1 }} 
-        defaultChecked={themeMode.mode === 'dark'}
-        onChange={(_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-          return handleThemeChange(checked);
-        }}
-      /> 
-    );
+  return ( 
+    <MaterialUISwitch 
+      sx={{ m: 1 }} 
+      defaultChecked={themeMode.mode === 'dark'}
+      onChange={(_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        return handleThemeChange(checked);
+      }}
+    /> 
+  );
 };  
 
 export default ThemeSwitch;

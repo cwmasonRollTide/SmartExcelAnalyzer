@@ -7,6 +7,7 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
 
 public class ProgressHubTests
 {
+    private const double Total = 100;
     private readonly Mock<IClientProxy> _clientProxyMock = new();
     private readonly Mock<ILogger<ProgressHub>> _loggerMock = new();
     private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
@@ -21,16 +22,15 @@ public class ProgressHubTests
     public async Task SendProgress_Sends_Progress_To_All_Clients()
     {
         double progress = 50;
-        double total = 100;
 
-        await Sut.SendProgress(progress, total);
+        await Sut.SendProgress(progress, Total);
 
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
                 It.Is<object[]>(args => 
                     (double)args[0] == progress && 
-                    (double)args[1] == total),
+                    (double)args[1] == Total),
                 default
             ),
             Times.Once
@@ -41,16 +41,25 @@ public class ProgressHubTests
     public async Task SendProgress_WithZeroProgress_Sends_Progress_To_All_Clients()
     {
         double progress = 0;
-        double total = 100;
 
-        await Sut.SendProgress(progress, total);
+        await Sut.SendProgress(progress, Total);
 
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
+            ),
+            Times.Once
+        );
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
                 It.Is<object[]>(args => 
                     (double)args[0] == progress && 
-                    (double)args[1] == total),
+                    (double)args[1] == Total),
                 default
             ),
             Times.Once
@@ -61,16 +70,86 @@ public class ProgressHubTests
     public async Task SendProgress_WithFullProgress_Sends_Progress_To_All_Clients()
     {
         double progress = 100;
-        double total = 100;
 
-        await Sut.SendProgress(progress, total);
+        await Sut.SendProgress(progress, Total);
 
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
+            ),
+            Times.Once
+        );
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
                 It.Is<object[]>(args => 
                     (double)args[0] == progress && 
-                    (double)args[1] == total),
+                    (double)args[1] == Total),
+                default
+            ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task SendError_Sends_Error_To_All_Clients()
+    {
+        string message = "Error message";
+
+        await Sut.SendError(message);
+
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress error: {message}"),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
+            ),
+            Times.Once
+        );
+        _clientProxyMock.Verify(
+            x => x.SendCoreAsync(
+                "ReceiveError",
+                It.Is<object[]>(args => 
+                    (string)args[0] == message),
+                default
+            ),
+            Times.Once
+        );
+    }
+
+    [Theory]
+    [InlineData(0d)]
+    [InlineData(25d)]
+    [InlineData(27.275d)]
+    [InlineData(99.999d)]
+    [InlineData(100)]
+    public async Task SendProgress_Sends_Progress_To_All_Clients_Theory_Version(double progress)
+    {
+
+        await Sut.SendProgress(progress, Total);
+
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
+            ),
+            Times.Once
+        );
+        _clientProxyMock.Verify(
+            x => x.SendCoreAsync(
+                "ReceiveProgress",
+                It.Is<object[]>(args => 
+                    (double)args[0] == progress && 
+                    (double)args[1] == Total),
                 default
             ),
             Times.Once

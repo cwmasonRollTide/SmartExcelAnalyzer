@@ -289,7 +289,7 @@ BRH:0
 FNF:1
 FNH:1
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Services\ExcelFileService.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Services\ExcelFileService.cs
 FN:96,System.Data.DataColumn[] Application.Services.ExcelFileService::GetTableColumns(System.Data.DataTable)
 FNDA:4,System.Data.DataColumn[] Application.Services.ExcelFileService::GetTableColumns(System.Data.DataTable)
 DA:97,4
@@ -376,16 +376,16 @@ DA:73,9
 DA:74,18
 DA:75,9
 DA:76,9
-DA:77,8
-DA:78,8
-DA:79,8
-DA:80,8
+DA:77,9
+DA:78,9
+DA:79,9
+DA:80,9
 DA:81,9
 DA:82,13
-BRDA:74,54,0,12
-BRDA:74,54,1,6
+BRDA:74,54,0,10
+BRDA:74,54,1,8
 BRDA:74,70,0,9
-BRDA:76,90,0,8
+BRDA:76,90,0,9
 BRDA:76,90,1,9
 BRDA:74,70,1,9
 FN:110,System.Void Application.Services.ExcelFileService/<>c__DisplayClass6_0::<ProcessRowsAsync>b__0()
@@ -589,7 +589,7 @@ BRH:46
 FNF:24
 FNH:24
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Queries\SubmitQuery.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Queries\SubmitQuery.cs
 FN:11,System.String Application.Queries.SubmitQuery::get_Query()
 FNDA:41,System.String Application.Queries.SubmitQuery::get_Query()
 DA:12,41
@@ -685,7 +685,7 @@ BRH:11
 FNF:10
 FNH:10
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Queries\SubmitQueryValidator.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Queries\SubmitQueryValidator.cs
 FN:6,System.Void Application.Queries.SubmitQueryValidator::.ctor()
 FNDA:7,System.Void Application.Queries.SubmitQueryValidator::.ctor()
 DA:7,7
@@ -705,7 +705,7 @@ BRH:0
 FNF:1
 FNH:1
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Commands\UploadFileCommand.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Commands\UploadFileCommand.cs
 FN:16,Microsoft.AspNetCore.Http.IFormFile Application.Commands.UploadFileCommand::get_File()
 FNDA:31,Microsoft.AspNetCore.Http.IFormFile Application.Commands.UploadFileCommand::get_File()
 DA:17,31
@@ -802,7 +802,7 @@ BRH:6
 FNF:8
 FNH:8
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Commands\UploadFileCommandValidator.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Application\Commands\UploadFileCommandValidator.cs
 FN:6,System.Void Application.Commands.UploadFileCommandValidator::.ctor()
 FNDA:3,System.Void Application.Commands.UploadFileCommandValidator::.ctor()
 DA:7,3
@@ -824,7 +824,7 @@ BRH:1
 FNF:1
 FNH:1
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Utilities\VectorMath.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Utilities\VectorMath.cs
 FN:48,System.Single Domain.Utilities.VectorMath::CalculateSimilarity(System.Single[],System.Single[])
 FNDA:17,System.Single Domain.Utilities.VectorMath::CalculateSimilarity(System.Single[],System.Single[])
 DA:49,17
@@ -862,7 +862,7 @@ BRH:6
 FNF:4
 FNH:4
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Document.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Document.cs
 FN:5,System.String Domain.Persistence.Document::get_Id()
 FNDA:31,System.String Domain.Persistence.Document::get_Id()
 DA:6,31
@@ -879,7 +879,7 @@ BRH:0
 FNF:3
 FNH:3
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Summary.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Summary.cs
 FN:4,System.String Domain.Persistence.Summary::get_Id()
 FNDA:7,System.String Domain.Persistence.Summary::get_Id()
 DA:5,7
@@ -893,7 +893,7 @@ BRH:0
 FNF:2
 FNH:2
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\QueryAnswer.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\QueryAnswer.cs
 FN:6,System.String Domain.Persistence.DTOs.QueryAnswer::get_Question()
 FNDA:9,System.String Domain.Persistence.DTOs.QueryAnswer::get_Question()
 DA:7,9
@@ -913,7 +913,7 @@ BRH:0
 FNF:4
 FNH:4
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\SummarizedExcelData.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\DTOs\SummarizedExcelData.cs
 FN:6,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Domain.Persistence.DTOs.SummarizedExcelData::get_Summary()
 FNDA:3067,System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object> Domain.Persistence.DTOs.SummarizedExcelData::get_Summary()
 DA:7,3067
@@ -927,7 +927,7 @@ BRH:0
 FNF:2
 FNH:2
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Configuration\Options.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Persistence\Configuration\Options.cs
 FN:4,System.Int32 Domain.Persistence.Configuration.LLMServiceOptions::get_COMPUTE_BATCH_SIZE()
 FNDA:176,System.Int32 Domain.Persistence.Configuration.LLMServiceOptions::get_COMPUTE_BATCH_SIZE()
 DA:5,176
@@ -977,7 +977,7 @@ BRH:0
 FNF:14
 FNH:14
 end_of_record
-SF:C:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Application\ExcelFileSummary.cs
+SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Domain\Application\ExcelFileSummary.cs
 FN:6,System.Int32 Domain.Application.ExcelFileSummary::get_RowCount()
 FNDA:9,System.Int32 Domain.Application.ExcelFileSummary::get_RowCount()
 DA:7,9
@@ -1081,8 +1081,8 @@ DA:44,53
 DA:74,53
 DA:75,53
 FN:421,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-FNDA:97,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-DA:422,97
+FNDA:91,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
+DA:422,91
 FN:253,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 FNDA:138,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 DA:254,138
@@ -1106,16 +1106,16 @@ FN:303,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass
 FNDA:0,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
 DA:304,0
 FN:426,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-FNDA:79,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-DA:427,79
-DA:428,79
-DA:429,79
-DA:430,156
+FNDA:73,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
+DA:427,73
+DA:428,73
+DA:429,73
+DA:430,144
 DA:431,2
-DA:433,79
-DA:434,79
-DA:435,79
-BRDA:430,77,0,77
+DA:433,73
+DA:434,73
+DA:435,73
+BRDA:430,77,0,71
 BRDA:430,77,1,2
 FN:291,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
 FNDA:23,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
@@ -1160,8 +1160,8 @@ BRDA:298,926,1,22
 BRDA:302,289,0,17
 BRDA:302,289,1,22
 BRDA:310,545,0,18
-BRDA:314,714,0,14
-BRDA:314,714,1,4
+BRDA:314,714,0,13
+BRDA:314,714,1,5
 BRDA:310,545,1,0
 BRDA:298,926,0,17
 FN:243,System.Void Persistence.Repositories.VectorRepository/<CreateBatchesAsync>d__33::MoveNext()
@@ -1226,17 +1226,17 @@ DA:396,18
 DA:397,18
 DA:398,18
 DA:399,18
-DA:400,16
-DA:401,16
-DA:402,16
+DA:400,17
+DA:401,17
+DA:402,17
 DA:405,18
 DA:406,18
 DA:407,18
-DA:408,16
+DA:408,17
 BRDA:382,16,0,18
 BRDA:382,16,1,36
 BRDA:401,528,0,12
-BRDA:401,528,1,4
+BRDA:401,528,1,5
 FN:136,System.Void Persistence.Repositories.VectorRepository/<QueryVectorDataAsync>d__31::MoveNext()
 FNDA:23,System.Void Persistence.Repositories.VectorRepository/<QueryVectorDataAsync>d__31::MoveNext()
 DA:137,23
@@ -1305,20 +1305,20 @@ DA:446,18
 DA:447,18
 DA:448,18
 DA:449,18
-DA:450,16
+DA:450,17
 DA:451,2
 DA:452,2
 DA:453,2
-DA:455,24
-DA:456,5
-DA:457,14
-DA:458,16
+DA:455,25
+DA:456,6
+DA:457,15
+DA:458,17
 BRDA:450,176,0,2
-BRDA:450,176,1,14
+BRDA:450,176,1,15
 BRDA:455,241,0,10
-BRDA:455,241,1,4
+BRDA:455,241,1,5
 BRDA:456,278,0,1
-BRDA:456,278,1,14
+BRDA:456,278,1,15
 FN:91,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 FNDA:29,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 DA:92,29
@@ -1403,7 +1403,7 @@ DA:343,23
 DA:344,23
 DA:346,23
 DA:347,23
-DA:348,97
+DA:348,98
 DA:349,18
 DA:350,18
 DA:351,18
@@ -1413,20 +1413,20 @@ DA:354,18
 DA:355,18
 DA:356,18
 DA:357,18
-DA:358,16
-DA:359,19
+DA:358,17
+DA:359,20
 DA:360,2
 DA:361,2
 DA:362,2
 DA:363,2
-DA:364,2
-DA:365,2
-DA:366,2
-DA:367,2
+DA:364,1
+DA:365,1
+DA:366,1
+DA:367,1
 DA:368,23
 DA:369,23
 BRDA:348,455,1,18
-BRDA:348,455,0,19
+BRDA:348,455,0,20
 BRDA:368,742,0,13
 BRDA:368,742,1,23
 LF:275
@@ -1468,42 +1468,42 @@ FNH:2
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Hubs\ProgressHub.cs
 FN:6,System.Void Persistence.Hubs.ProgressHub::.ctor(Microsoft.Extensions.Logging.ILogger`1<Persistence.Hubs.ProgressHub>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-FNDA:3,System.Void Persistence.Hubs.ProgressHub::.ctor(Microsoft.Extensions.Logging.ILogger`1<Persistence.Hubs.ProgressHub>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
-DA:7,3
-DA:8,3
-DA:9,3
-DA:10,3
+FNDA:9,System.Void Persistence.Hubs.ProgressHub::.ctor(Microsoft.Extensions.Logging.ILogger`1<Persistence.Hubs.ProgressHub>,Microsoft.AspNetCore.SignalR.IHubContext`1<Persistence.Hubs.ProgressHub>)
+DA:7,9
+DA:8,9
+DA:9,9
+DA:10,9
 FN:39,System.Void Persistence.Hubs.ProgressHub/<SendError>d__11::MoveNext()
-FNDA:0,System.Void Persistence.Hubs.ProgressHub/<SendError>d__11::MoveNext()
-DA:40,0
-DA:41,0
-DA:42,0
-DA:43,0
-DA:44,0
-DA:45,0
-DA:46,0
-DA:47,0
-DA:48,0
-DA:49,0
+FNDA:1,System.Void Persistence.Hubs.ProgressHub/<SendError>d__11::MoveNext()
+DA:40,1
+DA:41,1
+DA:42,1
+DA:43,1
+DA:44,1
+DA:45,1
+DA:46,1
+DA:47,1
+DA:48,1
+DA:49,1
 FN:26,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__10::MoveNext()
-FNDA:3,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__10::MoveNext()
-DA:27,3
-DA:28,3
-DA:29,3
-DA:30,3
-DA:31,3
-DA:32,3
-DA:33,3
-DA:34,3
-DA:35,3
-DA:36,3
-DA:37,3
+FNDA:8,System.Void Persistence.Hubs.ProgressHub/<SendProgress>d__10::MoveNext()
+DA:27,8
+DA:28,8
+DA:29,8
+DA:30,8
+DA:31,8
+DA:32,8
+DA:33,8
+DA:34,8
+DA:35,8
+DA:36,8
+DA:37,8
 LF:25
-LH:15
+LH:25
 BRF:0
 BRH:0
 FNF:3
-FNH:2
+FNH:3
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Database\QdrantDatabaseWrapper.cs
 FN:20,System.Byte[] Persistence.Database.QdrantDatabaseWrapper::get_NextRandomBytes()

@@ -8,5 +8,8 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.projectLanguageModel": 2,
-    "CodeGPT.apiKey": "Ollama"
+    "CodeGPT.apiKey": "Ollama",
+    "files.associations": {
+        "docker-stack.yml": "yaml"
+    }
 }

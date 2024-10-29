@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Persistence.Cache;
-using Xunit;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Cache
 {
@@ -19,7 +15,8 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Cache
             var cache = new MemoryCacheEmbeddingCache(options);
 
             var field = typeof(MemoryCacheEmbeddingCache).GetField("_cacheOptions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var cacheOptions = (MemoryCacheEntryOptions)field.GetValue(cache);
+            var cacheOptions = (MemoryCacheEntryOptions)field!.GetValue(cache)!;
+            Assert.NotNull(cacheOptions);
             Assert.Equal(1, cacheOptions.Size);
         }
 
