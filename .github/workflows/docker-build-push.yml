@@ -18,67 +18,9 @@ jobs:
           name: repo-artifact
           path: .
           retention-days: 1
-  
-  restore:
-    needs: checkout
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download repository
-        uses: actions/download-artifact@v3
-        with:
-          name: repo-artifact
-          path: .
-
-      - name: Clear NuGet cache
-        run: dotnet nuget locals all --clear
-
-      - name: Restore
-        run: dotnet restore Backend/SmartExcelAnalyzerBackend.sln
-
-      - name: Upload restored packages
-        uses: actions/upload-artifact@v3
-        with:
-          name: restored-packages
-          path: ./**/obj
-          retention-days: 1
-
-  build:
-    needs: restore
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download restored packages
-        uses: actions/download-artifact@v3
-        with:
-          name: restored-packages
-          path: .
-
-      - name: Build
-        run: dotnet build Backend/SmartExcelAnalyzerBackend.sln --no-restore
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: ./**/bin
-          retention-days: 1
-
-  run-tests:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: .
-
-      - name: Run tests
-        run: dotnet test Backend/SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj -c Backend/SmartExcelAnalyzer.Tests/xunit.runner.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   backend-build:
-    needs: run-tests
+    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
@@ -93,14 +35,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Backend
+      - name: 1.) Builds Project 2.) Runs Tests 3.) Builds Docker Image 4.) Pushes to Container Registry
         uses: docker/build-push-action@v4
         with:
           context: ./Backend
           file: ./Backend/backend.Dockerfile
 
   frontend-build:
-    needs: run-tests
+    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
@@ -124,7 +66,7 @@ jobs:
           tags: fivemowner/smart-excel-analyzer-frontend:latest
 
   llm-build:
-    needs: run-tests
+    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Download repository
