@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
 import { uploadFile, submitQuery } from './services/api';
-import { SubmitQueryResponse } from './services/SubmitQueryResponse';
+import { SubmitQueryResponse } from './interfaces/SubmitQueryResponse.ts';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';
-import QueryResult from './components/QueryResult/QueryResult';
+import QueryResult from './components/QueryResult/QueryResult.tsx';
+import { Document } from './interfaces/Document.tsx';
 
 const theme = createTheme({
   palette: {
@@ -22,11 +23,6 @@ const theme = createTheme({
     },
   },
 });
-
-interface Document {
-  id: string;
-  name: string;
-}
 
 function App() {
   const [toastOpen, setToastOpen] = useState(false);

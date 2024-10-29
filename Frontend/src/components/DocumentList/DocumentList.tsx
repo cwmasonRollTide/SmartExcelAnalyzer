@@ -5,17 +5,7 @@ import {
   ListItemButton, 
   ListItemText 
 } from '@mui/material';
-
-interface Document {
-  id: string;
-  name: string;
-}
-
-interface DocumentListProps {
-  documents: Document[];
-  selectedDocument: Document | null;
-  onSelectDocument: (document: Document) => void;
-}
+import { DocumentListProps } from '../../interfaces/DocumentListProps';
 
 const DocumentList: React.FC<DocumentListProps> = ({
   documents,

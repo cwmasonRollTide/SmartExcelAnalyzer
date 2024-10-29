@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, Typography, Box, LinearProgress } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
 const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || 'http://localhost:5001';
-
-interface FileUploadProps {
-  onFileUpload: (file: File) => void;
-}
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const [dragActive, setDragActive] = useState(false);
