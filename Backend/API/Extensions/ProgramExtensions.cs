@@ -21,10 +21,9 @@ public static class ProgramExtensions
     public static WebApplicationBuilder AddSmartExcelFileAnalyzerVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
-        builder.Configuration.AddEnvironmentVariables();
-        // TODO: KEYVAULT when in Azure
         builder!.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+        builder.Configuration.AddEnvironmentVariables();
         return builder;
     }
 
