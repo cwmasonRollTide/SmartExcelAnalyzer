@@ -40,6 +40,18 @@ jobs:
           name: repo-artifact
           path: .
 
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: ./Backend
+
+      - name: Build Backend
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./Backend
+
+      - name: Run Tests
+        run: dotnet test --no-restore --verbosity normal
+        working-directory: ./Backend
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
