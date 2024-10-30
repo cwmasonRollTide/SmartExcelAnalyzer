@@ -7,9 +7,21 @@ namespace Persistence.Repositories;
 
 public interface ILLMRepository
 {
-    Task<float[]?> ComputeEmbedding(string text, CancellationToken cancellationToken = default);
-    Task<QueryAnswer> QueryLLM(string document_id, string question, CancellationToken cancellationToken = default);
-    Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(IEnumerable<string> texts, CancellationToken cancellationToken = default);
+    Task<float[]?> ComputeEmbedding(
+        string text, 
+        CancellationToken cancellationToken = default
+    );
+
+    Task<QueryAnswer> QueryLLM(
+        string document_id, 
+        string question, 
+        CancellationToken cancellationToken = default
+    );
+
+    Task<IEnumerable<float[]?>> ComputeBatchEmbeddings(
+        IEnumerable<string> texts, 
+        CancellationToken cancellationToken = default
+    );
 }
 
 /// <summary>
