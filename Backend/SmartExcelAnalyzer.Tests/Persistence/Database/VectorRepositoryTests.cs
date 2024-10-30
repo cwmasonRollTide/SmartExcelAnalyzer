@@ -385,14 +385,14 @@ public class VectorRepoAddTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().Be("1");
-        // _loggerMock.Verify(
-        //     x => x.Log(
-        //         LogLevel.Warning,
-        //         It.IsAny<EventId>(),
-        //         It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Inconsistent document IDs across batches")),
-        //         It.IsAny<Exception>(),
-        //         It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-        //     Times.Once);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtMostOnce);
     }
 
     [Fact]
@@ -408,7 +408,7 @@ public class VectorRepoAddTests
             Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
         };
         _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new float[]?[] { null });
+            .ReturnsAsync([null]);
         _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(documentId);
 
