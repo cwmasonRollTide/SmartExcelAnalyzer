@@ -11,7 +11,7 @@ import { Document } from './interfaces/Document.tsx';
 import ThemeSwitch from './components/ThemeSwitch/ThemeSwitch.tsx';
 import { ThemeMode, ThemeModeEnum } from './interfaces/ThemeMode.tsx';
 
-const theme = createTheme({
+const originalTheme = createTheme({
   palette: {
     mode: ThemeModeEnum.LIGHT,
     primary: {
@@ -49,11 +49,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [theme, setTheme] = useState(createTheme({
-    palette: {
-      mode: ThemeModeEnum.DARK,
-    },
-  }));
+  const [theme, setTheme] = useState(originalTheme);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);

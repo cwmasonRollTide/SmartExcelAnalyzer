@@ -11,15 +11,10 @@ import { ThemeMode, ThemeModeEnum } from '../../interfaces/ThemeMode';
  * @param setThemeMode - The function to set the theme mode
  * @returns 
  */
-const ThemeSwitch = (
-  {
-    themeMode, 
-    setThemeMode
-  }: {
-    themeMode: ThemeMode, 
-    setThemeMode: (themeMode: ThemeMode) => void
-  }
-) => {
+const ThemeSwitch: React.FC<{
+  themeMode: ThemeMode; 
+  setThemeMode: (themeMode: ThemeMode) => void;
+}> = ({ themeMode, setThemeMode }) => {
   return ( 
     <MaterialUISwitch 
       sx={{ m: 1 }} 
