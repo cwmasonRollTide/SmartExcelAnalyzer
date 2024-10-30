@@ -1067,8 +1067,8 @@ FNH:7
 end_of_record
 SF:c:\Users\Connor\projects\SmartExcelAnalyzer\Backend\Persistence\Repositories\VectorRepository.cs
 FN:459,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
-FNDA:18,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
-DA:460,18
+FNDA:17,System.Diagnostics.Stopwatch Persistence.Repositories.VectorRepository::get_Now()
+DA:460,17
 FN:37,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
 FNDA:53,System.Void Persistence.Repositories.VectorRepository::.ctor(Persistence.Database.IDatabaseWrapper,Microsoft.Extensions.Logging.ILogger`1<Persistence.Repositories.VectorRepository>,Persistence.Repositories.ILLMRepository,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.LLMServiceOptions>,Microsoft.Extensions.Options.IOptions`1<Domain.Persistence.Configuration.DatabaseOptions>)
 DA:38,53
@@ -1081,8 +1081,8 @@ DA:44,53
 DA:74,53
 DA:75,53
 FN:421,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-FNDA:54,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
-DA:422,54
+FNDA:43,System.ValueTuple`2<System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[]> Persistence.Repositories.VectorRepository/<>c::<ProcessBatchAsync>b__37_0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>,System.Single[])
+DA:422,43
 FN:253,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 FNDA:138,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass33_1/<<CreateBatchesAsync>b__0>d::MoveNext()
 DA:254,138
@@ -1091,31 +1091,31 @@ DA:256,138
 DA:257,138
 DA:258,138
 DA:259,138
-DA:260,2
-DA:261,2
-DA:262,2
-DA:263,2
-DA:264,2
+DA:260,1
+DA:261,1
+DA:262,1
+DA:263,1
+DA:264,1
 DA:265,138
 DA:266,138
 BRDA:258,98,0,38
 BRDA:258,98,1,100
-BRDA:259,200,0,2
+BRDA:259,200,0,1
 BRDA:259,200,1,138
 FN:303,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
 FNDA:0,System.String Persistence.Repositories.VectorRepository/<>c__DisplayClass34_0::<ComputeEmbeddingsAsync>b__0(System.Collections.Concurrent.ConcurrentDictionary`2<System.String,System.Object>)
 DA:304,0
 FN:426,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-FNDA:40,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
-DA:427,40
-DA:428,40
-DA:429,40
-DA:430,78
+FNDA:30,System.Void Persistence.Repositories.VectorRepository/<>c__DisplayClass37_0/<<ProcessBatchAsync>b__1>d::MoveNext()
+DA:427,30
+DA:428,30
+DA:429,30
+DA:430,58
 DA:431,2
-DA:433,40
-DA:434,40
-DA:435,40
-BRDA:430,77,0,38
+DA:433,30
+DA:434,30
+DA:435,30
+BRDA:430,77,0,28
 BRDA:430,77,1,2
 FN:291,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
 FNDA:23,System.Void Persistence.Repositories.VectorRepository/<ComputeEmbeddingsAsync>d__34::MoveNext()
@@ -1124,25 +1124,25 @@ DA:293,23
 DA:294,23
 DA:296,23
 DA:297,23
-DA:298,95
-DA:299,18
-DA:300,18
-DA:301,18
-DA:302,18
-DA:303,18
-DA:305,18
-DA:306,18
-DA:307,18
-DA:308,14
-DA:309,14
-DA:310,14
-DA:311,14
-DA:312,14
-DA:313,14
-DA:314,14
-DA:315,14
+DA:298,93
+DA:299,17
+DA:300,17
+DA:301,17
+DA:302,17
+DA:303,17
+DA:305,17
+DA:306,17
+DA:307,17
+DA:308,13
+DA:309,13
+DA:310,13
+DA:311,13
+DA:312,13
+DA:313,13
+DA:314,13
+DA:315,13
 DA:316,0
-DA:317,14
+DA:317,13
 DA:318,17
 DA:319,2
 DA:320,2
@@ -1156,11 +1156,11 @@ DA:328,23
 DA:329,23
 DA:330,23
 DA:331,23
-BRDA:298,926,1,18
+BRDA:298,926,1,17
 BRDA:302,289,0,17
-BRDA:302,289,1,18
-BRDA:310,545,0,14
-BRDA:314,714,0,13
+BRDA:302,289,1,17
+BRDA:310,545,0,13
+BRDA:314,714,0,12
 BRDA:314,714,1,1
 BRDA:310,545,1,0
 BRDA:298,926,0,17
@@ -1193,49 +1193,49 @@ DA:283,23
 BRDA:269,368,0,16
 BRDA:269,368,1,21
 FN:415,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-FNDA:14,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
-DA:416,14
-DA:417,14
-DA:418,14
-DA:419,14
-DA:420,14
-DA:421,14
-DA:423,14
-DA:424,14
-DA:425,14
-DA:426,14
-DA:432,14
-DA:436,14
-DA:437,14
+FNDA:13,System.Void Persistence.Repositories.VectorRepository/<ProcessBatchAsync>d__37::MoveNext()
+DA:416,13
+DA:417,13
+DA:418,13
+DA:419,13
+DA:420,13
+DA:421,13
+DA:423,13
+DA:424,13
+DA:425,13
+DA:426,13
+DA:432,13
+DA:436,13
+DA:437,13
 FN:381,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-FNDA:14,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
-DA:382,14
-DA:383,14
-DA:384,14
-DA:386,14
-DA:387,14
-DA:388,14
-DA:389,14
-DA:390,14
-DA:391,14
-DA:392,14
-DA:393,14
-DA:394,14
-DA:395,14
-DA:396,14
-DA:397,14
-DA:398,14
-DA:399,14
-DA:400,13
-DA:401,13
-DA:402,13
-DA:405,14
-DA:406,14
-DA:407,14
-DA:408,13
-BRDA:382,16,0,14
-BRDA:382,16,1,28
-BRDA:401,528,0,12
+FNDA:13,System.Void Persistence.Repositories.VectorRepository/<ProcessChannelMessageAsync>d__36::MoveNext()
+DA:382,13
+DA:383,13
+DA:384,13
+DA:386,13
+DA:387,13
+DA:388,13
+DA:389,13
+DA:390,13
+DA:391,13
+DA:392,13
+DA:393,13
+DA:394,13
+DA:395,13
+DA:396,13
+DA:397,13
+DA:398,13
+DA:399,13
+DA:400,12
+DA:401,12
+DA:402,12
+DA:405,13
+DA:406,13
+DA:407,13
+DA:408,12
+BRDA:382,16,0,13
+BRDA:382,16,1,26
+BRDA:401,528,0,11
 BRDA:401,528,1,1
 FN:136,System.Void Persistence.Repositories.VectorRepository/<QueryVectorDataAsync>d__31::MoveNext()
 FNDA:23,System.Void Persistence.Repositories.VectorRepository/<QueryVectorDataAsync>d__31::MoveNext()
@@ -1298,27 +1298,27 @@ BRDA:164,602,1,4
 BRDA:164,622,0,4
 BRDA:164,622,1,4
 FN:443,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-FNDA:14,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
-DA:444,14
-DA:445,14
-DA:446,14
-DA:447,14
-DA:448,14
-DA:449,14
-DA:450,13
+FNDA:13,System.Void Persistence.Repositories.VectorRepository/<SaveBatchOfRowEmbeddings>d__38::MoveNext()
+DA:444,13
+DA:445,13
+DA:446,13
+DA:447,13
+DA:448,13
+DA:449,13
+DA:450,12
 DA:451,2
 DA:452,2
 DA:453,2
-DA:455,21
-DA:456,2
-DA:457,11
-DA:458,13
+DA:455,20
+DA:456,0
+DA:457,10
+DA:458,12
 BRDA:450,176,0,2
-BRDA:450,176,1,11
+BRDA:450,176,1,10
 BRDA:455,241,0,10
-BRDA:455,241,1,1
-BRDA:456,278,0,1
-BRDA:456,278,1,11
+BRDA:455,241,1,0
+BRDA:456,278,0,0
+BRDA:456,278,1,10
 FN:91,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 FNDA:29,System.Void Persistence.Repositories.VectorRepository/<SaveDocumentAsync>d__30::MoveNext()
 DA:92,29
@@ -1403,17 +1403,17 @@ DA:343,23
 DA:344,23
 DA:346,23
 DA:347,23
-DA:348,90
-DA:349,14
-DA:350,14
-DA:351,14
-DA:352,14
-DA:353,14
-DA:354,14
-DA:355,14
-DA:356,14
-DA:357,14
-DA:358,13
+DA:348,88
+DA:349,13
+DA:350,13
+DA:351,13
+DA:352,13
+DA:353,13
+DA:354,13
+DA:355,13
+DA:356,13
+DA:357,13
+DA:358,12
 DA:359,20
 DA:360,2
 DA:361,2
@@ -1425,14 +1425,14 @@ DA:366,1
 DA:367,1
 DA:368,23
 DA:369,23
-BRDA:348,455,1,14
+BRDA:348,455,1,13
 BRDA:348,455,0,20
 BRDA:368,742,0,13
 BRDA:368,742,1,23
 LF:275
-LH:269
+LH:268
 BRF:58
-BRH:55
+BRH:53
 FNF:15
 FNH:14
 end_of_record
