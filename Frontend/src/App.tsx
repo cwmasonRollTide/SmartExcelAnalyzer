@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
 import { uploadFile, submitQuery } from './services/api';
