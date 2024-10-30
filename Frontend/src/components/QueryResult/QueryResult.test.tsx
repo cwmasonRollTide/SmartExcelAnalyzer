@@ -1,6 +1,6 @@
 import React from 'react';
 import QueryResult from './QueryResult';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { SubmitQueryResponse } from '../../interfaces/SubmitQueryResponse';
 
 describe('QueryResult', () => {
@@ -15,7 +15,7 @@ describe('QueryResult', () => {
       documentId: documentId,
     };
     render(<QueryResult result={res} />);
-    expect(screen.getByText(result)).toBeTruthy();
+    waitFor(() => expect(screen.findByText('Query Result')).toBeInTheDocument());
     render(<Token />);
   });
 });

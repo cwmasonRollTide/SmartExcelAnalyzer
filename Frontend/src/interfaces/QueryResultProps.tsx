@@ -1,5 +1,15 @@
-import { SubmitQueryResponse } from "./SubmitQueryResponse";
 
 export interface QueryResultProps {
-  result: SubmitQueryResponse;
+  result: SubmitQueryResult;
+}
+
+export interface SubmitQueryResult {
+
+    answer: string;
+
+    question: string;
+
+    documentId: string;
+
+    relevantRows: Array<{ [key: string]: any }>;
 }

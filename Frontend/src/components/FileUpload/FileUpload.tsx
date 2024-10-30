@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Box, LinearProgress } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { Typography, Box, LinearProgress } from '@mui/material';
+import { FileUpload as MuiFileUpload } from '@mui/icons-material';
+import { useDropzone } from 'react-dropzone';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
-const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
+const SIGNALR_HUB_URL = 'http://localhost:5001'//import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
-  const [dragActive, setDragActive] = useState(false);
+const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
   const [saveProgress, setSaveProgress] = useState(0);
   const [connection, setConnection] = useState<HubConnection | null>(null);
@@ -35,86 +35,59 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
     }
   }, [connection]);
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
+  const onDrop = (acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      onFileUpload(acceptedFiles[0]);
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      onFileUpload(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      onFileUpload(e.target.files[0]);
-    }
-  };
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({
+    onDrop,
+    accept: {
+      'application/vnd.ms-excel': ['.xls', '.xlsx'],
+      'text/csv': ['.csv'],
+    },
+    maxFiles: 1,
+  });
 
   return (
     <Box
-      onDrop={handleDrop}
-      onDragOver={handleDrag}
-      onDragEnter={handleDrag}
-      onDragLeave={handleDrag}
+      {...getRootProps()}
       sx={{
         border: '2px dashed',
-        borderColor: dragActive ? 'primary.main' : 'grey.300',
+        borderColor: isDragActive ? 'primary.main' : 'grey.300',
         borderRadius: 2,
         p: 2,
         textAlign: 'center',
         cursor: 'pointer',
       }}
     >
-      <input
-        type="file"
-        id="file-upload"
-        style={{ display: 'none' }}
-        onChange={handleChange}
-        accept=".xlsx,.xls,.csv"
-      />
-      <label htmlFor="file-upload">
-        <Button
-          component="span"
-          variant="contained"
-          startIcon={<CloudUploadIcon />}
-        >
-          Upload Excel or CSV
-        </Button>
-      </label>
+      <input {...getInputProps()} />
+      <MuiFileUpload sx={{ fontSize: 48 }} />
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Drag and drop your file here or click to select
+        {isDragActive ? 
+          'Drop the file here...' :
+          'Drag and drop your file here or click to select'
+        }
       </Typography>
       {(parseProgress > 0 || saveProgress > 0) && (
         <Box sx={{ mt: 2 }}>
-          <Typography 
-            variant="body2"
-          >
+          <Typography variant="body2">
             Parsing Progress:
           </Typography>
           <LinearProgress 
-            variant="determinate" 
-            value={parseProgress} 
+            variant="determinate"
+            value={parseProgress}
           />
-          <Typography 
-            variant="body2" 
-            sx={{ mt: 1 }}
+          <Typography
+            variant="body2"
+            sx={{ mt: 1 }} 
           >
             Saving Progress:
           </Typography>
-          <LinearProgress 
+          <LinearProgress
             variant="determinate" 
-            value={saveProgress} 
+            value={saveProgress}
           />
         </Box>
       )}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SubmitQueryResponse } from '../interfaces/SubmitQueryResponse';
+import { SubmitQueryResponse } from './SubmitQueryResponse';
 
 export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();

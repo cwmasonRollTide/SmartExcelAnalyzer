@@ -22,5 +22,4 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/interfaces/Document.tsx"]
 }

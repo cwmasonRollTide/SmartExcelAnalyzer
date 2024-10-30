@@ -1,4 +1,3 @@
-
 export interface SubmitQueryResponse {
   answer: string;
   question?: string;
