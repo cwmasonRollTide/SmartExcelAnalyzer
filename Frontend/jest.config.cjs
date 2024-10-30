@@ -8,5 +8,5 @@ module.exports = {
   globals: {
     'import.meta.env': global.importMetaEnv,
   },
-  verbose: true, 
+  verbose: true,
 };
