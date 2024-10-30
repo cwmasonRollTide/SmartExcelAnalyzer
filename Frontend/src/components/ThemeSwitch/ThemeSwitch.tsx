@@ -1,3 +1,4 @@
+import React from 'react';
 import { ChangeEvent } from 'react';
 import Switch from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
@@ -10,23 +11,21 @@ import { ThemeMode, ThemeModeEnum } from '../../interfaces/ThemeMode';
  * @param setThemeMode - The function to set the theme mode
  * @returns 
  */
-const ThemeSwitch = (
-  {
-    themeMode, 
-    setThemeMode
-  }: {
-    themeMode: ThemeMode, 
-    setThemeMode: (themeMode: ThemeMode) => void
-  }
-) => {
+const ThemeSwitch: React.FC<{
+  themeMode: ThemeMode; 
+  setThemeMode: (themeMode: ThemeMode) => void;
+}> = ({ themeMode, setThemeMode }) => {
   return ( 
     <MaterialUISwitch 
       sx={{ m: 1 }} 
       checked={themeMode.mode === ThemeModeEnum.DARK}
       onChange={(
-        _: ChangeEvent<HTMLInputElement>, checked: boolean
+        _:  ChangeEvent<HTMLInputElement>, 
+            checked: boolean
       ) => {
-        setThemeMode({mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT});
+        setThemeMode({
+          mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT,
+        });
       }}
     /> 
   );

@@ -1,7 +1,6 @@
-
 export interface SubmitQueryResponse {
   answer: string;
-  question: string;
+  question?: string;
   documentId: string;
-  relevantRows: Record<string, unknown>[];
+  relevantRows?: Record<string, unknown>[];
 }

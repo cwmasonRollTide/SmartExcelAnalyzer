@@ -6,7 +6,7 @@ COPY . .
 RUN dotnet restore
 
 RUN PROJECT_TEST_PATH=$(find . -name 'SmartExcelAnalyzer.Tests.csproj') && \
-dotnet test $PROJECT_TEST_PATH
+dotnet test $PROJECT_TEST_PATH --collect:"XPlat Code Coverage" --settings ./coverlet.runsettings
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0
 WORKDIR /app

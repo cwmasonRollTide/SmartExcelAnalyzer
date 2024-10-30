@@ -10,6 +10,10 @@ jobs:
   checkout:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
       - uses: actions/checkout@v3
       
       - name: Upload repository
@@ -50,6 +54,14 @@ jobs:
         with:
           name: repo-artifact
           path: .
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./Frontend
+
+      # - name: Run Tests
+      #   run: npm test -- --verbose
+      #   working-directory: ./Frontend
 
       - name: Login to DockerHub
         uses: docker/login-action@v2

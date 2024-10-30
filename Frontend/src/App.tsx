@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
 import { uploadFile, submitQuery } from './services/api';
-import { SubmitQueryResponse } from './interfaces/SubmitQueryResponse.ts';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';
@@ -10,8 +9,9 @@ import QueryResult from './components/QueryResult/QueryResult.tsx';
 import { Document } from './interfaces/Document.tsx';
 import ThemeSwitch from './components/ThemeSwitch/ThemeSwitch.tsx';
 import { ThemeMode, ThemeModeEnum } from './interfaces/ThemeMode.tsx';
+import { SubmitQueryResult } from './interfaces/QueryResultProps.tsx';
 
-const theme = createTheme({
+const originalTheme = createTheme({
   palette: {
     mode: ThemeModeEnum.LIGHT,
     primary: {
@@ -49,15 +49,11 @@ const theme = createTheme({
 });
 
 function App() {
-  const [theme, setTheme] = useState(createTheme({
-    palette: {
-      mode: ThemeModeEnum.DARK,
-    },
-  }));
+  const [theme, setTheme] = useState(originalTheme);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [queryResult, setQueryResult] = useState<SubmitQueryResponse | null>(null);
+  const [queryResult, setQueryResult] = useState<SubmitQueryResult | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
 
@@ -85,7 +81,10 @@ function App() {
           question,
           selectedDocument.id
         );
-        setQueryResult(result);
+        setQueryResult({
+          ...result,
+          relevantRows: result.relevantRows || [],
+        });
       } catch (error) {
         console.error('Query submission failed:', error);
         showToast('Query submission failed', 'error');
