@@ -21,6 +21,7 @@ jobs:
       
       - name: Install dependencies
         run: npm install
+        working-directory: ./Frontend
 
       - name: Upload repository
         uses: actions/upload-artifact@v3
