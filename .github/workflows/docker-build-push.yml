@@ -19,8 +19,8 @@ jobs:
           node-version: '20.11.1'
       - uses: actions/checkout@v3
       
-      - name: Permissions for ESBuild
-        run: sudo chmod -R 755 ./Frontend/node_modules/esbuild
+      # - name: Permissions for ESBuild
+      #   run: sudo chmod -R 755 ./Frontend/node_modules/esbuild
 
       - name: Install dependencies
         run: npm install
