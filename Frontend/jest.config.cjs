@@ -3,7 +3,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': 'babel-jest',
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'cjs', 'json'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   globals: {
     'import.meta.env': global.importMetaEnv,
