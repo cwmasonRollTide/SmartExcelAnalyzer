@@ -15,5 +15,12 @@ describe('ThemeSwitch', () => {
     render(<ThemeSwitch themeMode={{ mode: ThemeModeEnum.LIGHT }} setThemeMode={onToggleMock} />);
     fireEvent.click(await screen.findByRole('checkbox'));
     await waitFor(() => expect(onToggleMock).toHaveBeenCalled());
+    render(<Token />);
   });
 });
+
+const Token: React.FC = () => {
+  return <div>Token</div>;
+};
+
+

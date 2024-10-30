@@ -19,5 +19,10 @@ describe('QueryForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Submit Query' }));
     
     expect(onQuerySubmitMock).toHaveBeenCalledWith(query);
+    render(<Token />);
   });
 });
+
+const Token: React.FC = () => {
+  return <div>Token</div>;
+};

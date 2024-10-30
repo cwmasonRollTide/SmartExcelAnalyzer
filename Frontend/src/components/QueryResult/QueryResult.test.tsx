@@ -16,5 +16,10 @@ describe('QueryResult', () => {
     };
     render(<QueryResult result={res} />);
     expect(screen.getByText(result)).toBeTruthy();
+    render(<Token />);
   });
 });
+
+const Token: React.FC = () => {
+  return <div>Token</div>;
+};
