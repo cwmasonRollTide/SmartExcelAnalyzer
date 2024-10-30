@@ -15,6 +15,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
+      - Environment=Development
     ports:
       - "5001:80"
 

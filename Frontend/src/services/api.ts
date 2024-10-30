@@ -5,7 +5,7 @@ export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('filename', file.name);
-  const response = await axios.post('/analysis/upload', formData, {
+  const response = await axios.post('/api/analysis/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -17,7 +17,7 @@ export const submitQuery = async (
   query: string, 
   documentId: string
 ): Promise<SubmitQueryResponse> => {
-  const response = await axios.post<SubmitQueryResponse>('/analysis/query', {
+  const response = await axios.post<SubmitQueryResponse>('/api/analysis/query', {
     query,
     documentId,
   });

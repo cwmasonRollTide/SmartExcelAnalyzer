@@ -29,7 +29,6 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
-        builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
         builder.Services.AddLogging();
         builder.Services.AddApplicationInsightsTelemetry();
@@ -144,7 +143,8 @@ public static class ProgramExtensions
 
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment()) app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
+        if (app.Environment.IsDevelopment()) 
+            app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
 
         app.UseCors()
            .UseRouting()

@@ -1,3 +1,5 @@
+version: '3.8'
+
 x-healthcheck: &default-healthcheck
   interval: 120s
   timeout: 10s
@@ -16,6 +18,8 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+    volumes:
+      - qdrant_data:/qdrant/data
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -24,21 +28,23 @@ services:
       replicas: 3
     ports:
       - "8000:8000"
-    depends_on:
-      - qdrant
+    volumes:
+      - ./LLM:/app
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
+    depends_on:
+      - qdrant
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
     ports:
       - "5001:80"
-    depends_on:
-      - qdrant
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+    depends_on:
+      - qdrant
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest

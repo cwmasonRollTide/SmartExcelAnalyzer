@@ -18,18 +18,19 @@
     - [3. Ask a Question](#3-ask-a-question)
   - [Development](#development)
     - [Backend Setup](#backend-setup)
-      - [Windows (PowerShell)](#windows-powershell)
-      - [macOS](#macos)
-      - [Linux](#linux)
+      - [Windows (PowerShell)](#be-setup---windows-powershell)
+      - [macOS](#be-setup---macos)
+      - [Linux](#be-setup---linux)
     - [Frontend Setup](#frontend-setup)
-      - [Windows (PowerShell)](#windows-powershell-1)
-      - [macOS](#macos-1)
-      - [Linux](#linux-1)
+      - [Windows (PowerShell)](#fe-setup---windows-powershell)
+      - [macOS](#fe-setup---macos)
+      - [Linux](#fe-setup---linux)
     - [LLM Services Setup](#llm-services-setup)
-      - [Windows (PowerShell)](#windows-powershell-2)
-      - [macOS](#macos-2)
-      - [Linux](#linux-2)
-    - [Run the whole project:](#run-the-whole-project)
+      - [Windows (PowerShell)](#llm-setup---windows-powershell)
+      - [macOS](#llm-setup---macos)
+      - [Linux](#llm-setup---linux)
+    - [Run the whole project with docker compose:](#run-the-whole-project-with-docker-compose)
+    - [Run the whole project with docker swarm:](#run-the-whole-project-with-docker-swarm)
   - [Docker](#docker)
   - [Testing](#testing)
   - [Contact](#contact)
@@ -244,68 +245,75 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### Backend Setup
 
-#### Windows (PowerShell)
-```powershell
-# Install .NET 8 SDK from https://dotnet.microsoft.com/download/dotnet/8.0
-cd Backend
-dotnet restore
-```
+- #### BE Setup - Windows (PowerShell)
 
-#### macOS
-```bash
-# Install .NET 8 SDK
-brew install dotnet@8
+    ```powershell
+    # Install .NET 8 SDK from https://dotnet.microsoft.com/download/dotnet/8.0
+    cd Backend
+    dotnet restore
+    ```
 
-cd Backend
-dotnet restore
-```
+- #### BE Setup - macOS
 
-#### Linux
-```bash
-# Install .NET 8 SDK (Ubuntu/Debian)
-wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-sudo dpkg -i packages-microsoft-prod.deb
-sudo apt-get update
-sudo apt-get install -y dotnet-sdk-8.0
+  ```bash
+  # Install .NET 8 SDK
+  brew install dotnet@8
 
-cd Backend
-dotnet restore
-```
+  cd Backend
+  dotnet restore
+  ```
+
+- #### BE Setup - Linux
+
+  ```bash
+  # Install .NET 8 SDK (Ubuntu/Debian)
+  wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  sudo dpkg -i packages-microsoft-prod.deb
+  sudo apt-get update
+  sudo apt-get install -y dotnet-sdk-8.0
+
+  cd Backend
+  dotnet restore
+  ```
 
 ### Frontend Setup
 
-#### Windows (PowerShell)
-```powershell
-# Install Node.js from https://nodejs.org/
-cd Frontend
-npm install
-npm run dev
-```
+- #### FE Setup - Windows (PowerShell)
 
-#### macOS
-```bash
-# Install Node.js
-brew install node
+  ```powershell
+  # Install Node.js from https://nodejs.org/
+  cd Frontend
+  npm install
+  npm run dev
+  ```
 
-cd Frontend
-npm install
-npm run dev
-```
+- #### FE Setup - macOS
 
-#### Linux
-```bash
-# Install Node.js (Ubuntu/Debian)
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt-get install -y nodejs
+  ```bash
+  # Install Node.js
+  brew install node
 
-cd Frontend
-npm install
-npm run dev
-```
+  cd Frontend
+  npm install
+  npm run dev
+  ```
+
+- #### FE Setup - Linux
+
+  ```bash
+  # Install Node.js (Ubuntu/Debian)
+  curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+
+  cd Frontend
+  npm install
+  npm run dev
+  ```
 
 ### LLM Services Setup
 
-#### Windows (PowerShell)
+#### LLM Setup - Windows (PowerShell)
+
 ```powershell
 # Install Python 3.9+ from https://www.python.org/downloads/
 cd LLM
@@ -314,7 +322,8 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-#### macOS
+#### LLM Setup - macOS
+
 ```bash
 # Install Python 3.9+
 brew install python@3.9
@@ -325,7 +334,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-#### Linux
+#### LLM Setup - Linux
+
 ```bash
 # Install Python 3.9+ (Ubuntu/Debian)
 sudo apt-get update
@@ -337,12 +347,39 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Run the whole project:
+### Run the whole project with docker compose
 
 ```powershell
 cd SmartExcelAnalyzer
 docker compose up --build -d
 ```
+
+### Run the whole project with docker swarm
+
+Another way to run the whole project is by using Docker Swarm. This is a docker service that more closely mimics a cloud environment.
+Follow these steps:
+
+  1. **Deploy the stack**:
+
+      ```powershell
+      docker stack deploy -c docker-stack.yml smart-excel-analyzer
+      ```
+
+  2. **Check the status of the services**:
+
+      ```powershell
+      docker stack services smart-excel-analyzer
+      ```
+
+  3. **Access the frontend application** at [http://localhost:3000](http://localhost:3000).
+
+  4. **Access the backend API directly** at [http://localhost:5001/swagger](http://localhost:5001/swagger).
+
+  5. **Tear down the stack**:
+
+      ```powershell
+      docker stack rm smart-excel-analyzer
+      ```
 
 ## Docker
 
