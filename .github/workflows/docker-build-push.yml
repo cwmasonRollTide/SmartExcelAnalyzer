@@ -19,6 +19,9 @@ jobs:
           node-version: '20'
       - uses: actions/checkout@v3
       
+      - name: Install dependencies
+        run: npm install
+
       - name: Upload repository
         uses: actions/upload-artifact@v3
         with:
