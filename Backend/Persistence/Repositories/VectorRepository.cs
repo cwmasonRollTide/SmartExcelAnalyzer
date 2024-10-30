@@ -200,11 +200,11 @@ public class VectorRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Environment.ProcessorCount - 4)
+        var batchChannel = Channel.CreateBounded<IEnumerable<ConcurrentDictionary<string, object>>>(new BoundedChannelOptions(Math.Max(1,Environment.ProcessorCount - 4))
         {
             FullMode = BoundedChannelFullMode.Wait
         });
-        var embeddingChannel = Channel.CreateBounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>(new BoundedChannelOptions(Environment.ProcessorCount - 4)
+        var embeddingChannel = Channel.CreateBounded<(IEnumerable<float[]> Embeddings, IEnumerable<ConcurrentDictionary<string, object>> Batch)>(new BoundedChannelOptions(Math.Max(1, Environment.ProcessorCount - 4))
         {
             FullMode = BoundedChannelFullMode.Wait
         });
