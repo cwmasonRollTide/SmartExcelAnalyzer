@@ -312,40 +312,40 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### LLM Services Setup
 
-#### LLM Setup - Windows (PowerShell)
+- #### LLM Setup - Windows (PowerShell)
 
-```powershell
-# Install Python 3.9+ from https://www.python.org/downloads/
-cd LLM
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
+  ```powershell
+  # Install Python 3.9+ from https://www.python.org/downloads/
+  cd LLM
+  python -m venv venv
+  .\venv\Scripts\Activate.ps1
+  pip install -r requirements.txt
+  ```
 
-#### LLM Setup - macOS
+- #### LLM Setup - macOS
 
-```bash
-# Install Python 3.9+
-brew install python@3.9
+  ```bash
+  # Install Python 3.9+
+  brew install python@3.9
 
-cd LLM
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+  cd LLM
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+  ```
 
-#### LLM Setup - Linux
+- #### LLM Setup - Linux
 
-```bash
-# Install Python 3.9+ (Ubuntu/Debian)
-sudo apt-get update
-sudo apt-get install -y python3.9 python3.9-venv python3-pip
+  ```bash
+  # Install Python 3.9+ (Ubuntu/Debian)
+  sudo apt-get update
+  sudo apt-get install -y python3.9 python3.9-venv python3-pip
 
-cd LLM
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+  cd LLM
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+  ```
 
 ### Run the whole project with docker compose
 
