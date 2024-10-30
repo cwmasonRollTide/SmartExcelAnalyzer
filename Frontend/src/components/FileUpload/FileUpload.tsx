@@ -4,8 +4,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
-const SIGNALR_HUB_URL = import.meta.env?.VITE_SIGNALR_HUB_URL || 'http://localhost:5001';
-
+const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const [dragActive, setDragActive] = useState(false);

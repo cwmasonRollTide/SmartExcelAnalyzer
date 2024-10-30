@@ -1,3 +1,4 @@
+import React from 'react';
 import { ChangeEvent } from 'react';
 import Switch from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
@@ -24,9 +25,12 @@ const ThemeSwitch = (
       sx={{ m: 1 }} 
       checked={themeMode.mode === ThemeModeEnum.DARK}
       onChange={(
-        _: ChangeEvent<HTMLInputElement>, checked: boolean
+        _:  ChangeEvent<HTMLInputElement>, 
+            checked: boolean
       ) => {
-        setThemeMode({mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT});
+        setThemeMode({
+          mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT,
+        });
       }}
     /> 
   );
