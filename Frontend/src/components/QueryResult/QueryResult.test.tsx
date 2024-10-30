@@ -1,25 +1,27 @@
 import React from 'react';
 import QueryResult from './QueryResult';
 import { render, screen, waitFor } from '@testing-library/react';
-import { SubmitQueryResponse } from '../../interfaces/SubmitQueryResponse';
+import '@testing-library/jest-dom';
+import { QueryResultProps } from '../../interfaces/QueryResultProps';
 
 describe('QueryResult', () => {
-  it('renders the query result', () => {
+  it('renders the query result', async () => {
     const result = 'Test result';
-    const question = 'Test question';
+    const question = 'Test question'; 
     const documentId = 'Test docId';
 
-    const res: SubmitQueryResponse = {
-      answer: result,
-      question: question,
-      documentId: documentId,
+    const res: QueryResultProps = {
+      result: {
+        answer: result,
+        question,
+        documentId,
+        relevantRows: [],
+      }
     };
-    render(<QueryResult result={res} />);
-    waitFor(() => expect(screen.findByText('Query Result')).toBeInTheDocument());
-    render(<Token />);
+    
+    render(<QueryResult {...res} />);
+    await waitFor(() => {
+      expect(screen.getByText('Query Result')).toBeInTheDocument();
+    });
   });
 });
-
-const Token: React.FC = () => {
-  return <div>Token</div>;
-};
