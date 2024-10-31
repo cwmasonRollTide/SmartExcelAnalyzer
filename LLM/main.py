@@ -84,9 +84,7 @@ async def process_query(query: Query) -> QueryResponse:
         inputs = tokenizer(query.question, return_tensors="pt", truncation=True, padding=True)
         with torch.no_grad():
             question_embedding = embedding_model(**inputs).last_hidden_state.mean(dim=1).numpy().tolist()[0]
-
         logger.info(f"Question Embedding: {question_embedding}")
-
         search_result = qdrant_client.search(
             collection_name="documents",
             query_vector=question_embedding,
