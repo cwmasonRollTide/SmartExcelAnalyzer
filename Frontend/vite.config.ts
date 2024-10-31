@@ -13,7 +13,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         secure: true,
-        changeOrigin: true,
+        changeOrigin: false,
         target: process.env.VITE_BASE_API_URL,
       },
     },
