@@ -1,50 +1,74 @@
-# React + TypeScript + Vite
+# Smart Excel Analyzer Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for the Smart Excel Analyzer application. It provides a web-based user interface for uploading Excel files, querying the data using natural language, and viewing the results.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📁 File upload component for sending Excel files to the backend
+- 🔍 Query form for entering natural language questions about the data
+- 📊 Document list showing uploaded files
+- 💬 Query result component displaying answers from the AI
+- 🌙 Light and dark theme UI
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React
+- TypeScript
+- Vite
+- Jest for testing
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Prerequisites
+
+- Node.js and npm installed
+- Backend API running (see main README for instructions)
+
+### Running Locally
+
+- Install dependencies:
+
+```powershell
+  npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- Start the dev server:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```powershell
+  npm run dev
 ```
+
+### Running with Docker
+
+- Build the Docker Image:
+  
+  ```powershell
+  docker build -t smart-excel-analyzer-frontend -f frontend.Dockerfile .
+  ```
+  
+- Run the Container:
+  
+  ```powershell
+  docker run -p 3000:3000 smart-excel-analyzer-frontend
+  ```
+  
+- Open <http://localhost:3000> in your browser
+
+## Other Commands
+
+- `npm test` - Run the test suite
+- `npm run build` - Build the production version of the app
+- `npm run lint` - Lint the code using ESLint
+
+### Project Components
+
+| Component                         | Description                                                                        |
+|-----------------------------------|------------------------------------------------------------------------------------|
+| **App.tsx**                       | Main application component. Manages state for uploaded documents and query results.|
+| **FileUpload**                    | Allows user to select an Excel file and upload it to the backend.                  |
+| **QueryForm**                     | Accepts natural language questions from the user and submits them to the backend.  |
+| **DocumentList**                  | Displays a list of uploaded Excel files                                            |
+| **QueryResult**                   | Shows the result of the most recent query.                                         |
+| **ThemeSwitch**                   | Allows toggling between light and dark UI themes.                                  |
+
+*The `services` directory contains modules for interacting with the backend API.*

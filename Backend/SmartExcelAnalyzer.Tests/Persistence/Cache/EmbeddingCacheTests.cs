@@ -92,7 +92,7 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Cache
             cache.SetEmbedding(key1, embedding1);
             cache.SetEmbedding(key2, embedding2);
             cache.SetEmbedding(key3, embedding3);
-            cache.GetEmbedding(key2); // Access key2 to make it most recently used
+            cache.GetEmbedding(key2);
             cache.SetEmbedding(key4, embedding4);
 
             var result1 = cache.GetEmbedding(key1);
@@ -119,7 +119,7 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Cache
             await Task.WhenAll(task1, task2);
 
             var result = cache.GetEmbedding(key);
-            Assert.True(result.SequenceEqual(embedding1) || result.SequenceEqual(embedding2));
+            Assert.True(result!.SequenceEqual(embedding1) || result!.SequenceEqual(embedding2));
         }
 
         [Fact]

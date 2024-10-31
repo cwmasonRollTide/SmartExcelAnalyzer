@@ -1,0 +1,44 @@
+name: Smart Excel Analyzer .NET Backend CI/CID Workflow
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./Backend
+      
+    - name: Build
+      run: dotnet build
+      working-directory: ./Backend
+      
+    - name: Test
+      run: dotnet test
+      working-directory: ./Backend
+      
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Build and Push to DockerHub Registry
+      uses: docker/build-push-action@v4
+      with:
+        context: ./Backend
+        file: ./Backend/backend.Dockerfile
+        push: true
+        tags: fivemowner/smart-excel-analyzer-backend:latest

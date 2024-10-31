@@ -106,7 +106,7 @@ public class MongoDatabaseWrapper(
     )
     {
         var tasks = new List<Task>();
-        var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
+        var semaphore = new SemaphoreSlim(Math.Max(1,Environment.ProcessorCount-1));
         await foreach (var batch in reader.ReadAllAsync(cancellationToken))
         {
             await semaphore.WaitAsync(cancellationToken);

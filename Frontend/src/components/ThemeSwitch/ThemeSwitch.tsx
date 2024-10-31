@@ -21,10 +21,12 @@ const ThemeSwitch: React.FC<{
       checked={themeMode.mode === ThemeModeEnum.DARK}
       onChange={(
         _:  ChangeEvent<HTMLInputElement>, 
-            checked: boolean
+        checked: boolean
       ) => {
         setThemeMode({
-          mode: checked ? ThemeModeEnum.DARK : ThemeModeEnum.LIGHT,
+          mode: checked 
+            ? ThemeModeEnum.DARK 
+            : ThemeModeEnum.LIGHT,
         });
       }}
     /> 

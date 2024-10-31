@@ -1,7 +1,8 @@
 import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import QueryResult from './QueryResult';
-import { render, screen, waitFor } from '@testing-library/react';
-import { SubmitQueryResponse } from '../../interfaces/SubmitQueryResponse';
+import { QueryResultProps } from '../../interfaces/QueryResultProps';
 
 describe('QueryResult', () => {
   it('renders the query result', () => {
@@ -9,17 +10,19 @@ describe('QueryResult', () => {
     const question = 'Test question';
     const documentId = 'Test docId';
 
-    const res: SubmitQueryResponse = {
-      answer: result,
-      question: question,
-      documentId: documentId,
+    const res: QueryResultProps = {
+      result: {
+        answer: result,
+        question,
+        documentId,
+        relevantRows: [{ key: 'value' }],
+      },
     };
-    render(<QueryResult result={res} />);
-    waitFor(() => expect(screen.findByText('Query Result')).toBeInTheDocument());
-    render(<Token />);
+
+    render(<QueryResult {...res} />);
+    expect(screen.getByText('Query Result')).toBeInTheDocument();
+    expect(screen.getByText(`Question: ${question}`)).toBeInTheDocument();
+    expect(screen.getByText(`Answer: ${result}`)).toBeInTheDocument();
+    expect(screen.getByText(`Document ID: ${documentId}`)).toBeInTheDocument();
   });
 });
-
-const Token: React.FC = () => {
-  return <div>Token</div>;
-};
