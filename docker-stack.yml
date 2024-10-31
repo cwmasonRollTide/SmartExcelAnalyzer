@@ -35,6 +35,7 @@ services:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
+      - ./qdrant_data:/qdrant/data
     env_file:
       - ./LLM/.env
     healthcheck:
@@ -83,6 +84,8 @@ services:
       - ./Frontend/.env
     volumes:
       - ./Frontend/src:/app/src
+    ports:
+      - "3000:3000"
     logging:
       <<: *default-logging
     deploy:
