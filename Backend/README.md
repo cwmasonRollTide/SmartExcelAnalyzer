@@ -1,8 +1,6 @@
 # 📊 Smart Excel Analyzer Backend
 
 - [![Smart Excel Analyzer .NET Backend CI/CID Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml/badge.svg)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml)
-- [![Smart Excel Analyzer Frontend CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml)
-- [![Smart Excel Analyzer LLM CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml)
 
 *This C# project provides the backend API for the **Smart Excel Analyzer** application. It allows users to upload Excel files, extracts insights and summaries from the data using AI, and provides a natural language interface to query the data.*
 
@@ -10,7 +8,7 @@
 
 ## 🏗️ Architecture
 
-The backend is built on **.NET 8** and follows a **Clean Architecture** with multiple layers:
+The backend is built on **.NET 8** and follows **Clean Architecture / CQRS** with multiple layers:
 
 - **API Layer** (`./API`): Defines the web API endpoints and HTTP interface. Key components:
 

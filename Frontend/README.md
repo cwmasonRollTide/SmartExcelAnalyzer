@@ -1,5 +1,7 @@
 # Smart Excel Analyzer Frontend
 
+- [![Smart Excel Analyzer Frontend CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml)
+
 This is the frontend for the Smart Excel Analyzer application. It provides a web-based user interface for uploading Excel files, querying the data using natural language, and viewing the results.
 
 ## Features
@@ -38,7 +40,7 @@ This is the frontend for the Smart Excel Analyzer application. It provides a web
   npm run dev
 ```
 
-### Running with Docker
+### 🐳 Running with Docker
 
 - Build the Docker Image:
   

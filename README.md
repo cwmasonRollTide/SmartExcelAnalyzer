@@ -1,6 +1,12 @@
-# Smart Excel Analyzer
+# 📊 Smart Excel Analyzer
 
-## Table of Contents
+- [![Smart Excel Analyzer LLM CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml)
+
+- [![Smart Excel Analyzer Frontend CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/frontend-workflow.yml)
+
+- [![Smart Excel Analyzer .NET Backend CI/CID Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml/badge.svg)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml)
+
+## 📋 Table of Contents
 
 - [Smart Excel Analyzer](#smart-excel-analyzer)
   - [Table of Contents](#table-of-contents)
@@ -83,7 +89,7 @@ This project aims to transform the way users interact with spreadsheet data by p
   - Provides instant responses to queries.
   - Optimized for quick data processing.
 
-## Tech Stack
+## ⚙️ Tech Stack
 
 - **Backend**:
   - ![C#](https://img.shields.io/badge/CSharp-239120?style=for-the-badge&logo=c-sharp&logoColor=white) [C# 12](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12)
@@ -117,7 +123,7 @@ This project aims to transform the way users interact with spreadsheet data by p
   - ![ExcelDataReader](https://img.shields.io/badge/ExcelDataReader-1D76DB?style=for-the-badge&logo=excel&logoColor=white) [ExcelDataReader for Fast Excel Data Loading](https://github.com/ExcelDataReader/ExcelDataReader)
   - ![MediatR](https://img.shields.io/badge/MediatR-FF6F00?style=for-the-badge&logo=mediatR&logoColor=white) [MediatR for CQRS pattern](https://github.com/jbogard/MediatR) **Only choice in my opinion**
   
-## Architecture
+## 🏢 Architecture
 
 The Smart Excel Analyzer follows a microservices architecture:
 
@@ -135,7 +141,7 @@ The Smart Excel Analyzer follows a microservices architecture:
 
 The application uses a CQRS (Command Query Responsibility Segregation) pattern with MediatR for efficient request handling.
 
-## Setup and Installation
+## 🏠 Setup and Installation
 
 1. **Clone the repository**:
 
@@ -181,7 +187,7 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 API documentation is available via Swagger UI. After starting the backend service, navigate to:
 [http://localhost:5001/swagger](http://localhost:5001/swagger)
 
-## Full Workflow Example
+## 🌊 Full Workflow Example
 
 ### 1. Upload Excel File
 
@@ -241,7 +247,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   }
   ```
 
-## Development
+## 🚀 Development
 
 ### Backend Setup
 
@@ -347,14 +353,14 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-### Run the whole project with docker compose
+### Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
 
 ```powershell
-cd SmartExcelAnalyzer
+cd SmartExcelAnalyzer; \
 docker compose up --build -d
 ```
 
-### Run the whole project with docker swarm
+### Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
 
 Another way to run the whole project is by using Docker Swarm. This is a docker service that more closely mimics a cloud environment.
 Follow these steps:
@@ -373,7 +379,7 @@ Follow these steps:
 
   3. **Access the frontend application** at [http://localhost:3000](http://localhost:3000).
 
-  4. **Access the backend API directly** at [http://localhost:5001/swagger](http://localhost:5001/swagger).
+  4. **Access the backend API directly** at [http://localhost:5000/swagger](http://localhost:5001/swagger).
 
   5. **Tear down the stack**:
 
@@ -381,7 +387,7 @@ Follow these steps:
       docker stack rm smart-excel-analyzer
       ```
 
-## Docker
+## 🐳 Docker
 
 - All of our docker images will be published to these docker hub container registries:
 
@@ -393,16 +399,16 @@ Follow these steps:
 
 - This process is kicked off in the [GitHub Action File](.github/workflows/docker-build-push.yml)
   
-## Testing
+## ✅ Testing
 
 - Backend tests: Run dotnet test in the ./Backend/ directory.
   
 - Frontend tests: Run npm test in the ./Frontend/ directory.
   
-## Contact
+## 📧 Contact
 
 - If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
 
-  - Connor Mason - <connor.mason@fivemconsulting.com>
+- Connor Mason - <connor.mason@fivemconsulting.com> ✉️
 
-  - [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
+- [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git) 💻
