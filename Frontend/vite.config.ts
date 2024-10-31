@@ -12,9 +12,9 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
+        secure: true,
+        changeOrigin: true,
         target: process.env.VITE_BASE_API_URL,
-        changeOrigin: false,
-        secure: false,
       },
     },
   },

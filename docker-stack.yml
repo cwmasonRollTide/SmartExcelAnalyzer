@@ -4,6 +4,12 @@ x-healthcheck: &default-healthcheck
   retries: 200
   start_period: 40s
 
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -13,9 +19,13 @@ services:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/qdrant_config.yaml"
+    env_file:
+      - .env
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+    logging:
+      <<: *default-logging
     volumes:
       - qdrant_data:/qdrant/data
 
@@ -28,9 +38,13 @@ services:
       - "8000:8000"
     volumes:
       - ./LLM:/app
+    env_file:
+      - ./LLM/.env
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
+    logging:
+      <<: *default-logging
     depends_on:
       - qdrant
 
@@ -38,16 +52,30 @@ services:
     image: fivemowner/smart-excel-analyzer-backend:latest
     ports:
       - "5001:80"
+    volumes:
+      - ./backend:/app
+      - qdrant_data:/qdrant/data
+      - model_cache:/app/model_cache
+    env_file:
+      - .env
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+    logging:
+      <<: *default-logging
     depends_on:
       - qdrant
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
+    env_file:
+      - ./Frontend/.env
     ports:
       - "3000:3000"
+    volumes:
+      - ./Frontend/src:/app/src
+    logging:
+      <<: *default-logging
     depends_on:
       - backend
 
