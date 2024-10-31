@@ -1,4 +1,4 @@
-name: Build and Push Backend
+name: Smart Excel Analyzer .NET Backend CI/CID Workflow
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-    - name: Build and Push to DockerHub registry
+    - name: Build and Push to DockerHub Registry
       uses: docker/build-push-action@v4
       with:
         context: ./Backend
