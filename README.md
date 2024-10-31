@@ -6,6 +6,8 @@
 
 - [![Smart Excel Analyzer .NET Backend CI/CID Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml/badge.svg)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/backend-workflow.yml)
 
+  *These workflows will trigger if the respective project is changed and a pull request is created or I push directly to main. If I edit a markdown file, .env file, or .yml file, all three workflows trigger* 
+
 ## 📋 Table of Contents
 
 - [Smart Excel Analyzer](#-smart-excel-analyzer)

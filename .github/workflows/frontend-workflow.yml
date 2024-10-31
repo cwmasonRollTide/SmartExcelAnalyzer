@@ -5,6 +5,9 @@ on:
     branches: [ main ]
     paths:
       - 'Frontend/**'
+      - '*.yml'
+      - '*.md'
+      - '*.env'
   pull_request:
     branches: [ main ]  
     paths:
