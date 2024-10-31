@@ -96,7 +96,6 @@ function App() {
     setToastMessage(message);
 
     setToastSeverity(severity);
-    
     setToastOpen(true);
   };
 
