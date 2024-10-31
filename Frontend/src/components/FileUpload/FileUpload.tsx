@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
-const SIGNALR_HUB_URL = 'http://localhost:5001'//import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
+const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
