@@ -10,10 +10,6 @@ x-logging: &default-logging
     max-size: "10m"
     max-file: "3"
 
-networks:
-  smart-excel-analyzer-net:
-    driver: overlay
-
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -31,11 +27,11 @@ services:
     volumes:
       - qdrant_data:/qdrant/data
     deploy:
+      replicas: 1
       placement:
         constraints:
+          - node.role == manager
           - node.labels.qdrant == true
-    networks:
-      - smart-excel-analyzer-net
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -58,8 +54,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-    networks:
-      - smart-excel-analyzer-net
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -84,8 +78,6 @@ services:
         parallelism: 2
         delay: 10s
         order: stop-first
-    networks:
-      - smart-excel-analyzer-net
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -103,8 +95,6 @@ services:
         condition: on-failure
     depends_on:
       - backend
-    networks:
-      - smart-excel-analyzer-net
 
 volumes:
   model_cache:

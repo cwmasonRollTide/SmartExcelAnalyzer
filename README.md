@@ -250,7 +250,7 @@ API documentation is available via Swagger UI. After starting the backend servic
     DocumentId: "123456789012",
     Question: "What are the total sales for Q1 2024?",
     Answer: "one... BILLION dollars, Dr. Eveel.",
-    RelevantRows: ConcurrentBag<ConcurrentDictionary<string, object>>
+    RelevantRows: [{}]
   }
   ```
 
