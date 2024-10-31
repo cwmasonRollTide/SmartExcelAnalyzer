@@ -163,10 +163,9 @@ public static class ProgramExtensions
             var frontendUrlString = frontendUrl?.ToString();
             if (!string.IsNullOrEmpty(frontendUrlString))
             {
-                builder.WithOrigins(frontendUrlString)
+                builder.AllowAnyOrigin()
                        .AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowCredentials();
+                       .AllowAnyMethod();
             }
         });
         return app;

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Box, LinearProgress } from '@mui/material';
 import { FileUpload as MuiFileUpload } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import signalR, { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
-const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:5001';
+const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL as string || 'http://localhost:5001';
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
@@ -14,8 +14,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactEle
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl(`${SIGNALR_HUB_URL}`)
+      .withUrl(SIGNALR_HUB_URL)
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
       .build();
 
     setConnection(newConnection);
