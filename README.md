@@ -8,21 +8,21 @@
 
 ## 📋 Table of Contents
 
-- [Smart Excel Analyzer](#smart-excel-analyzer)
-  - [Table of Contents](#table-of-contents)
+- [Smart Excel Analyzer](#-smart-excel-analyzer)
+  - [Table of Contents](#-table-of-contents)
   - [Introduction](#introduction)
   - [Features](#features)
     - [Detailed Features](#detailed-features)
-  - [Tech Stack](#tech-stack)
-  - [Architecture](#architecture)
-  - [Setup and Installation](#setup-and-installation)
+  - [Tech Stack](#️-tech-stack)
+  - [Architecture](#-architecture)
+  - [Setup and Installation](#-setup-and-installation)
   - [Usage](#usage)
   - [API Documentation](#api-documentation)
-  - [Full Workflow Example](#full-workflow-example)
+  - [Full Workflow Example](#-full-workflow-example)
     - [1. Upload Excel File](#1-upload-excel-file)
     - [2. Get the Status of an Upload](#2-get-the-status-of-an-upload)
     - [3. Ask a Question](#3-ask-a-question)
-  - [Development](#development)
+  - [Development](#-development)
     - [Backend Setup](#backend-setup)
       - [Windows (PowerShell)](#be-setup---windows-powershell)
       - [macOS](#be-setup---macos)
@@ -35,11 +35,11 @@
       - [Windows (PowerShell)](#llm-setup---windows-powershell)
       - [macOS](#llm-setup---macos)
       - [Linux](#llm-setup---linux)
-    - [Run the whole project with docker compose:](#run-the-whole-project-with-docker-compose)
-    - [Run the whole project with docker swarm:](#run-the-whole-project-with-docker-swarm)
-  - [Docker](#docker)
-  - [Testing](#testing)
-  - [Contact](#contact)
+    - [Run the whole project with docker compose](#run-the-whole-project-with-docker-compose)
+    - [Run the whole project with docker swarm](#run-the-whole-project-with-docker-swarm)
+  - [Docker](#-docker)
+  - [Testing](#-testing)
+  - [Contact](#-contact)
 
 ## Introduction
 
@@ -63,30 +63,37 @@ This project aims to transform the way users interact with spreadsheet data by p
 
 - **Excel File Upload**:
   - Easily upload Excel files through the web interface.
+
   - Supports large files with efficient processing.
 
 - **Natural Language Querying**:
   - Use natural language to ask questions about your data.
+
   - Example: "What are the total sales for Q1 2024?"
 
 - **Intelligent Data Analysis**:
   - Extract insights using advanced LLM technology.
+
   - Provides summaries, trends, and anomalies in your data.
 
 - **Local Data Analysis**:
   - Ensures data privacy by not requiring internet access.
+
   - All processing is done locally on your machine.
 
 - **Vector Database Integration**:
   - Uses Qdrant for fast and efficient data retrieval.
+
   - Supports similarity search for complex queries.
 
 - **Scalable Architecture**:
   - Handles large datasets with ease.
+
   - Uses distributed services for better performance.
 
 - **Real-time Processing**:
   - Provides instant responses to queries.
+  
   - Optimized for quick data processing.
 
 ## ⚙️ Tech Stack
