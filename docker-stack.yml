@@ -13,8 +13,6 @@ x-logging: &default-logging
 services:
   qdrant:
     image: qdrant/qdrant:latest
-    ports:
-      - "6333:6333"
     command:
       - "./qdrant"
       - "--config-path"
@@ -28,14 +26,13 @@ services:
       <<: *default-logging
     volumes:
       - qdrant_data:/qdrant/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.qdrant == true
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
-    deploy:
-      mode: replicated
-      replicas: 3
-    ports:
-      - "8000:8000"
     volumes:
       - ./LLM:/app
     env_file:
@@ -45,13 +42,16 @@ services:
       test: curl -f http://localhost:8000/health
     logging:
       <<: *default-logging
-    depends_on:
-      - qdrant
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
-    ports:
-      - "5001:80"
     volumes:
       - ./backend:/app
       - qdrant_data:/qdrant/data
@@ -63,21 +63,32 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     logging:
       <<: *default-logging
-    depends_on:
-      - qdrant
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+      rollback_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+      placement:
+        constraints:
+          - node.role == manager
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
     env_file:
       - ./Frontend/.env
-    ports:
-      - "3000:3000"
     volumes:
       - ./Frontend/src:/app/src
     logging:
       <<: *default-logging
-    depends_on:
-      - backend
+    deploy:
+      endpoint_mode: vip
+      restart_policy:
+        condition: on-failure
 
 volumes:
   model_cache:
