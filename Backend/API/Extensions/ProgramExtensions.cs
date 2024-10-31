@@ -165,8 +165,7 @@ public static class ProgramExtensions
             {
                 builder.AllowAnyOrigin()
                        .AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowCredentials();
+                       .AllowAnyMethod();
             }
         });
         return app;

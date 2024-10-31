@@ -22,7 +22,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             webHost.Configure(app =>
             {
                 app.UseRouting();
-                app.UseCors();
+                app.UseCors(policy => 
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
