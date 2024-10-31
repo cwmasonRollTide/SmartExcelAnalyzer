@@ -10,11 +10,13 @@ public class ProgressHubWrapper(
     ILogger<IProgressHubWrapper> _logger
 ) : IProgressHubWrapper
 {
+    #region Log message templates
     private const string ReceiveErrorMethod = "ReceiveError";
     private const string ReceiveProgressMethod = "ReceiveProgress";
     private const string ProgressCompleteMessage = "Progress complete";
     private const string ProgressCompleteLogMessage = "Progress complete: {Message}";
     private const string ProgressUpdateMessage = "Progress update: {Progress}/{Total}";
+    #endregion
 
     public async Task SendProgress(double progress, double total) 
     {

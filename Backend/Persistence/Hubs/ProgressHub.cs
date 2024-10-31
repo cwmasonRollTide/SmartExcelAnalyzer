@@ -12,7 +12,6 @@ public class ProgressHub(
     #region SignalR methods
     private const string RECEIVE_ERROR = "ReceiveError";
     private const string RECEIVE_PROGRESS = "ReceiveProgress";
-    private const string RECEIVE_COMPLETION = "ReceiveCompletion";
     #endregion
 
     #region Log message templates

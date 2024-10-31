@@ -56,7 +56,7 @@ public class AnalysisController(
             new UploadFileCommand
             {
                 File = fileToUpload,
-                Progress = new Progress<(double, double)>(
+                Progress = new Progress<(double ParseProgress, double SaveProgress)>(
                     async progressTuple =>
                     {
                         var ( parseProgress, saveProgress ) = progressTuple;
