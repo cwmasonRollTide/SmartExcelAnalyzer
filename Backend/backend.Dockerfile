@@ -23,5 +23,5 @@ EXPOSE 5001
 ENTRYPOINT ["/bin/sh", "-c", "\
     PROJECT_PATH=$(find . -name 'API.csproj') && \
     dotnet restore $PROJECT_PATH && \
-    dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80 \
+    dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80,http://+:5000,http://+:5001\
 "]

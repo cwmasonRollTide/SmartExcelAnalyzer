@@ -4,52 +4,94 @@ x-healthcheck: &default-healthcheck
   retries: 200
   start_period: 40s
 
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   qdrant:
     image: qdrant/qdrant:latest
-    ports:
-      - "6333:6333"
     command:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/qdrant_config.yaml"
+    env_file:
+      - .env
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+    logging:
+      <<: *default-logging
     volumes:
       - qdrant_data:/qdrant/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.qdrant == true
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
-    deploy:
-      mode: replicated
-      replicas: 3
-    ports:
-      - "8000:8000"
     volumes:
       - ./LLM:/app
+      - ./qdrant_data:/qdrant/data
+    env_file:
+      - ./LLM/.env
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
-    depends_on:
-      - qdrant
+    logging:
+      <<: *default-logging
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
-    ports:
-      - "5001:80"
+    volumes:
+      - ./backend:/app
+      - qdrant_data:/qdrant/data
+      - model_cache:/app/model_cache
+    env_file:
+      - .env
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-    depends_on:
-      - qdrant
+    logging:
+      <<: *default-logging
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+      rollback_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+      placement:
+        constraints:
+          - node.role == manager
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
+    env_file:
+      - ./Frontend/.env
+    volumes:
+      - ./Frontend/src:/app/src
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
+    logging:
+      <<: *default-logging
+    deploy:
+      endpoint_mode: vip
+      restart_policy:
+        condition: on-failure
 
 volumes:
   model_cache:
