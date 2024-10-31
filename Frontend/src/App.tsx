@@ -94,7 +94,9 @@ function App() {
 
   const showToast = (message: string, severity: 'success' | 'error') => {
     setToastMessage(message);
+
     setToastSeverity(severity);
+    
     setToastOpen(true);
   };
 
