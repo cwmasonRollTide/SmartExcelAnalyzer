@@ -13,7 +13,6 @@ The LLM (Language Model) Service is a key component of the Smart Excel Analyzer 
   - [macOS](#macos)
 - [Local Setup](#local-setup)
 - [Dependencies](#dependencies-)
-- [Usage](#usage-)
 
 ## Overview 📝
 
@@ -147,26 +146,9 @@ But really the easiest way is to run the whole project
 
 The LLM Service relies on the following key dependencies:
 
-- `openai`: Provides access to OpenAI's powerful language models.
+- `hugging face`: Provides access to Hugging Face's powerful open source models.
 - `azure-functions`: Enables running the service as an Azure Function.
 - `requests`: Allows making HTTP requests to interact with the backend API.
+- `qdrant`: Vector Database used for storing and retrieving high-dimensional vectors quickly to compare against computed LLM embeddings of data.
 
 For a complete list of dependencies, refer to the `requirements.txt` file.
-
-## Usage 🚀
-
-The LLM Service exposes an API endpoint that accepts user queries and Excel data as input. It processes the input using advanced NLP techniques and returns relevant answers and summaries.
-
-To use the LLM Service:
-
-1. Ensure the service is running and accessible.
-2. Send a POST request to the `/analyze` endpoint with the following payload:
-
-   ```http
-   {
-     "query": "User's natural language query",
-     "data": "Excel data as JSON"
-   }
-   ```
-
-3. The service will process the request and return the generated answer and summary.
