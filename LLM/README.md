@@ -1,5 +1,7 @@
 # LLM Service 🤖💬
 
+- [![Smart Excel Analyzer LLM CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml)
+
 The LLM (Language Model) Service is a key component of the Smart Excel Analyzer project. It leverages advanced natural language processing techniques to analyze Excel data and generate insightful answers to user queries.
 
 ## Table of Contents
