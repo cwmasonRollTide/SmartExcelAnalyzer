@@ -55,8 +55,6 @@ services:
     image: fivemowner/smart-excel-analyzer-backend:latest
     volumes:
       - ./backend:/app
-      - qdrant_data:/qdrant/data
-      - model_cache:/app/model_cache
     env_file:
       - .env
     healthcheck:
