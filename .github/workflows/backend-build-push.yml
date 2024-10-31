@@ -18,15 +18,15 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Restore dependencies
-      run: dotnet restore --configuration Release --no-cache
+      run: dotnet restore
       working-directory: ./Backend
       
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build
       working-directory: ./Backend
       
     - name: Test
-      run: dotnet test --configuration Release --no-build --no-restore
+      run: dotnet test
       working-directory: ./Backend
       
     - name: Login to DockerHub
