@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Box, LinearProgress } from '@mui/material';
 import { FileUpload as MuiFileUpload } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
-import signalR, { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { FileUploadProps } from '../../interfaces/FileUploadProps';
 
 const SIGNALR_HUB_URL = import.meta.env.VITE_BASE_API_URL as string || 'http://localhost:5001';
@@ -16,7 +16,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactEle
     const newConnection = new HubConnectionBuilder()
       .withUrl(SIGNALR_HUB_URL)
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information)
+      .configureLogging(LogLevel.Information)
       .build();
 
     setConnection(newConnection);
