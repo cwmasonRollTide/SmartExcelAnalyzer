@@ -10,6 +10,10 @@ x-logging: &default-logging
     max-size: "10m"
     max-file: "3"
 
+networks:
+  smart-excel-analyzer-net:
+    driver: overlay
+
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -30,6 +34,8 @@ services:
       placement:
         constraints:
           - node.labels.qdrant == true
+    networks:
+      - smart-excel-analyzer-net
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -43,6 +49,8 @@ services:
       test: curl -f http://localhost:8000/health
     logging:
       <<: *default-logging
+    depends_on:
+      - qdrant
     deploy:
       replicas: 3
       restart_policy:
@@ -50,6 +58,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    networks:
+      - smart-excel-analyzer-net
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -62,6 +72,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     logging:
       <<: *default-logging
+    depends_on:
+      - qdrant
     deploy:
       replicas: 1
       update_config:
@@ -72,9 +84,8 @@ services:
         parallelism: 2
         delay: 10s
         order: stop-first
-      placement:
-        constraints:
-          - node.role == manager
+    networks:
+      - smart-excel-analyzer-net
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -90,6 +101,10 @@ services:
       endpoint_mode: vip
       restart_policy:
         condition: on-failure
+    depends_on:
+      - backend
+    networks:
+      - smart-excel-analyzer-net
 
 volumes:
   model_cache:
