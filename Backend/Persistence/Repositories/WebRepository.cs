@@ -32,18 +32,23 @@ public class WebRepository<T>(
         CancellationToken cancellationToken = default
     )
     {
-        var client = httpClientFactory.CreateClient(DefaultClientName);
         var content = new StringContent(
             JsonConvert.SerializeObject(payload), 
             Encoding.UTF8, 
             ContentType
         );
-        var response = await client.PostAsync(
-            endpoint, 
-            content, 
-            cancellationToken
-        );
+        var response = await httpClientFactory
+            .CreateClient(DefaultClientName)
+            .PostAsync(
+                endpoint, 
+                content, 
+                cancellationToken
+            );
         response.EnsureSuccessStatusCode();
-        return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync(cancellationToken))!;
+        return JsonConvert.DeserializeObject<T>(
+            await response
+                .Content
+                .ReadAsStringAsync(cancellationToken)
+        )!;
     }
 }
