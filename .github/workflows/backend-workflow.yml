@@ -22,11 +22,11 @@ jobs:
       working-directory: ./Backend
       
     - name: Build
-      run: dotnet build
+      run: dotnet build --no-restore
       working-directory: ./Backend
       
     - name: Test
-      run: dotnet test
+      run: dotnet test --no-build --verbosity normal
       working-directory: ./Backend
       
     - name: Login to DockerHub
