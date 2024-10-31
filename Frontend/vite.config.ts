@@ -12,9 +12,19 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        secure: true,
-        changeOrigin: false,
+        secure: false,
+        changeOrigin: true,
         target: process.env.VITE_BASE_API_URL,
+      },
+      '/socket.io': {
+        secure: false,
+        changeOrigin: true,
+        target: process.env.VITE_SIGNALR_HUB_URL,
+      },
+      '/progressHub': {
+        secure: false,
+        changeOrigin: true,
+        target: process.env.VITE_SIGNALR_HUB_URL,
       },
     },
   },
