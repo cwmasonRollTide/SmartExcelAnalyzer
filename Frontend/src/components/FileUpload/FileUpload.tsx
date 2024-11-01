@@ -3,7 +3,7 @@ import { Typography, Box, LinearProgress } from '@mui/material';
 import { FileUpload as MuiFileUpload } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { FileUploadProps } from '../../interfaces/FileUploadProps';
+import { FileUploadProps } from './FileUploadProps';
 
 const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL as string || 'http://localhost:5001';
 

@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QueryForm from './QueryForm';
+import { describe, expect, it, jest } from '@jest/globals';
 
 describe('QueryForm', () => {
   it('renders the query form', () => {
-    render(<QueryForm onQuerySubmit={() => jest.fn(() => true)} isDocumentSelected={true} />);
+    render(<QueryForm onQuerySubmit={jest.fn()} isDocumentSelected={true} />);
     expect(screen.getByLabelText('Ask a question about the selected document')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Submit Query' })).toBeTruthy();
   });
@@ -19,10 +20,5 @@ describe('QueryForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Submit Query' }));
     
     expect(onQuerySubmitMock).toHaveBeenCalledWith(query);
-    render(<Token />);
   });
 });
-
-const Token: React.FC = () => {
-  return <div>Token</div>;
-};

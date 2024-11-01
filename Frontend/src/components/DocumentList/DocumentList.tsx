@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import { DocumentListProps } from "../../interfaces/DocumentListProps";
+import { DocumentListProps } from "./DocumentListProps";
 
 const DocumentList = ({
   documents,
@@ -14,7 +14,7 @@ const DocumentList = ({
         bgcolor: "background.paper",
       }}
     >
-      {documents.map((document) => (
+      {documents?.map((document) => (
         <ListItem disablePadding key={document.id}>
           <ListItemButton
             selected={selectedDocument?.id === document.id}

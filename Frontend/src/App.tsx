@@ -8,8 +8,8 @@ import QueryForm from './components/QueryForm/QueryForm';
 import QueryResult from './components/QueryResult/QueryResult.tsx';
 import { Document } from './interfaces/Document.tsx';
 import ThemeSwitch from './components/ThemeSwitch/ThemeSwitch.tsx';
-import { ThemeMode, ThemeModeEnum } from './interfaces/ThemeMode.tsx';
-import { SubmitQueryResult } from './interfaces/QueryResultProps.tsx';
+import { ThemeMode, ThemeModeEnum } from './components/ThemeSwitch/ThemeMode.tsx';
+import { SubmitQueryResult } from './components/QueryResult/QueryResultProps.tsx';
 
 const originalTheme = createTheme({
   palette: {

@@ -1,4 +1,4 @@
-import { Document } from "./Document.tsx";
+import { Document } from "../../interfaces/Document";
 
 export interface DocumentListProps {
   documents: Document[];

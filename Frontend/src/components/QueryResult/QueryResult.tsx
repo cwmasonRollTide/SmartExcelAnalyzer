@@ -10,7 +10,7 @@ import {
   Typography, 
   Box 
 } from '@mui/material';
-import { QueryResultProps } from '../../interfaces/QueryResultProps';
+import { QueryResultProps } from './QueryResultProps';
 
 const QueryResult: React.FC<QueryResultProps> = ({ result }: QueryResultProps) => {
   const { answer, question, documentId, relevantRows } = result;
