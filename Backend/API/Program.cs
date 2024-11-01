@@ -15,6 +15,7 @@ public class Program
         .ConfigureHttpClient()
         .ConfigureLLMService()
         .Build()
+        .ConfigureCors()
         .ConfigureMiddleware() 
         .ConfigureProgressHub()
         .Run();

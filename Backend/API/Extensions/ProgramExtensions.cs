@@ -9,6 +9,7 @@ using Application.Services;
 using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using FluentValidation.AspNetCore;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -17,12 +18,14 @@ namespace API.Extensions;
 
 public static class ProgramExtensions
 {
-    private const string DefaultClientName = "DefaultClient";
     public static WebApplicationBuilder AddSmartExcelFileAnalyzerVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
-        builder!.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+        builder!.Configuration.AddJsonFile(Constants.AppSettingsJson, optional: true, reloadOnChange: true);
+        builder.Configuration.AddJsonFile(
+            string.Format(Constants.AppSettingsEnvironmentJson, builder.Environment.EnvironmentName), 
+            optional: true, 
+            reloadOnChange: true);
         builder.Configuration.AddEnvironmentVariables();
         return builder;
     }
@@ -33,13 +36,13 @@ public static class ProgramExtensions
         builder.Services.AddLogging();
         builder.Services.AddApplicationInsightsTelemetry();
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection(Constants.LoggingSection));
         return builder;
     }
 
     public static WebApplicationBuilder ConfigureHttpClient(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient(DefaultClientName, 
+        builder.Services.AddHttpClient(Constants.DefaultClientName, 
             client =>
             {
                 client.Timeout = TimeSpan.FromMinutes(30);
@@ -53,12 +56,12 @@ public static class ProgramExtensions
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
         builder.Services.AddScoped<BaseController>();
-        var frontendUrl = builder.Configuration["FrontendUrl"];
+        var frontendUrl = builder.Configuration[Constants.FrontendUrlConfig];
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy", builder =>
+            options.AddPolicy(Constants.DefaultCorsPolicy, builder =>
             {
                 if (!string.IsNullOrEmpty(frontendUrl))
                 {
@@ -74,18 +77,18 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureDatabase(this WebApplicationBuilder builder)
     {
-        var databaseOptions = builder.Configuration.GetSection("DatabaseOptions");
+        var databaseOptions = builder.Configuration.GetSection(Constants.DatabaseOptionsSection);
         builder.Services.Configure<DatabaseOptions>(databaseOptions);
         builder.Services
             .AddOptions<DatabaseOptions>()
-            .Validate(options => options.PORT > 0, "Qdrant Port must be set.")
-            .Validate(options => options.SAVE_BATCH_SIZE > 0, "Qdrant Save Batch Size must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.HOST), "Qdrant Host String must be set.")
-            .Validate(options => options.MAX_CONNECTION_COUNT > 0, "Qdrant Max Connection Count must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.QDRANT_API_KEY), "Qdrant API Key must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), "Qdrant Database Name must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.CollectionName), "Qdrant Collection Name must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), "Qdrant Collection Name Two must be set.");
+            .Validate(options => options.PORT > 0, Constants.ValidationMessages.QdrantPortValidation)
+            .Validate(options => options.SAVE_BATCH_SIZE > 0, Constants.ValidationMessages.QdrantBatchSizeValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.HOST), Constants.ValidationMessages.QdrantHostValidation)
+            .Validate(options => options.MAX_CONNECTION_COUNT > 0, Constants.ValidationMessages.QdrantMaxConnectionValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.QDRANT_API_KEY), Constants.ValidationMessages.QdrantApiKeyValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.DatabaseName), Constants.ValidationMessages.QdrantDatabaseNameValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.CollectionName), Constants.ValidationMessages.QdrantCollectionNameValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.CollectionNameTwo), Constants.ValidationMessages.QdrantCollectionNameTwoValidation);
         var options = databaseOptions.Get<DatabaseOptions>();
         builder.Services.AddSingleton(sp => new QdrantClient(
             options!.HOST, 
@@ -104,11 +107,11 @@ public static class ProgramExtensions
     public static WebApplicationBuilder ConfigureLLMService(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<ILLMServiceLoadBalancer, LLMLoadBalancer>();
-        builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection("LLMServiceOptions"));
+        builder.Services.Configure<LLMServiceOptions>(builder.Configuration.GetSection(Constants.LLMServiceOptionsSection));
         builder.Services
             .AddOptions<LLMServiceOptions>()
-            .Validate(options => options.LLM_SERVICE_URLS.Count > 0, "LLM_SERVICE_URLS must be set.")
-            .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), "LLM_SERVICE_URL must be set.");
+            .Validate(options => options.LLM_SERVICE_URLS.Count > 0, Constants.ValidationMessages.LLMServiceUrlsValidation)
+            .Validate(options => !string.IsNullOrEmpty(options.LLM_SERVICE_URL), Constants.ValidationMessages.LLMServiceUrlValidation);
         builder.Services.AddScoped<ILLMRepository, LLMRepository>();
         return builder;
     }
@@ -123,7 +126,6 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSignalR();
         builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
         builder.Services.AddScoped<IProgressHubWrapper, ProgressHubWrapper>();
         builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));
@@ -134,7 +136,11 @@ public static class ProgramExtensions
     {
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smart Excel File Analyzer API", Version = "v1" });
+            c.SwaggerDoc(Constants.SwaggerConfig.Version, 
+                new OpenApiInfo { 
+                    Title = Constants.SwaggerConfig.Title, 
+                    Version = Constants.SwaggerConfig.Version 
+                });
             c.OperationFilter<SwaggerFileOperationFilter>();
         });
         return builder;
@@ -145,28 +151,55 @@ public static class ProgramExtensions
         if (app.Environment.IsDevelopment()) 
             app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
 
-        app.UseCors()
-           .UseRouting()
-           .UseMiddleware<ExceptionMiddleware>();
         app.MapControllers();
-        app.MapHealthChecks("/health");
+        app.UseMiddleware<ExceptionMiddleware>();
+        app.MapHealthChecks(Constants.HealthCheckEndpoint);
         return app;
     }
 
     public static WebApplication ConfigureProgressHub(this WebApplication app)
     {
-        app.MapHub<ProgressHub>("/progressHub");
-        app.UseCors(builder =>
-        {
-            var frontendUrl = app.Configuration["FrontendUrl"];
-            var frontendUrlString = frontendUrl?.ToString();
-            if (!string.IsNullOrEmpty(frontendUrlString))
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyHeader()
-                       .AllowAnyMethod();
-            }
-        });
+        app.MapHub<ProgressHub>(Constants.ProgressHubEndpoint);
         return app;
+    }
+
+    public static WebApplication ConfigureCors(this WebApplication app)
+    {
+        app.UseCors(Constants.DefaultCorsPolicy);
+        return app;
+    }
+
+    private static class Constants
+    {
+        public const string LoggingSection = "Logging";
+        public const string HealthCheckEndpoint = "/health";
+        public const string DefaultCorsPolicy = "CorsPolicy";
+        public const string FrontendUrlConfig = "FrontendUrl";
+        public const string DefaultClientName = "DefaultClient";
+        public const string AppSettingsJson = "appsettings.json";
+        public const string ProgressHubEndpoint = "/progressHub";
+        public const string DatabaseOptionsSection = "DatabaseOptions";
+        public const string LLMServiceOptionsSection = "LLMServiceOptions";
+        public const string AppSettingsEnvironmentJson = "appsettings.{0}.json";
+        
+        public static class ValidationMessages
+        {
+            public const string QdrantPortValidation = "Qdrant Port must be set.";
+            public const string QdrantApiKeyValidation = "Qdrant API Key must be set.";
+            public const string LLMServiceUrlValidation = "LLM_SERVICE_URL must be set.";
+            public const string QdrantHostValidation = "Qdrant Host String must be set.";
+            public const string LLMServiceUrlsValidation = "LLM_SERVICE_URLS must be set.";
+            public const string QdrantBatchSizeValidation = "Qdrant Save Batch Size must be set.";
+            public const string QdrantDatabaseNameValidation = "Qdrant Database Name must be set.";
+            public const string QdrantCollectionNameValidation = "Qdrant Collection Name must be set.";
+            public const string QdrantMaxConnectionValidation = "Qdrant Max Connection Count must be set.";
+            public const string QdrantCollectionNameTwoValidation = "Qdrant Collection Name Two must be set.";
+        }
+
+        public static class SwaggerConfig
+        {
+            public const string Version = "v1";
+            public const string Title = "Smart Excel File Analyzer API";
+        }
     }
 }
