@@ -58,14 +58,13 @@ public static class ProgramExtensions
         builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
         builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(builder =>
+            options.AddPolicy("CorsPolicy", builder =>
             {
                 if (!string.IsNullOrEmpty(frontendUrl))
                 {
                     builder.AllowAnyOrigin()
                            .AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .AllowCredentials();
+                           .AllowAnyMethod();
                 }
             });
         });
