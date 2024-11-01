@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'LLM/**'
-      - '*.yml'
+      - '**.yml'
       - '*.md'
       - '*.env'
   pull_request:
