@@ -4,19 +4,18 @@ using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace API.Controllers;
 
 /// <summary>
 /// AnalysisController handles the API requests for the LLM and the vector database.
-/// dependencies: IMediator, IHubContext<ProgressHub>
+/// dependencies: IMediator, IProgressHubWrapper
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
 public class AnalysisController(
     IMediator mediator, 
-    IHubContext<ProgressHub> _hubContext
+    IProgressHubWrapper _hubContext
 ) : BaseController(mediator)
 {
     private const string StatusTopicName = "ReceiveProgress";
@@ -59,15 +58,15 @@ public class AnalysisController(
                 Progress = new Progress<(double ParseProgress, double SaveProgress)>(
                     async progressTuple =>
                     {
-                        var ( parseProgress, saveProgress ) = progressTuple;
-                        await _hubContext
-                            .Clients
-                            .All
-                            .SendAsync(
-                                StatusTopicName, 
-                                parseProgress, 
-                                saveProgress
-                            );
+                        var ( 
+                            parseProgress, 
+                            saveProgress 
+                        ) = progressTuple;
+
+                        await _hubContext.SendProgress(
+                            parseProgress, 
+                            saveProgress
+                        );
                     }
                 )
             }

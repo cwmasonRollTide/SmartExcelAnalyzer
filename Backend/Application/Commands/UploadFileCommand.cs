@@ -7,7 +7,6 @@ using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.SignalR;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Commands;
@@ -46,11 +45,10 @@ public class UploadFileCommandHandler(
     IExcelFileService _excelService,
     IVectorDbRepository _vectorDbRepository,
     ILogger<UploadFileCommandHandler> _logger,
-    IHubContext<ProgressHub> _hubContext
+    IProgressHubWrapper _hubContext
 ) : IRequestHandler<UploadFileCommand, string?>
 {
     #region Log Message Constants
-    private const string ReceiveProgress = "ReceiveProgress";
     private const string LogTimeSaveTaken = "Time taken to save document: {Time}ms";
     private const string LogTimeParseTaken = "Time taken to prepare excel file: {Time}ms";
     private const string LogPreparingExcelFile = "Preparing excel file {FileName} for LLM.";
@@ -81,11 +79,7 @@ public class UploadFileCommandHandler(
             double SaveProgress
         )>(
             async report =>
-                await _hubContext
-                    .Clients
-                    .All
-                    .SendAsync(
-                        method: ReceiveProgress, 
+                await _hubContext.SendProgress(
                         report.ParseProgress, 
                         report.SaveProgress, 
                         cancellationToken: cancellationToken
