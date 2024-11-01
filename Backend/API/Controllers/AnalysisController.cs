@@ -4,23 +4,22 @@ using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace API.Controllers;
 
 /// <summary>
 /// AnalysisController handles the API requests for the LLM and the vector database.
-/// dependencies: IMediator, IHubContext<ProgressHub>
+/// dependencies: IMediator, IProgressHubWrapper
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
 public class AnalysisController(
-    IMediator mediator, 
-    IHubContext<ProgressHub> _hubContext
+    IMediator mediator,
+    IProgressHubWrapper _hubContext
 ) : BaseController(mediator)
 {
     private const string StatusTopicName = "ReceiveProgress";
-    
+
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -36,7 +35,8 @@ public class AnalysisController(
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument) => Ok(await _mediator.Send(queryAboutExcelDocument));
+    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument, CancellationToken cancellationToken = default) =>
+        Ok(await _mediator.Send(queryAboutExcelDocument, cancellationToken));
 
     /// <summary>
     /// Uploads an excel file to the vector database and returns the documentId. 
@@ -51,25 +51,22 @@ public class AnalysisController(
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload) => 
-        Ok(await _mediator.Send(
-            new UploadFileCommand
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload, CancellationToken cancellationToken = default) =>
+        Ok(
+            await _mediator.Send(new UploadFileCommand
             {
                 File = fileToUpload,
-                Progress = new Progress<(double ParseProgress, double SaveProgress)>(
+                Progress = new Progress<(
+                    double ParseProgress,
+                    double SaveProgress
+                )>(
                     async progressTuple =>
-                    {
-                        var ( parseProgress, saveProgress ) = progressTuple;
-                        await _hubContext
-                            .Clients
-                            .All
-                            .SendAsync(
-                                StatusTopicName, 
-                                parseProgress, 
-                                saveProgress
-                            );
-                    }
+                        await _hubContext.SendProgress(
+                            progressTuple.ParseProgress,
+                            progressTuple.SaveProgress,
+                            cancellationToken
+                        )
                 )
-            }
-        ));
+            }, cancellationToken)
+        );
 }

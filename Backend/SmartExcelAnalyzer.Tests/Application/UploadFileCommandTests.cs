@@ -55,10 +55,11 @@ public class UploadFileCommandTests
     {
         private readonly Mock<IClientProxy> _clientProxyMock = new();
         private readonly Mock<IExcelFileService> _excelServiceMock = new();
+        private readonly Mock<IProgressHubWrapper> _hubWrapperMock = new();
         private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
         private readonly Mock<IVectorDbRepository> _vectorDbRepositoryMock = new();
         private readonly Mock<ILogger<UploadFileCommandHandler>> _loggerMock = new();
-        private UploadFileCommandHandler Sut => new(_excelServiceMock.Object, _vectorDbRepositoryMock.Object, _loggerMock.Object, _hubContextMock.Object);
+        private UploadFileCommandHandler Sut => new(_excelServiceMock.Object, _vectorDbRepositoryMock.Object, _loggerMock.Object, _hubWrapperMock.Object);
 
         public UploadFileCommandHandlerTests()
         {

@@ -6,8 +6,8 @@ namespace Persistence.Hubs;
 
 #region Hub
 public class ProgressHub(
-    ILogger<ProgressHub> logger, 
-    IHubContext<ProgressHub> hubContext
+    ILogger<ProgressHub> _logger, 
+    IProgressHubWrapper _hubContext
 ) : Hub, IProgressHubWrapper
 {
     #region SignalR methods
@@ -23,29 +23,16 @@ public class ProgressHub(
     #endregion
 
     #region SignalR client methods
-    public async Task SendProgress(double progress, double total)
+    public async Task SendProgress(double progress, double total, CancellationToken cancellationToken = default)
     {
-        logger.LogInformation(PROGRESS_UPDATE, progress, total);
-        await hubContext
-            .Clients
-            .All
-            .SendAsync(
-                RECEIVE_PROGRESS, 
-                progress, 
-                total
-            );
+        _logger.LogInformation(PROGRESS_UPDATE, progress, total);
+        await _hubContext.SendProgress(progress, total);
     }
 
     public async Task SendError(string message)
     {
-        logger.LogError(PROGRESS_ERROR, message);
-        await hubContext
-            .Clients
-            .All
-            .SendAsync(
-                RECEIVE_ERROR, 
-                message
-            );
+        _logger.LogError(PROGRESS_ERROR, message);
+        await _hubContext.SendError(message);
     }
     #endregion
 
@@ -53,13 +40,13 @@ public class ProgressHub(
     [ExcludeFromCodeCoverage]
     public override async Task OnConnectedAsync()
     {
-        logger.LogInformation(CLIENT_CONNECTED, Context.ConnectionId);
+        _logger.LogInformation(CLIENT_CONNECTED, Context.ConnectionId);
         await base.OnConnectedAsync();
     }
     [ExcludeFromCodeCoverage]
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        logger.LogInformation(CLIENT_DISCONNECTED, Context.ConnectionId);
+        _logger.LogInformation(CLIENT_DISCONNECTED, Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
     }
     #endregion
@@ -70,7 +57,7 @@ public class ProgressHub(
 public interface IProgressHubWrapper
 {
     Task SendError(string message);
-    Task SendProgress(double progress, double total);
+    Task SendProgress(double progress, double total, CancellationToken cancellationToken = default);
 }
 
 [ExcludeFromCodeCoverage]
@@ -87,7 +74,7 @@ public class ProgressHubWrapper(
     private const string ProgressUpdateMessage = "Progress update: {Progress}/{Total}";
     #endregion
 
-    public async Task SendProgress(double progress, double total) 
+    public async Task SendProgress(double progress, double total, CancellationToken cancellationToken = default) 
     {
         _logger.LogInformation(ProgressUpdateMessage, progress, total);
 
@@ -100,7 +87,8 @@ public class ProgressHubWrapper(
             .SendAsync(
                 ReceiveProgressMethod, 
                 progress, 
-                total
+                total,
+                cancellationToken: cancellationToken
             );
     }
 

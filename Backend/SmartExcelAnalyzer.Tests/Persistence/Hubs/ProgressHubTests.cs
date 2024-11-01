@@ -11,12 +11,14 @@ public class ProgressHubTests
     private const double Total = 100;
     private readonly Mock<IClientProxy> _clientProxyMock = new();
     private readonly Mock<ILogger<ProgressHub>> _loggerMock = new();
-    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
-    private ProgressHub Sut => new(_loggerMock.Object, _hubContextMock.Object);
+    private readonly Mock<IProgressHubWrapper> _hubWrapperMock = new();
+    private ProgressHub Sut => new(_loggerMock.Object, _hubWrapperMock.Object);
 
     public ProgressHubTests()
     {
-        _hubContextMock.Setup(h => h.Clients.All).Returns(_clientProxyMock.Object);
+        _hubWrapperMock
+            .Setup(x => x.SendProgress(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     [Fact]
@@ -26,16 +28,8 @@ public class ProgressHubTests
 
         await Sut.SendProgress(progress, Total);
 
-        _clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "ReceiveProgress",
-                It.Is<object[]>(args => 
-                    (double)args[0] == progress && 
-                    (double)args[1] == Total),
-                default
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
+        _hubWrapperMock.Verify(x => x.SendProgress(progress, Total, default), Times.Once);
     }
 
     [Fact]
@@ -46,16 +40,7 @@ public class ProgressHubTests
         await Sut.SendProgress(progress, Total);
 
         _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
-        _clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "ReceiveProgress",
-                It.Is<object[]>(args => 
-                    (double)args[0] == progress && 
-                    (double)args[1] == Total),
-                default
-            ),
-            Times.Once
-        );
+        _hubWrapperMock.Verify(x => x.SendProgress(progress, Total, default), Times.Once);
     }
 
     [Fact]
@@ -66,16 +51,7 @@ public class ProgressHubTests
         await Sut.SendProgress(progress, Total);
 
         _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
-        _clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "ReceiveProgress",
-                It.Is<object[]>(args => 
-                    (double)args[0] == progress && 
-                    (double)args[1] == Total),
-                default
-            ),
-            Times.Once
-        );
+        _hubWrapperMock.Verify(x => x.SendProgress(progress, Total, default), Times.Once);
     }
 
     [Fact]
@@ -86,15 +62,7 @@ public class ProgressHubTests
         await Sut.SendError(message);
 
         _loggerMock.VerifyLog(LogLevel.Error, message);
-        _clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "ReceiveError",
-                It.Is<object[]>(args => 
-                    (string)args[0] == message),
-                default
-            ),
-            Times.Once
-        );
+        _hubWrapperMock.Verify(x => x.SendError(message), Times.Once);
     }
 
     [Theory]
@@ -109,15 +77,6 @@ public class ProgressHubTests
         await Sut.SendProgress(progress, Total);
 
         _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
-        _clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "ReceiveProgress",
-                It.Is<object[]>(args => 
-                    (double)args[0] == progress && 
-                    (double)args[1] == Total),
-                default
-            ),
-            Times.Once
-        );
+        _hubWrapperMock.Verify(x => x.SendProgress(progress, Total, default), Times.Once);
     }
 }

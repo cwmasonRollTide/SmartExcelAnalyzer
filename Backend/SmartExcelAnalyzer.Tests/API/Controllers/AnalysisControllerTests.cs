@@ -9,15 +9,14 @@ using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SignalR;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 
 public class AnalysisControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock = new();
-    private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
-    private AnalysisController Sut => new(_mediatorMock.Object, _hubContextMock.Object);
+    private readonly Mock<IProgressHubWrapper> _hubWrapperMock = new();
+    private AnalysisController Sut => new(_mediatorMock.Object, _hubWrapperMock.Object);
 
     [Fact]
     public async Task SubmitQuery_ReturnsOkResult_WhenQueryIsValid()
