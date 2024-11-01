@@ -62,7 +62,7 @@ public static class ProgramExtensions
             {
                 if (!string.IsNullOrEmpty(frontendUrl))
                 {
-                    builder.WithOrigins(frontendUrl)
+                    builder.AllowAnyOrigin()
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();

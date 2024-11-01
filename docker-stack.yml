@@ -89,6 +89,8 @@ services:
     image: fivemowner/smart-excel-analyzer-frontend:latest
     env_file:
       - ./Frontend/.env
+    environment:
+      - BACKEND_URL=backend
     volumes:
       - ./Frontend/src:/app/src
     ports:
