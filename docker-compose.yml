@@ -1,4 +1,4 @@
-name: Smart Excel File Analyzer Docker Compose Network
+version: '3.8'
 
 x-healthcheck: &default-healthcheck
   interval: 120s
@@ -8,6 +8,20 @@ x-healthcheck: &default-healthcheck
 
 x-default-network: &default-network
   smart-excel-network: 
+
+x-llm-service: &llm-service
+  image: fivemowner/smart-excel-analyzer-llm:latest
+  volumes:
+    - ./LLM:/app
+  depends_on:
+    - qdrant
+  networks:
+    <<: *default-network
+  env_file:
+    - ./LLM/.env
+  healthcheck:
+    <<: *default-healthcheck
+    test: curl -f http://localhost:8000/health
 
 services:
   qdrant:
@@ -27,54 +41,21 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-    
+
   llm-service-0:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    volumes:
-      - ./LLM:/app
+    <<: *llm-service
     ports:
       - "8000:8000"
-    depends_on:
-      - qdrant
-    networks:
-      <<: *default-network
-    env_file:
-      - ./LLM/.env
-    healthcheck:
-      <<: *default-healthcheck
-      test: curl -f http://localhost:8000/health
 
   llm-service-1:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    volumes:
-      - ./LLM:/app
+    <<: *llm-service
     ports:
       - "8001:8000"
-    depends_on:
-      - qdrant
-    networks:
-      <<: *default-network
-    env_file:
-      - ./LLM/.env
-    healthcheck:
-      <<: *default-healthcheck
-      test: curl -f http://localhost:8000/health
 
   llm-service-2:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    volumes:
-      - ./LLM:/app
+    <<: *llm-service
     ports:
       - "8002:8000"
-    depends_on:
-      - qdrant
-    networks:
-      <<: *default-network
-    env_file:
-      - ./LLM/.env
-    healthcheck:
-      <<: *default-healthcheck
-      test: curl -f http://localhost:8000/health
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -86,6 +67,9 @@ services:
       - "5001:80"
     depends_on:
       - qdrant
+      - llm-service-0
+      - llm-service-1
+      - llm-service-2
     networks:
       <<: *default-network
     env_file:
@@ -114,7 +98,7 @@ services:
 
 networks:
   smart-excel-network:
-    driver: bridge
+    driver: overlay
 
 volumes:
   model_cache:
