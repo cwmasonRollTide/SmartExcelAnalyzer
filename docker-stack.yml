@@ -22,6 +22,8 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+    networks:
+      - smart-excel-network
     logging:
       <<: *default-logging
     volumes:
@@ -43,6 +45,8 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
+    networks:
+      - smart-excel-network
     logging:
       <<: *default-logging
     depends_on:
@@ -64,6 +68,8 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+    networks:
+      - smart-excel-network
     logging:
       <<: *default-logging
     depends_on:
@@ -89,12 +95,18 @@ services:
       - "3000:3000"
     logging:
       <<: *default-logging
+    networks:
+      - smart-excel-network
     deploy:
       endpoint_mode: vip
       restart_policy:
         condition: on-failure
     depends_on:
       - backend
+
+networks:
+  smart-excel-network:
+    driver: overlay
 
 volumes:
   model_cache:

@@ -1,4 +1,5 @@
 using MediatR;
+using FluentValidation;
 using Domain.Persistence.DTOs;
 using Persistence.Repositories;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,20 @@ public class SubmitQuery : IRequest<QueryAnswer?>
     [Required]
     public required string DocumentId { get; set; }
     public int? RelevantRowsCount { get; set; } = null;
+}
+
+public class SubmitQueryValidator : AbstractValidator<SubmitQuery>
+{
+    public SubmitQueryValidator()
+    {
+        RuleFor(x => x.Query).NotNull().WithMessage("Query is required.");
+        RuleFor(x => x.Query).NotEmpty().WithMessage("Query is required.");
+        RuleFor(x => x.DocumentId).NotNull().WithMessage("DocumentId is required.");
+        RuleFor(x => x.DocumentId).NotEmpty().WithMessage("DocumentId is required.");
+        RuleFor(x => x.RelevantRowsCount)
+            .GreaterThanOrEqualTo(0).WithMessage("RelevantRowsCount must be greater than or equal to 0.")
+            .When(x => x.RelevantRowsCount.HasValue);
+    }
 }
 
 /// <summary>

@@ -1,4 +1,5 @@
 using MediatR;
+using FluentValidation;
 using Persistence.Hubs;
 using System.Diagnostics;
 using Application.Services;
@@ -16,6 +17,21 @@ public class UploadFileCommand : IRequest<string?>
     [Required]
     public IFormFile File { get; set; } = null!;    
     public IProgress<(double ParseProgress, double SaveProgress)> Progress { get; set; } = new Progress<(double, double)>();
+}
+
+public class UploadFileCommandValidator : AbstractValidator<UploadFileCommand>
+{
+    public UploadFileCommandValidator()
+    {
+        RuleFor(x => x.File)
+            .NotNull()
+            .WithMessage("File is required.");
+
+        RuleFor(x => x.File)
+            .Must(file => file?.Length > 0)
+            .When(x => x.File != null)
+            .WithMessage("File is empty.");
+    }
 }
 
 /// <summary>
@@ -107,7 +123,8 @@ public class UploadFileCommandHandler(
         );
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
-        if (summarizedExcelData is null) _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
+        if (summarizedExcelData is null) 
+            _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
         return summarizedExcelData;
     }
 

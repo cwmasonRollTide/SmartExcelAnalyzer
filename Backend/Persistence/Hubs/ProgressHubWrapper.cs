@@ -4,6 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Persistence.Hubs;
 
+public interface IProgressHubWrapper
+{
+    Task SendError(string message);
+    Task SendProgress(double progress, double total);
+}
+
 [ExcludeFromCodeCoverage]
 public class ProgressHubWrapper(
     IHubContext<ProgressHub> _hubContext, 
