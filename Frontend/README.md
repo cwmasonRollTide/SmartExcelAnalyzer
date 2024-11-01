@@ -51,7 +51,7 @@ This is the frontend for the Smart Excel Analyzer application. It provides a web
 - Run the Container:
   
   ```powershell
-  docker run -p 3000:3000 smart-excel-analyzer-frontend
+  docker run -p 3000:8080 smart-excel-analyzer-frontend
   ```
   
 - Open <http://localhost:3000> in your browser
