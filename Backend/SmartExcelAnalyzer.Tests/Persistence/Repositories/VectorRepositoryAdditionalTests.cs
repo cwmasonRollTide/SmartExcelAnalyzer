@@ -7,6 +7,7 @@ using Domain.Persistence.Configuration;
 using Persistence.Database;
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
@@ -40,15 +41,7 @@ public class VectorRepositoryAdditionalTests
             .ReturnsAsync(new float[]?[] { null });
 
         await Sut.SaveDocumentAsync(data);
-
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Embedding at index")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Warning, "Embedding at index");
     }
 
     [Fact]
@@ -68,15 +61,7 @@ public class VectorRepositoryAdditionalTests
             .ReturnsAsync(() => null!);
 
         await Sut.SaveDocumentAsync(data);
-
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Failed to save vectors to the database for document")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Warning, "Failed to save vectors to the database for document");
     }
 
     [Fact]
@@ -92,14 +77,7 @@ public class VectorRepositoryAdditionalTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().BeNullOrWhiteSpace();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Failed to save")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Warning, "Failed to save");
     }
 
     [Fact]

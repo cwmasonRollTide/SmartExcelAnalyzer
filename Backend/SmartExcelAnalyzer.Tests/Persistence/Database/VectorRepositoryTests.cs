@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
@@ -358,14 +359,7 @@ public class VectorRepoAddTests
         result.Should().NotBeNull();
         result.Rows.Should().HaveCount(1);
         result.Summary.Should().BeNull();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Failed to query the summary of the document")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Warning, "Failed to query the summary of the document");
     }
 
     [Fact]
@@ -415,14 +409,7 @@ public class VectorRepoAddTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().Be(documentId);
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Embedding at index")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Warning, "Embedding at index");
     }
 
     [Fact]

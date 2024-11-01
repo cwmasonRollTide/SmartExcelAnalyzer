@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
@@ -190,14 +191,7 @@ public class VectorRepositoryTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().BeNullOrEmpty();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Error computing embeddings")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Error, "Error computing embeddings");
     }
 
     [Fact]
@@ -211,14 +205,7 @@ public class VectorRepositoryTests
         var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
 
         result.Should().BeNull();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("An error occurred while querying vector data for document")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Error, "An error occurred while querying vector data for document");
     }
 
     [Fact]
@@ -274,13 +261,6 @@ public class VectorRepositoryTests
         var result = await Sut.SaveDocumentAsync(data, cancellationToken: cts.Token);
 
         result.Should().BeNullOrEmpty();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Batch creation was cancelled")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Information, "Batch creation was cancelled");
     }
 }

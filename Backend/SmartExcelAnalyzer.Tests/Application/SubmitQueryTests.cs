@@ -6,6 +6,7 @@ using Persistence.Repositories;
 using FluentValidation.TestHelper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Application;
 
@@ -100,14 +101,7 @@ public class SubmitQueryTests
             var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().BeNull();
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to query LLM")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-                Times.Once);
+            _loggerMock.VerifyLog(LogLevel.Warning, "Failed to query LLM");
         }
 
         [Fact]
@@ -143,14 +137,7 @@ public class SubmitQueryTests
             var result = await Sut.Handle(query, CancellationToken.None);
 
             result.Should().BeNull();
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-                Times.Once);
+            _loggerMock.VerifyLog(LogLevel.Warning, "Failed to query");
         }
 
         [Fact]

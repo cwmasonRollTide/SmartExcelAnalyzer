@@ -9,7 +9,6 @@ using Application.Services;
 using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Mvc;
 using FluentValidation.AspNetCore;
 using Domain.Persistence.Configuration;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;

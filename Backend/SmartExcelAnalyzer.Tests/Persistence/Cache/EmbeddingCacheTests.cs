@@ -98,7 +98,7 @@ namespace SmartExcelAnalyzer.Tests.Persistence.Cache
             var result1 = cache.GetEmbedding(key1);
             var result2 = cache.GetEmbedding(key2);
             var result3 = cache.GetEmbedding(key3);
-            var result4 = cache.GetEmbedding(key4);
+            var _ = cache.GetEmbedding(key4);
             Assert.Equal(embedding1, result1);
             Assert.Equal(embedding2, result2);
             Assert.Equal(embedding3, result3);

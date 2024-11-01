@@ -1,5 +1,6 @@
 using Moq;
 using System.Net;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 using API.Middleware;
 using FluentAssertions;
 using FluentValidation;
@@ -52,16 +53,7 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("500");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 
     [Fact]
@@ -86,16 +78,7 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("400");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 
     [Fact]
@@ -120,16 +103,7 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("408");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 
     [Fact]
@@ -154,16 +128,7 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("408");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 
     [Fact]
@@ -188,16 +153,7 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("502");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 
     [Fact]
@@ -222,15 +178,6 @@ public class ExceptionMiddlewareTests
         
         responseBody.Should().Contain(exceptionMessage);
         responseBody.Should().Contain("408");
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(exceptionMessage)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, exceptionMessage);
     }
 }
