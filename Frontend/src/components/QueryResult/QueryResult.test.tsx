@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import QueryResult from './QueryResult';
-import { QueryResultProps } from '../../interfaces/QueryResultProps';
+import { QueryResultProps } from './QueryResultProps';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, jest } from '@jest/globals';
 
 describe('QueryResult', () => {
   it('renders the query result', () => {
@@ -20,9 +21,9 @@ describe('QueryResult', () => {
     };
 
     render(<QueryResult {...res} />);
-    expect(screen.getByText('Query Result')).toBeInTheDocument();
-    expect(screen.getByText(`Question: ${question}`)).toBeInTheDocument();
-    expect(screen.getByText(`Answer: ${result}`)).toBeInTheDocument();
-    expect(screen.getByText(`Document ID: ${documentId}`)).toBeInTheDocument();
+    expect(screen.getByText('Query Result')).toBeTruthy();
+    expect(screen.getByText(`Question: ${question}`)).toBeTruthy();
+    expect(screen.getByText(`Answer: ${result}`)).toBeTruthy();
+    expect(screen.getByText(`Document ID: ${documentId}`)).toBeTruthy();
   });
 });

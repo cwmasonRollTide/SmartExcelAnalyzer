@@ -6,6 +6,9 @@ x-healthcheck: &default-healthcheck
   retries: 200
   start_period: 40s
 
+x-default-network: &default-network
+  smart-excel-network: 
+
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -15,10 +18,16 @@ services:
       - "./qdrant"
       - "--config-path"
       - "/qdrant/config/qdrant_config.yaml"
+    volumes:
+      - qdrant_data:/qdrant/data
+    networks:
+      <<: *default-network
+    env_file:
+      - .env
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-
+    
   llm-service-0:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
@@ -27,6 +36,10 @@ services:
       - "8000:8000"
     depends_on:
       - qdrant
+    networks:
+      <<: *default-network
+    env_file:
+      - ./LLM/.env
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
@@ -39,6 +52,10 @@ services:
       - "8001:8000"
     depends_on:
       - qdrant
+    networks:
+      <<: *default-network
+    env_file:
+      - ./LLM/.env
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
@@ -51,23 +68,55 @@ services:
       - "8002:8000"
     depends_on:
       - qdrant
+    networks:
+      <<: *default-network
+    env_file:
+      - ./LLM/.env
     healthcheck:
       <<: *default-healthcheck
       test: curl -f http://localhost:8000/health
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
+    volumes:
+      - ./Backend:/app
+      - /app/obj
+      - /app/bin
     ports:
       - "5001:80"
     depends_on:
       - qdrant
+    networks:
+      <<: *default-network
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Environment=Development
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
+    networks:
+      <<: *default-network
+    env_file:
+      - .env
     depends_on:
       - backend
+
+networks:
+  smart-excel-network:
+    driver: bridge
+
+volumes:
+  model_cache:
+  qdrant_data:
+  llm_cache:

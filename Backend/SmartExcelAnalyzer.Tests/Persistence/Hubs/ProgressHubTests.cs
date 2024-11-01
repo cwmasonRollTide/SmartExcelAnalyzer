@@ -2,6 +2,7 @@ using Moq;
 using Persistence.Hubs;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using SmartExcelAnalyzer.Tests.TestUtilities;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Hubs;
 
@@ -44,16 +45,7 @@ public class ProgressHubTests
 
         await Sut.SendProgress(progress, Total);
 
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
@@ -73,16 +65,7 @@ public class ProgressHubTests
 
         await Sut.SendProgress(progress, Total);
 
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",
@@ -102,16 +85,7 @@ public class ProgressHubTests
 
         await Sut.SendError(message);
 
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress error: {message}"),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Error, message);
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveError",
@@ -134,16 +108,7 @@ public class ProgressHubTests
 
         await Sut.SendProgress(progress, Total);
 
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Progress update: {progress}/{Total}"),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception?, string>>((o, t) => true)
-            ),
-            Times.Once
-        );
+        _loggerMock.VerifyLog(LogLevel.Information, $"Progress update: {progress}/{Total}");
         _clientProxyMock.Verify(
             x => x.SendCoreAsync(
                 "ReceiveProgress",

@@ -2,7 +2,7 @@ import React from 'react';
 import { ChangeEvent } from 'react';
 import Switch from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
-import { ThemeMode, ThemeModeEnum } from '../../interfaces/ThemeMode';
+import { ThemeMode, ThemeModeEnum } from './ThemeMode';
 
 /**
  * A switch component to toggle the theme mode of the frontend application.

@@ -4,7 +4,7 @@ import {
   Button, 
   Box 
 } from '@mui/material';
-import { QueryFormProps } from '../../interfaces/QueryFormProps';
+import { QueryFormProps } from './QueryFormProps';
 
 const QueryForm: React.FC<QueryFormProps> = ({ onQuerySubmit, isDocumentSelected }) => {
   const [question, setQuestion] = useState('');

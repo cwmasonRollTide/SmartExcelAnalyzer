@@ -2,7 +2,8 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import ThemeSwitch from './ThemeSwitch';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ThemeModeEnum } from '../../interfaces/ThemeMode'; // Update the path to the correct module
+import { ThemeModeEnum } from './ThemeMode'; // Update the path to the correct module
+import { describe, expect, it, jest } from '@jest/globals';
 
 describe('ThemeSwitch', () => {
   it('renders the theme switch', async () => {
@@ -15,12 +16,5 @@ describe('ThemeSwitch', () => {
     render(<ThemeSwitch themeMode={{ mode: ThemeModeEnum.LIGHT }} setThemeMode={onToggleMock} />);
     fireEvent.click(await screen.findByRole('checkbox'));
     await waitFor(() => expect(onToggleMock).toHaveBeenCalled());
-    render(<Token />);
   });
 });
-
-const Token: React.FC = () => {
-  return <div>Token</div>;
-};
-
-
