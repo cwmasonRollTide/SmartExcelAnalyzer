@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import ThemeSwitch from './ThemeSwitch';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ThemeModeEnum } from './ThemeMode'; // Update the path to the correct module
+import { ThemeModeEnum } from './ThemeMode';
 import { describe, expect, it, jest } from '@jest/globals';
 
 describe('ThemeSwitch', () => {

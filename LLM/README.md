@@ -143,7 +143,7 @@ To set up the LLM Service, follow the instructions for your operating system:
    2. Run the Docker Container:
 
       ```powershell
-      docker run -p 8000:80000 llm
+      docker run -p 8000:8000 llm
       ```
 
    3. Make a request to the LLM Service:

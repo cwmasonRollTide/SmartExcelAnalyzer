@@ -8,18 +8,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true,
+    host: 'smartexcelanalyzer.test.com',
     strictPort: true,
     proxy: {
       '/api': {
         secure: false,
         changeOrigin: true,
         target: process.env.VITE_BASE_API_URL,
-      },
-      '/socket.io': {
-        secure: false,
-        changeOrigin: true,
-        target: process.env.VITE_SIGNALR_HUB_URL,
       },
       '/progressHub': {
         secure: false,
