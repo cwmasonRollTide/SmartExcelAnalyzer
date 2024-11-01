@@ -1,4 +1,3 @@
-
 # 🤖💬 LLM Service
 
 - [![Smart Excel Analyzer LLM CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml)
@@ -153,7 +152,7 @@ To set up the LLM Service, follow the instructions for your operating system:
       POST "http://localhost:8000/query" 
       "Content-Type: application/json" 
       {
-         query: "What is the total revenue for the year 2023?", 
+         question: "What is the total revenue for the year 2023?", 
          documentId: "123456789012" 
       }
       ```
