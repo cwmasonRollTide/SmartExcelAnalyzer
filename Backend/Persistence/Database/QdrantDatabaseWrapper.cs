@@ -1,12 +1,12 @@
+using Qdrant.Client;
 using System.Text.Json;
 using Qdrant.Client.Grpc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 using static Qdrant.Client.Grpc.Conditions;
-using System.Diagnostics.CodeAnalysis;
-using Qdrant.Client;
 
 namespace Persistence.Database;
 
@@ -96,7 +96,7 @@ public class QdrantDatabaseWrapper(
             summaryData.Payload["document_id"] = new Value { StringValue = documentId };
             summaryData.Payload["content"] = new Value { StringValue = JsonSerializer.Serialize(summary, _serializerOptions) };
             await _client.UpsertAsync(
-                points: [summaryData],
+                points: [ summaryData ],
                 collectionName: SummaryCollectionName,
                 cancellationToken: cancellationToken
             );
@@ -161,9 +161,12 @@ public class QdrantDatabaseWrapper(
             limit: 1,
             cancellationToken: cancellationToken
         );
-        if (searchResult is null || searchResult.Count is 0) return new();
+        if (searchResult is null or { Count: 0 }) 
+            return new();
 
-        if (!searchResult[0]!.Payload.TryGetValue("content", out Value? value)) return new();
+        if (!searchResult[0]!.Payload.TryGetValue("content", out Value? value)) 
+            return new();
+
         return JsonSerializer.Deserialize<ConcurrentDictionary<string, object>>(value.StringValue, _serializerOptions)!;
     }
     #endregion

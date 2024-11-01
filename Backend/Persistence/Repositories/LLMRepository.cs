@@ -5,6 +5,7 @@ using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 
+#region Repository
 public interface ILLMRepository
 {
     Task<float[]?> ComputeEmbedding(
@@ -122,7 +123,9 @@ public class LLMRepository(
         );
     #endregion
 }
+#endregion
 
+#region Load Balancer
 public interface ILLMServiceLoadBalancer
 {
     string GetServiceUrl();
@@ -131,20 +134,28 @@ public interface ILLMServiceLoadBalancer
 [ExcludeFromCodeCoverage]
 public class LLMLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceLoadBalancer
 {
+    #region Private Fields
     private int _currentIndex = 0;
     private readonly object _lock = new();
+    private readonly string _serviceUrl = options.Value.LLM_SERVICE_URL;
     private readonly List<string> _serviceUrls = options.Value.LLM_SERVICE_URLS;
+    private readonly bool _weAreInSwarmMode = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOCKER_SWARM_TASK_ID"));
+    #endregion
 
-    /// <summary>
-    /// Get the next service URL in the list of service URLs
-    /// </summary>
-    /// <returns></returns>
     public string GetServiceUrl()
     {
-        lock (_lock)
+        if (_weAreInSwarmMode)
         {
-            if (_currentIndex >= _serviceUrls.Count) _currentIndex = 0;
-            return _serviceUrls[_currentIndex++];
+            return _serviceUrl;
+        }
+        else
+        {
+            lock (_lock)
+            {
+                if (_currentIndex >= _serviceUrls.Count) _currentIndex = 0;
+                return _serviceUrls[_currentIndex++];
+            }
         }
     }
 }
+#endregion

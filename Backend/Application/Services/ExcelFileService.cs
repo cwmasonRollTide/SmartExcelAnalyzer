@@ -28,9 +28,11 @@ public interface IExcelFileService
 /// </summary>
 public class ExcelFileService : IExcelFileService
 {
+    #region Concurrency Consts
     private const double LOADING_WEIGHT = 0.1;
     private const double SUMMARIZING_WEIGHT = 0.3;
     private const double PROCESSING_ROWS_WEIGHT = 0.6;
+    #endregion
 
     /// <summary>
     /// Prepare the given Excel file for LLM by reading the file and extracting the data and summary statistics
@@ -92,6 +94,7 @@ public class ExcelFileService : IExcelFileService
         };
     }
 
+    #region Private Excel File Processing Methods
     private static async Task<DataTable> LoadExcelTableAsync(IFormFile file) => (await LoadExcelDataAsync(file)).Tables[0] ?? new();
 
     private static DataColumn[] GetTableColumns(DataTable table) => table.Columns.Cast<DataColumn>().ToArray();
@@ -338,4 +341,5 @@ public class ExcelFileService : IExcelFileService
             CancellationToken = cancellationToken,
             MaxDegreeOfParallelism = Math.Max(-1, Environment.ProcessorCount - 4)
         };
+    #endregion
 }
