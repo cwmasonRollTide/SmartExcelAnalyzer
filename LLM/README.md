@@ -1,4 +1,5 @@
-# LLM Service 🤖💬
+
+# 🤖💬 LLM Service
 
 - [![Smart Excel Analyzer LLM CI/CD Workflow](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml/badge.svg?branch=main)](https://github.com/cwmasonRollTide/SmartExcelAnalyzer/actions/workflows/llm-workflow.yml)
 
@@ -6,19 +7,21 @@ The LLM (Language Model) Service is a key component of the Smart Excel Analyzer 
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Setup](#setup)
-  - [Windows (PowerShell)](#windows-powershell)
-  - [Linux](#linux)
-  - [macOS](#macos)
-- [Local Setup](#local-setup)
-- [Dependencies](#dependencies-)
+- [🤖💬 LLM Service](#-llm-service)
+  - [Table of Contents](#table-of-contents)
+  - [📝 Overview](#-overview)
+  - [⚙️ Setup](#️-setup)
+    - [Windows (PowerShell)](#windows-powershell)
+    - [Linux](#linux)
+    - [macOS](#macos)
+  - [🐳 Using Docker](#-using-docker)
+  - [📦 Dependencies](#-dependencies)
 
-## Overview 📝
+## 📝 Overview
 
 The LLM Service is built using Python and utilizes state-of-the-art language models to understand and process natural language queries. It integrates with the Smart Excel Analyzer backend API to receive user queries and Excel data, and returns relevant answers and summaries.
 
-## Setup ⚙️
+## ⚙️ Setup  
 
 To set up the LLM Service, follow the instructions for your operating system:
 
@@ -130,19 +133,34 @@ To set up the LLM Service, follow the instructions for your operating system:
    python main.py
    ```
 
-## Local Setup
+## 🐳 Using Docker
 
-But really the easiest way is to run the whole project
+   1. Build the Docker Image:
 
-   1. Go to the root directory
+      ```powershell
+      docker buildx build -f llm.Dockerfile -t llm .
+      ```
 
-   2. Run the command
+   2. Run the Docker Container:
 
-   ```powershell
-   docker compose up -d
-   ```
+      ```powershell
+      docker run -p 8000:80000 llm
+      ```
 
-## Dependencies 📦
+   3. Make a request to the LLM Service:
+
+      ```http
+      POST "http://localhost:8000/query" 
+      "Content-Type: application/json" 
+      {
+         query: "What is the total revenue for the year 2023?", 
+         documentId: "123456789012" 
+      }
+      ```
+
+   ***Note:** The qdrant database must be running and accessible for the LLM service to query the data. Also must have a document with this id uploaded previously*
+
+## 📦 Dependencies
 
 The LLM Service relies on the following key dependencies:
 
