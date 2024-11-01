@@ -26,21 +26,20 @@ public class MemoryCacheEmbeddingCache : IEmbeddingCache
             .SetPriority(CacheItemPriority.Normal);
     }
 
-    public float[]? GetEmbedding(string text)
-    {
-        return _cache.Get<float[]>(text);
-    }
+    public float[]? GetEmbedding(string text) => _cache.Get<float[]>(text);
 
     public void SetEmbedding(string text, float[] embedding)
     {
-        _cache.Set(text, embedding, _cacheOptions);
+        _cache.Set(
+            text, 
+            embedding, 
+            _cacheOptions
+        );
     }
 
     public void ClearCache()
     {
         if (_cache is MemoryCache memoryCache)
-        {
             memoryCache.Compact(1.0);
-        }
     }
 }

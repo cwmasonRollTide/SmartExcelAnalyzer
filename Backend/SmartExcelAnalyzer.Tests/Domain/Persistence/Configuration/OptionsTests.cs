@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Domain.Persistence.Configuration;
 
 namespace SmartExcelAnalyzer.Tests.Domain.Persistence.Configuration;
@@ -7,16 +8,19 @@ public class LLMServiceOptionsTests
     [Fact]
     public void LLMServiceOptions_Properties_ShouldBeSettable()
     {
+        var serviceUrl = "test-url";
+        var computeBatchSize = 200;
+        var serviceUrls = new List<string> { "url1", "url2" };
         var options = new LLMServiceOptions
         {
-            COMPUTE_BATCH_SIZE = 200,
-            LLM_SERVICE_URLS = ["url1", "url2"],
-            LLM_SERVICE_URL = "test-url"
+            COMPUTE_BATCH_SIZE = computeBatchSize,
+            LLM_SERVICE_URLS = serviceUrls,
+            LLM_SERVICE_URL = serviceUrl
         };
 
-        Assert.Equal(200, options.COMPUTE_BATCH_SIZE);
-        Assert.Equal(new List<string> { "url1", "url2" }, options.LLM_SERVICE_URLS);
-        Assert.Equal("test-url", options.LLM_SERVICE_URL);
+        options.LLM_SERVICE_URL.Should().Be(serviceUrl);
+        options.LLM_SERVICE_URLS.Should().BeEquivalentTo(serviceUrls);
+        options.COMPUTE_BATCH_SIZE.Should().Be(computeBatchSize);
     }
 
     [Fact]
@@ -24,9 +28,9 @@ public class LLMServiceOptionsTests
     { 
         var options = new LLMServiceOptions();
 
-        Assert.Equal(100, options.COMPUTE_BATCH_SIZE);
-        Assert.Empty(options.LLM_SERVICE_URLS);
-        Assert.Equal(string.Empty, options.LLM_SERVICE_URL);
+        options.COMPUTE_BATCH_SIZE.Should().Be(100);
+        options.LLM_SERVICE_URLS.Should().BeEmpty();
+        options.LLM_SERVICE_URL.Should().BeEmpty();
     }
 }
 
@@ -50,17 +54,17 @@ public class DatabaseOptionsTests
             CollectionNameTwo = "test-collection-two"
         };
 
-        Assert.Equal(5432, options.PORT);
-        Assert.Equal(1000, options.SAVE_BATCH_SIZE);
-        Assert.Equal(5, options.MAX_RETRY_COUNT);
-        Assert.True(options.USE_HTTPS);
-        Assert.Equal(20, options.MAX_CONNECTION_COUNT);
-        Assert.Equal("test-host", options.HOST);
-        Assert.Equal("test-db", options.DatabaseName);
-        Assert.Equal("test-api-key", options.QDRANT_API_KEY);
-        Assert.Equal("test-collection", options.CollectionName);
-        Assert.Equal("test-connection-string", options.ConnectionString);
-        Assert.Equal("test-collection-two", options.CollectionNameTwo);
+        options.PORT.Should().Be(5432);
+        options.SAVE_BATCH_SIZE.Should().Be(1000);
+        options.MAX_RETRY_COUNT.Should().Be(5);
+        options.USE_HTTPS.Should().BeTrue();
+        options.MAX_CONNECTION_COUNT.Should().Be(20);
+        options.HOST.Should().Be("test-host");
+        options.DatabaseName.Should().Be("test-db");
+        options.QDRANT_API_KEY.Should().Be("test-api-key");
+        options.CollectionName.Should().Be("test-collection");
+        options.ConnectionString.Should().Be("test-connection-string");
+        options.CollectionNameTwo.Should().Be("test-collection-two");
     }
 
     [Fact]
@@ -68,13 +72,13 @@ public class DatabaseOptionsTests
     { 
         var options = new DatabaseOptions();
 
-        Assert.False(options.USE_HTTPS);
-        Assert.Equal(10, options.MAX_CONNECTION_COUNT);
-        Assert.Equal(" ", options.HOST);
-        Assert.Equal(" ", options.DatabaseName);
-        Assert.Equal(" ", options.QDRANT_API_KEY);
-        Assert.Equal(" ", options.CollectionName);
-        Assert.Equal(" ", options.ConnectionString);
-        Assert.Equal(" ", options.CollectionNameTwo);
+        options.USE_HTTPS.Should().BeFalse();
+        options.MAX_CONNECTION_COUNT.Should().Be(10);
+        options.HOST.Should().Be(" ");
+        options.DatabaseName.Should().Be(" ");
+        options.QDRANT_API_KEY.Should().Be(" ");
+        options.CollectionName.Should().Be(" ");
+        options.ConnectionString.Should().Be(" ");
+        options.CollectionNameTwo.Should().Be(" ");
     }
 }

@@ -5,6 +5,7 @@ using Domain.Persistence.Configuration;
 
 namespace Persistence.Repositories;
 
+#region Repository
 public interface ILLMRepository
 {
     Task<float[]?> ComputeEmbedding(
@@ -122,7 +123,9 @@ public class LLMRepository(
         );
     #endregion
 }
+#endregion
 
+#region Load Balancer
 public interface ILLMServiceLoadBalancer
 {
     string GetServiceUrl();
@@ -155,3 +158,4 @@ public class LLMLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceL
         }
     }
 }
+#endregion
