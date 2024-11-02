@@ -2,7 +2,10 @@ name: Update PR Description with All Other Workflow Statuses
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [ 
+        opened, 
+        synchronize
+    ] 
 
 jobs:
   update-pr-description:
@@ -21,8 +24,10 @@ jobs:
     - name: Get Workflow Statuses
       id: get-status
       run: |
-        # Get the status of all CI/CD workflows
-        statuses=$(gh run list --json name,status,conclusion --jq '.[] | "\(.name): \(.status) (\(.conclusion))"')
+        # Ensure the repository context is correct
+        REPO_OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
+        REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+        statuses=$(gh run list --repo $REPO_OWNER/$REPO_NAME --json name,status,conclusion --jq '.[] | "\(.name): \(.status) (\(.conclusion))"')
         echo "statuses=$statuses" >> $GITHUB_ENV
 
     - name: Generate Badges
@@ -43,6 +48,6 @@ jobs:
         BADGES: ${{ env.badges }}
       run: |
         pr_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        pr_body=$(gh pr view $pr_number --json body --jq ..body)
+        pr_body=$(gh pr view $pr_number --json body --jq .body)
         new_body="$pr_body\n\n### CI/CD Status\n$BADGES"
         gh pr edit $pr_number --body "$new_body"
