@@ -5,9 +5,11 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  globals: {
-    'import.meta.env': global.importMetaEnv,
-    VITE_SIGNALR_HUB_URL: 'http://localhost:5001',
-  },
   verbose: true,
+  globals: {
+    'process.env': {
+      VITE_BASE_API_URL: 'http://backend:5001/api',
+      VITE_SIGNALR_HUB_URL: 'http://backend:5001/progressHub',
+    },
+  },
 };
