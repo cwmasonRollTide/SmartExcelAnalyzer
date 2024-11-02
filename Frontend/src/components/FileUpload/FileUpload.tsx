@@ -21,12 +21,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactEle
       .withKeepAliveInterval(20000)
       .withStatefulReconnect()
       .build();
-    // newConnection.onreconnecting((error) => {
-    //   console.log('SignalR Reconnecting: ', error);
-    // });
-    // newConnection.onreconnected(() => {
-    //   console.log('SignalR Reconnected');
-    // });
     newConnection.onclose((error) => {
       console.log('SignalR Closed: ', error);
     });
