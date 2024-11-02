@@ -87,7 +87,7 @@ services:
     env_file:
       - .env
     environment:
-      - REACT_APP_BACKEND_URL=http://backend:80
+      - REACT_APP_BACKEND_URL=http://backend:5001
     ports:
       - "3000:3000"
     networks:
