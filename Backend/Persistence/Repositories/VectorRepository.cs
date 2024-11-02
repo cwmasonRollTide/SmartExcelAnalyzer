@@ -262,7 +262,7 @@ public class VectorRepository(
                         batch.Clear();
                         await writer.WriteAsync(batchToWrite, cancellationToken);
                     }
-                    await Task.CompletedTask;
+                    await Task.Yield();
                 }
             );
 
@@ -307,7 +307,7 @@ public class VectorRepository(
                 );
                 stopwatch.Stop();
                 _logger.LogInformation(LOG_COMPUTE_EMBEDDINGS, batch.Count(), stopwatch.ElapsedMilliseconds);
-                if (embeddings is not null)
+                if (embeddings is not null && embeddings.Any())
                 {
                     await writer.WriteAsync((embeddings, batch)!, cancellationToken);
                     processedRows += batch.Count();
@@ -431,7 +431,7 @@ public class VectorRepository(
                 else _logger.LogWarning(LOG_NULL_EMBEDDING, "Unknown");
 
                 batchesToStore.Add(row);
-                await Task.CompletedTask;
+                await Task.Yield();
             }
         );
     }

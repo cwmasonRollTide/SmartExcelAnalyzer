@@ -8,7 +8,7 @@ namespace SmartExcelAnalyzer.Tests.TestUtilities;
 [ExcludeFromCodeCoverage]
 public static class MockLoggerExtensions
 {
-    public static void VerifyLog<T>(this Mock<ILogger<T>> loggerMock, LogLevel logLevel, string message)
+    public static void VerifyLog<T>(this Mock<ILogger<T>> loggerMock, LogLevel logLevel, string message, Times? times = null)
     {
         loggerMock.Verify(
             x => x.Log(
@@ -17,7 +17,7 @@ public static class MockLoggerExtensions
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(message)),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
-            Times.Once);
+            times ?? Times.Once());
 
     }
 }

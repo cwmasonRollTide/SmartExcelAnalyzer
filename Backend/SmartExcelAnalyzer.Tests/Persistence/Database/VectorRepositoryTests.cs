@@ -304,14 +304,7 @@ public class VectorRepoAddTests
         var result = await Sut.SaveDocumentAsync(data, cancellationToken: cts.Token);
 
         result.Should().BeNullOrEmpty();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Exactly(1));
+        _loggerMock.VerifyLog(LogLevel.Warning, "Failed to save vectors to the database", Times.AtLeastOnce());
     }
 
     [Fact]
@@ -335,6 +328,9 @@ public class VectorRepoAddTests
 
         progressReports.Should().NotBeEmpty();
         progressReports.Should().Contain((1, 1));
+        _loggerMock.VerifyLog(LogLevel.Information, "Starting to save document");
+        _loggerMock.VerifyLog(LogLevel.Information, "Computing embeddings for document with", Times.AtLeastOnce());
+        _loggerMock.VerifyLog(LogLevel.Information, "Saved document with id 1 to the database");
     }
 
     [Fact]
@@ -390,7 +386,7 @@ public class VectorRepoAddTests
     }
 
     [Fact]
-    public async Task SaveDocumentAsync_ShouldHandleNullEmbeddings()
+    public async Task SaveDocumentAsync_ShouldHandleNullEmbeddings_Empty()
     {
         const string documentId = "1";
         var data = new SummarizedExcelData
@@ -410,6 +406,29 @@ public class VectorRepoAddTests
 
         result.Should().Be(documentId);
         _loggerMock.VerifyLog(LogLevel.Warning, "Embedding at index");
+    }
+
+    [Fact]
+    public async Task SaveDocumentAsync_ShouldHandleNullEmbeddings_AllNull()
+    {
+        const string documentId = "1";
+        var data = new SummarizedExcelData
+        {
+            Rows =
+            [
+                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
+            ],
+            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
+        };
+        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((float[][])null!);
+        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(documentId);
+
+        var result = await Sut.SaveDocumentAsync(data);
+
+        result.Should().BeNullOrEmpty();
+        _loggerMock.VerifyLog(LogLevel.Warning, "Failed to save vectors to the database", Times.AtLeastOnce());
     }
 
     [Fact]
