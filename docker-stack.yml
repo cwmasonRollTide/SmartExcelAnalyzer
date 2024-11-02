@@ -90,7 +90,7 @@ services:
     env_file:
       - ./Frontend/.env
     environment:
-      - BACKEND_URL=backend
+      - REACT_APP_BACKEND_URL=backend
     volumes:
       - ./Frontend/src:/app/src
     ports:
