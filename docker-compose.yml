@@ -6,9 +6,6 @@ x-healthcheck: &default-healthcheck
   retries: 200
   start_period: 40s
 
-x-default-network: &default-network
-  smart-excel-network: 
-
 x-llm-service: &llm-service
   image: fivemowner/smart-excel-analyzer-llm:latest
   volumes:
@@ -18,7 +15,7 @@ x-llm-service: &llm-service
   depends_on:
     - qdrant
   networks:
-    <<: *default-network
+    - smart-excel-network
   healthcheck:
     <<: *default-healthcheck
     test: curl -f http://localhost:8000/health
@@ -37,7 +34,7 @@ services:
     env_file:
       - .env
     networks:
-      <<: *default-network
+      - smart-excel-network
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
@@ -73,7 +70,7 @@ services:
       - llm-service-1
       - llm-service-2
     networks:
-      <<: *default-network
+      - smart-excel-network
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
@@ -92,13 +89,14 @@ services:
     ports:
       - "3000:3000"
     networks:
-      <<: *default-network
+      - smart-excel-network
     depends_on:
       - backend
 
 networks:
   smart-excel-network:
     driver: overlay
+    attachable: true
 
 volumes:
   model_cache:
