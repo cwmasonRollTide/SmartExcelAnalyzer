@@ -1,11 +1,12 @@
+import React from "react";
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { DocumentListProps } from "./DocumentListProps";
 
-const DocumentList = ({
+const DocumentList: React.FC<DocumentListProps> = ({
   documents,
   selectedDocument,
   onSelectDocument,
-}: DocumentListProps) => {
+}) => {
   return (
     <List
       sx={{

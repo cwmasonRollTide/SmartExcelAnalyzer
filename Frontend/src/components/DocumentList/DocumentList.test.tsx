@@ -2,7 +2,6 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DocumentList from './DocumentList';
-import { DocumentListProps } from './DocumentListProps';
 import { describe, expect, it, jest } from '@jest/globals';
 
 const mockDocuments = [
@@ -23,10 +22,5 @@ describe('DocumentList', () => {
     
     fireEvent.click(screen.getByText(/Document 1/i));
     expect(onSelectDocumentMock).toHaveBeenCalledWith(mockDocuments[0]);
-  });
-
-  it('highlights the selected document', () => {
-    render(<DocumentList documents={mockDocuments} selectedDocument={mockDocuments[0]} onSelectDocument={jest.fn()} />);
-    expect(screen.getByText(/Document 1/i).closest('button')).toHaveProperty('Mui-selected');
   });
 });

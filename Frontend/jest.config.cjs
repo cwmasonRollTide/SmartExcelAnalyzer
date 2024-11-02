@@ -7,6 +7,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   globals: {
     'import.meta.env': global.importMetaEnv,
+    VITE_SIGNALR_HUB_URL: 'http://localhost:5001',
   },
   verbose: true,
 };
