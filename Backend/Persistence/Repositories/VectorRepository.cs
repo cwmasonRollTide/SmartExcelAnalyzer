@@ -146,42 +146,34 @@ public class VectorRepository(
             return null!;
         }
         _logger.LogInformation(LOG_START_QUERY, documentId);
-        try
+        var relevantDocuments = await _database.GetRelevantDocumentsAsync(
+            documentId, 
+            queryVector, 
+            topRelevantCount, 
+            cancellationToken
+        );
+        if (relevantDocuments is null || !relevantDocuments.Any())
         {
-            var relevantDocuments = await _database.GetRelevantDocumentsAsync(
-                documentId, 
-                queryVector, 
-                topRelevantCount, 
-                cancellationToken
-            );
-            if (relevantDocuments is null || !relevantDocuments.Any())
-            {
-                _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
-                return null!;
-            }
-            var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantDocuments);
-            var summary = await _database.GetSummaryAsync(documentId, cancellationToken);
-            if (summary is null || summary.IsEmpty)
-            {
-                _logger.LogWarning(LOG_FAIL_QUERY_SUMMARY, documentId);
-                return new() 
-                { 
-                    Rows = rows,
-                    Summary = null!
-                };
-            }
-            _logger.LogInformation(LOG_SUCCESS_QUERY, documentId, relevantDocuments.Count());
-            return new()
-            {
-                Rows = rows,
-                Summary = summary
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, LOG_ERROR_QUERYING_VECTOR_DATA, documentId);
+            _logger.LogWarning(LOG_FAIL_QUERY_ROWS, documentId);
             return null!;
         }
+        var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>(relevantDocuments);
+        var summary = await _database.GetSummaryAsync(documentId, cancellationToken);
+        if (summary is null || summary.IsEmpty)
+        {
+            _logger.LogWarning(LOG_FAIL_QUERY_SUMMARY, documentId);
+            return new() 
+            { 
+                Rows = rows,
+                Summary = null!
+            };
+        }
+        _logger.LogInformation(LOG_SUCCESS_QUERY, documentId, relevantDocuments.Count());
+        return new()
+        {
+            Rows = rows,
+            Summary = summary
+        };
     }
     #endregion
 
@@ -268,14 +260,6 @@ public class VectorRepository(
 
             if (!batch.IsEmpty) await writer.WriteAsync(batch, cancellationToken);
         }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation(LOG_BATCH_CREATION_CANCELLED);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, LOG_ERROR_CREATING_BATCHES);
-        }
         finally
         {
             writer.Complete();
@@ -316,14 +300,6 @@ public class VectorRepository(
                 else _logger.LogWarning(LOG_FAIL_SAVE_BATCH);
             }
         }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation(LOG_EMBEDDING_COMPUTATION_CANCELLED);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, LOG_ERROR_COMPUTING_EMBEDDINGS);
-        }
         finally
         {
             writer.Complete();
@@ -357,13 +333,9 @@ public class VectorRepository(
                 );
             }
         }
-        catch (OperationCanceledException)
+        finally
         {
-            _logger.LogInformation(LOG_STORING_EMBEDDINGS_CANCELLED);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, LOG_ERROR_STORING_EMBEDDINGS);
+            progress?.Report((1, 1));
         }
         return documentId ?? string.Empty;
     }

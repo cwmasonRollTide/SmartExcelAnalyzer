@@ -33,6 +33,7 @@ public class AnalysisController(
     /// </returns>
     [HttpPost("query")]
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument, CancellationToken cancellationToken = default) =>
@@ -50,6 +51,7 @@ public class AnalysisController(
     [HttpPost("upload")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload, CancellationToken cancellationToken = default) =>

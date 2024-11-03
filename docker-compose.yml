@@ -6,20 +6,6 @@ x-healthcheck: &default-healthcheck
   retries: 200
   start_period: 40s
 
-x-llm-service: &llm-service
-  image: fivemowner/smart-excel-analyzer-llm:latest
-  volumes:
-    - ./LLM:/app
-  env_file:
-    - ./LLM/.env
-  depends_on:
-    - qdrant
-  networks:
-    - smart-excel-network
-  healthcheck:
-    <<: *default-healthcheck
-    test: curl -f http://localhost:8000/health
-
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -39,20 +25,21 @@ services:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
 
-  llm-service-0:
-    <<: *llm-service
+  llm-service:
+    image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
+    env_file:
+      - ./LLM/.env
     ports:
       - "8000:8000"
-
-  llm-service-1:
-    <<: *llm-service
-    ports:
-      - "8001:8000"
-
-  llm-service-2:
-    <<: *llm-service
-    ports:
-      - "8002:8000"
+    depends_on:
+      - qdrant
+    networks:
+      - smart-excel-network
+    healthcheck:
+      <<: *default-healthcheck
+      test: curl -f http://localhost:8000/health
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -71,9 +58,18 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     depends_on:
       - qdrant
-      - llm-service-0
-      - llm-service-1
-      - llm-service-2
+      - llm-service
+
+  nginx:
+    build:
+      context: ./Frontend
+      dockerfile: ./nginx.Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - smart-excel-network
+    depends_on:
+      - backend
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -88,22 +84,13 @@ services:
       - smart-excel-network
     healthcheck:
       <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
     depends_on:
-      - backend
-
-  # nginx:
-  #   image: fivemowner/smart-excel-analyzer-nginx:latest
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - smart-excel-network
-  #   depends_on:
-  #     - frontend
+      - nginx
 
 networks:
   smart-excel-network:
-    driver: overlay
+    driver: bridge
     attachable: true
 
 volumes:

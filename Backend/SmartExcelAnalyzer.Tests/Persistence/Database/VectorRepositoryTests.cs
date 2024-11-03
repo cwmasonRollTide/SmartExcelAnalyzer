@@ -173,56 +173,6 @@ public class VectorRepoAddTests
     }
 
     [Fact]
-    public async Task SaveDocumentAsync_ShouldHandleExceptionAndReturnNull()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => null!);
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().BeNullOrEmpty();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Error computing embeddings")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task QueryVectorData_ShouldHandleExceptionAndReturnNull()
-    {
-        var documentId = "testDoc";
-        var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
-        _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
-
-        result.Should().BeNull();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("An error occurred while querying vector data for document")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
     public async Task SaveDocumentAsync_ShouldReturnNullWhenRowsAreEmpty()
     {
         var data = new SummarizedExcelData
@@ -256,33 +206,6 @@ public class VectorRepoAddTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().Be(documentId);
-    }
-
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldCancelOperationWhenCancellationRequested()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await Sut.SaveDocumentAsync(data, cancellationToken: cts.Token);
-
-        result.Should().BeNullOrEmpty();
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Batch creation was cancelled")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
     }
 
     [Fact]

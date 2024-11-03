@@ -100,30 +100,4 @@ public class VectorRepositoryAdditionalTests
 
         _databaseMock.Verify(c => c.StoreSummaryAsync(It.IsAny<string>(), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
-
-    [Fact]
-    public async Task ComputeEmbeddingsAsync_ShouldLogError_WhenExceptionIsThrown()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new() { ["col1"] = "val1" },
-                new() { ["col2"] = "val2" }
-            ]
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        await Sut.SaveDocumentAsync(data);
-
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Error computing embeddings")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
 }
