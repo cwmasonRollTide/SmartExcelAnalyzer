@@ -32,7 +32,7 @@
         "containerName": "smartexcelanalyzer-swagger-container",
         "publishAllPorts": true
       },
-      "httpPort": 50001,
+      "httpPort": 5001,
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -41,30 +41,5 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:5001",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "docker": {
-        "commandName": "Docker",
-        "containerOptions": {
-          "containerName": "smartexcelanalyzer-swagger-container",
-          "publishAllPorts": true
-        },
-        "httpPort": 5000,
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "applicationUrl": "https://localhost:5001",
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        },
-      }
-    }
   }
 }

@@ -13,10 +13,9 @@ namespace API.Controllers;
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
-public class AnalysisController(
-    IMediator mediator,
-    IProgressHubWrapper _hubContext
-) : BaseController(mediator)
+[ApiController]
+[Route("api/[controller]")]
+public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext) : ControllerBase
 {
     /// <summary>
     /// Submits a query to the LLM and returns the answer.

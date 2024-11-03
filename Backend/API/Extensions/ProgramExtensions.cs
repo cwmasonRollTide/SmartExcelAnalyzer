@@ -54,7 +54,6 @@ public static class ProgramExtensions
     {
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
-        builder.Services.AddScoped<BaseController>();
         var frontendUrl = builder.Configuration[Constants.FrontendUrlConfig];
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
         builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
