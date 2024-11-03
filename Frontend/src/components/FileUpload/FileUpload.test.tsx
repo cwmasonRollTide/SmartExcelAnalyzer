@@ -5,6 +5,9 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { render, screen, fireEvent, act, createEvent, waitFor } from '@testing-library/react';
 
 jest.mock('@microsoft/signalr');
+jest.mock('../../utils/getEnv', () => ({
+  getEnv: () => 'http://localhost:5001'
+}));
 
 describe('FileUpload', () => {
   it('renders the file upload component', async () => {

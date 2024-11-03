@@ -4,8 +4,9 @@ import { FileUpload as MuiFileUpload } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { FileUploadProps } from './FileUploadProps';
+import { getEnv } from '../../utils/getEnv';
 
-const SIGNALR_HUB_URL = process.env.VITE_SIGNALR_HUB_URL as string ?? 'http://localhost:5001';
+const SIGNALR_HUB_URL = getEnv('VITE_SIGNALR_HUB_URL', '/progressHub');
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
