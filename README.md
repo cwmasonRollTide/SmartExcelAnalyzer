@@ -26,17 +26,17 @@
     - [3. Ask a Question](#3-ask-a-question)
   - [Development](#-development)
     - [Backend Setup](#backend-setup)
-      - [Windows (PowerShell)](#be-setup---windows-powershell)
-      - [macOS](#be-setup---macos)
-      - [Linux](#be-setup---linux)
+      - [Windows PowerShell](#be-setup-🖥️-windows-powershell)
+      - [macOS](#be-setup-🍎-macos)
+      - [Linux](#be-setup-🐧-linux)
     - [Frontend Setup](#frontend-setup)
-      - [Windows (PowerShell)](#fe-setup---windows-powershell)
-      - [macOS](#fe-setup---macos)
-      - [Linux](#fe-setup---linux)
+      - [Windows PowerShell](#fe-setup-🖥️-windows-powershell)
+      - [macOS](#fe-setup-🍎-macos)
+      - [Linux](#fe-setup-🐧-linux)
     - [LLM Services Setup](#llm-services-setup)
-      - [Windows (PowerShell)](#llm-setup---windows-powershell)
-      - [macOS](#llm-setup---macos)
-      - [Linux](#llm-setup---linux)
+      - [Windows PowerShell](#llm-setup-🖥️-windows-powershell)
+      - [macOS](#llm-setup-🍎-macos)
+      - [Linux](#llm-setup-🐧-linux)
     - [Run the whole project with docker compose](#run-the-whole-project-with-docker-compose)
     - [Run the whole project with docker swarm](#run-the-whole-project-with-docker-swarm)
   - [Docker](#-docker)
@@ -260,7 +260,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### Backend Setup
 
-- #### BE Setup - Windows (PowerShell)
+- #### BE-Setup-🖥️-Windows-PowerShell
 
     ```powershell
     # Install .NET 8 SDK from https://dotnet.microsoft.com/download/dotnet/8.0
@@ -268,7 +268,7 @@ API documentation is available via Swagger UI. After starting the backend servic
     dotnet restore
     ```
 
-- #### BE Setup - macOS
+- #### BE-Setup-🍎-macOS
 
   ```bash
   # Install .NET 8 SDK
@@ -278,7 +278,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   dotnet restore
   ```
 
-- #### BE Setup - Linux
+- #### BE-Setup-🐧-Linux
 
   ```bash
   # Install .NET 8 SDK (Ubuntu/Debian)
@@ -293,7 +293,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### Frontend Setup
 
-- #### FE Setup - Windows (PowerShell)
+- #### FE-Setup-🖥️-Windows-PowerShell
 
   ```powershell
   # Install Node.js from https://nodejs.org/
@@ -302,7 +302,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   npm run dev
   ```
 
-- #### FE Setup - macOS
+- #### FE-Setup-🍎-macOS
 
   ```bash
   # Install Node.js
@@ -313,7 +313,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   npm run dev
   ```
 
-- #### FE Setup - Linux
+- #### FE-Setup-🐧-Linux
 
   ```bash
   # Install Node.js (Ubuntu/Debian)
@@ -327,7 +327,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### LLM Services Setup
 
-- #### LLM Setup - Windows (PowerShell)
+- #### LLM-Setup-🖥️-Windows-PowerShell
 
   ```powershell
   # Install Python 3.9+ from https://www.python.org/downloads/
@@ -337,7 +337,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-- #### LLM Setup - macOS
+- #### LLM-Setup-🍎-macOS
 
   ```bash
   # Install Python 3.9+
@@ -349,7 +349,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-- #### LLM Setup - Linux
+- #### LLM-Setup-🐧-Linux
 
   ```bash
   # Install Python 3.9+ (Ubuntu/Debian)
@@ -362,7 +362,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-### Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
+### 🎼 Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
 
   1. Start the Docker Compose Process:
   
@@ -377,10 +377,18 @@ API documentation is available via Swagger UI. After starting the backend servic
   2. Scale up the llm-service:
 
       ```powershell
-      docker-compose up --scale llm-service=3 -d
+      docker compose up --scale llm-service=3 -d
+      ```
+  
+  3. Access the frontend application at <http://localhost:3000>
+
+  4. Tear down the docker compose network with command:
+
+      ```powershell
+      docker compose down -v
       ```
 
-### Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
+### 🐝 Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
 
 Another way to run the whole project is by using Docker Swarm. This is a docker service that more closely mimics a cloud environment.
 Follow these steps:
@@ -421,7 +429,7 @@ Follow these steps:
 
   - [LLM Service](https://hub.docker.com/repository/docker/fivemowner/smart-excel-analyzer-llm/general)
 
-- This process is kicked off in the [GitHub Action File](.github/workflows/docker-build-push.yml)
+- This process is kicked off in these [GitHub Action Files](.github/workflows/)
   
 ## ✅ Testing
 
@@ -431,7 +439,7 @@ Follow these steps:
   
 ## 📧 Contact
 
-- If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
+- If you are having trouble using this utility, feel free to contact me! I will reply when I can.
 
 - ✉️ Connor Mason - <connor.mason@fivemconsulting.com>
 
