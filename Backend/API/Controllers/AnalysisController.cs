@@ -49,11 +49,12 @@ public class AnalysisController(
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload, CancellationToken cancellationToken = default) =>
-        Ok(
-            await _mediator.Send(new UploadFileCommand
+        Ok(await _mediator.Send(
+            new UploadFileCommand
             {
                 File = fileToUpload,
                 Progress = new Progress<(

@@ -10,6 +10,16 @@ using static Qdrant.Client.Grpc.Conditions;
 
 namespace Persistence.Database;
 
+/// <summary>
+/// Qdrant Database Wrapper
+/// Stores the data in Qdrant Database. 
+/// Uses two collections:
+/// - Document Collection: Stores the vectors of the excel file
+/// - Summary Collection: Stores the summary of the excel file
+/// </summary>
+/// <param name="_client"></param>
+/// <param name="options"></param>
+/// <param name="_logger"></param>
 public class QdrantDatabaseWrapper(
     IQdrantClient _client,
     IOptions<DatabaseOptions> options,
@@ -91,7 +101,11 @@ public class QdrantDatabaseWrapper(
     {
         try
         {
-            var summaryData = new PointStruct { Id = new PointId(), Vectors = _dummyVector };
+            var summaryData = new PointStruct 
+            { 
+                Id = new PointId(), 
+                Vectors = _dummyVector 
+            };
             summaryData.Payload["is_summary"] = new Value { BoolValue = true };
             summaryData.Payload["document_id"] = new Value { StringValue = documentId };
             summaryData.Payload["content"] = new Value { StringValue = JsonSerializer.Serialize(summary, _serializerOptions) };

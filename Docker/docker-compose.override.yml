@@ -1,0 +1,40 @@
+name: Smart Excel File Analyzer Docker Compose Network
+
+services:
+  llm-service-0:
+    build:
+      context: ../LLM
+      dockerfile: ../LLM/llm.Dockerfile
+    volumes:
+      - ../LLM:/app
+
+  llm-service-1:
+    build:
+      context: ../LLM
+      dockerfile: ../LLM/llm.Dockerfile
+    volumes:
+      - ../LLM:/app
+  
+  llm-service-2:
+    build:
+      context: ../LLM
+      dockerfile: ../LLM/llm.Dockerfile
+    volumes:
+      - ../LLM:/app
+
+  backend:
+    build:
+      context: ../Backend
+      dockerfile: ../Backend/backend.Dockerfile
+    volumes:
+      - ../Backend:/app
+      - /app/obj
+      - /app/bin
+
+  frontend:
+    build:
+      context: ../Frontend
+      dockerfile: ../Frontend/frontend.Dockerfile
+    volumes:
+      - ../Frontend:/app
+      - /app/node_modules
