@@ -78,7 +78,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3000:8080"
+      - "3000:3000"
     networks:
       - smart-excel-network
     healthcheck:
@@ -90,6 +90,7 @@ services:
 networks:
   smart-excel-network:
     driver: bridge
+    attachable: true
 
 volumes:
   model_cache:

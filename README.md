@@ -364,10 +364,21 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 ### Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
 
-```powershell
-cd SmartExcelAnalyzer; \
-docker compose up --build -d
-```
+  1. Start the Docker Compose Process:
+  
+      ```powershell
+      cd SmartExcelAnalyzer
+      ```
+
+      ```powershell
+      docker compose up --build -d
+      ```
+
+  2. Scale up the llm-service:
+
+      ```powershell
+      docker-compose up --scale llm-service=3 -d
+      ```
 
 ### Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
 
@@ -377,7 +388,11 @@ Follow these steps:
   1. **Deploy the stack**:
 
       ```powershell
-      docker stack deploy -c docker-stack.yml smart-excel-analyzer
+      cd SmartExcelAnalyzer
+      ```
+
+      ```powershell
+      docker stack deploy -c "./Docker/docker-stack.yml" smart-excel-analyzer
       ```
 
   2. **Check the status of the services**:
@@ -388,7 +403,7 @@ Follow these steps:
 
   3. **Access the frontend application** at [http://localhost:3000](http://localhost:3000).
 
-  4. **Access the backend API directly** at [http://localhost:5000/swagger](http://localhost:5001/swagger).
+  4. **Access the backend API directly** at [http://localhost:5001/swagger](http://localhost:5001/swagger).
 
   5. **Tear down the stack**:
 
@@ -418,6 +433,6 @@ Follow these steps:
 
 - If you are trying to fork this or having trouble using the tool itself, feel free to contact me!
 
-- Connor Mason - <connor.mason@fivemconsulting.com> ✉️
+- ✉️ Connor Mason - <connor.mason@fivemconsulting.com>
 
-- [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git) 💻
+- 💻 [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
