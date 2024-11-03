@@ -29,10 +29,9 @@ services:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
+      - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
-    ports:
-      - "8000:8000"
     depends_on:
       - qdrant
     networks:
@@ -65,7 +64,7 @@ services:
       context: ./Frontend
       dockerfile: ./nginx.Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:80"
     networks:
       - smart-excel-network
     depends_on:
@@ -91,9 +90,7 @@ services:
 networks:
   smart-excel-network:
     driver: bridge
-    attachable: true
 
 volumes:
   model_cache:
   qdrant_data:
-  llm_cache:
