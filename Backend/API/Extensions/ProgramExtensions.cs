@@ -23,7 +23,8 @@ public static class ProgramExtensions
         builder.Configuration.AddJsonFile(
             string.Format(Constants.AppSettingsEnvironmentJson, builder.Environment.EnvironmentName), 
             optional: true, 
-            reloadOnChange: true);
+            reloadOnChange: true
+        );
         builder.Configuration.AddEnvironmentVariables();
         return builder;
     }
@@ -53,11 +54,7 @@ public static class ProgramExtensions
     {
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
-        builder.Services
-            .AddControllers(options => options.AddCommonResponseTypes());
-        builder.Services
-            .AddFluentValidationAutoValidation()
-            .AddFluentValidationClientsideAdapters();
+        builder.Services.AddControllers(options => options.AddCommonResponseTypes());
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(Constants.DefaultCorsPolicy, builder =>

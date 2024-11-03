@@ -45,26 +45,19 @@ public class VectorRepository(
 {
     #region Logging Message Constants
     private const string LOG_NULL_INPUT_DATA = "Input data is null.";
-    private const string LOG_ERROR_CREATING_BATCHES = "Error creating batches";
     private const string LOG_NULL_DOCUMENT_ID = "Document ID is null or empty.";
-    private const string LOG_ERROR_STORING_EMBEDDINGS = "Error storing embeddings";
     private const string LOG_EMPTY_QUERY_VECTOR = "Query vector is empty or null.";
     private const string LOG_NULL_EMBEDDING = "Embedding at index {Index} is null.";    
-    private const string LOG_ERROR_COMPUTING_EMBEDDINGS = "Error computing embeddings";
     private const string LOG_START_SAVE = "Starting to save document to the database.";
-    private const string LOG_BATCH_CREATION_CANCELLED = "Batch creation was cancelled.";
     private const string LOG_FAIL_SAVE_BATCH = "Failed to save vectors to the database.";
-    private const string LOG_STORING_EMBEDDINGS_CANCELLED = "Storing embeddings was cancelled.";
     private const string LOG_SUCCESS_SAVE = "Saved document with id {DocumentId} to the database.";
     private const string LOG_START_COMPUTE = "Computing embeddings for document with {Count} rows.";
-    private const string LOG_EMBEDDING_COMPUTATION_CANCELLED = "Embedding computation was cancelled.";
     private const string LOG_FAIL_SAVE_VECTORS = "Failed to save vectors of the document to the database.";
     private const string LOG_COMPUTE_EMBEDDINGS = "Computed {Count} embeddings in {ElapsedMilliseconds}ms";
     private const string LOG_START_QUERY = "Querying the VectorDb for the most relevant rows for document {DocumentId}.";
     private const string LOG_FAIL_SAVE_SUMMARY = "Failed to save the summary of the document with Id {Id} to the database.";
     private const string LOG_FAIL_QUERY_SUMMARY = "Failed to query the summary of the document with Id {Id} from the database.";
     private const string LOG_FAIL_SAVE_BATCH_FOR_DOCUMENT = "Failed to save vectors to the database for document {DocumentId}.";
-    private const string LOG_ERROR_QUERYING_VECTOR_DATA = "An error occurred while querying vector data for document {DocumentId}";
     private const string LOG_FAIL_QUERY_ROWS = "Failed to query the relevant rows of the document with Id {Id} from the database.";
     private const string LOG_INCONSISTENT_IDS = "Inconsistent document IDs across batches. Document Id {DocumentId} is not equal to batch document Id {BatchDocumentId}.";
     private const string LOG_SUCCESS_QUERY = "Querying the VectorDb for the most relevant rows for document {DocumentId} was successful. Found {RelevantRowsCount} relevant rows.";
