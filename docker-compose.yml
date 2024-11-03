@@ -89,7 +89,7 @@ services:
 
 networks:
   smart-excel-network:
-    driver: bridge
+    driver: overlay
     attachable: true
 
 volumes:
