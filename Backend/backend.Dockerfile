@@ -15,9 +15,6 @@ COPY . .
 
 RUN dotnet restore
 
-EXPOSE 80
-EXPOSE 443  
-EXPOSE 5000
 EXPOSE 5001
 
 ENTRYPOINT ["/bin/sh", "-c", "\

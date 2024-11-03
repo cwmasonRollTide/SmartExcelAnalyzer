@@ -1,4 +1,4 @@
-name: Smart Excel File Analyzer Docker Compose Network
+name: Smart Excel Analyzer
 
 x-healthcheck: &default-healthcheck
   interval: 120s
