@@ -11,7 +11,6 @@ using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using Domain.Persistence.Configuration;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace API.Extensions;
 
@@ -54,19 +53,14 @@ public static class ProgramExtensions
     {
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
-        var frontendUrl = builder.Configuration[Constants.FrontendUrlConfig];
         builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
-        builder.Services.AddMvcCore().PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AnalysisController).Assembly));
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(Constants.DefaultCorsPolicy, builder =>
             {
-                if (!string.IsNullOrEmpty(frontendUrl))
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
-                }
+                builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
             });
         });
 
@@ -93,8 +87,7 @@ public static class ProgramExtensions
             options!.PORT, 
             options!.USE_HTTPS, 
             options!.QDRANT_API_KEY, 
-            grpcTimeout: TimeSpan.FromMinutes(30)
-            )
+            grpcTimeout: TimeSpan.FromMinutes(30))
         );
         builder.Services.AddSingleton<IQdrantClient, QdrantClientWrapper>();
         builder.Services.AddScoped<IDatabaseWrapper, QdrantDatabaseWrapper>();
