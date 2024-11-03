@@ -18,8 +18,6 @@ public class AnalysisController(
     IProgressHubWrapper _hubContext
 ) : BaseController(mediator)
 {
-    private const string StatusTopicName = "ReceiveProgress";
-
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -36,7 +34,10 @@ public class AnalysisController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument, CancellationToken cancellationToken = default) =>
+    public async Task<IActionResult> SubmitQuery(
+        [FromBody] SubmitQuery queryAboutExcelDocument, 
+        CancellationToken cancellationToken = default
+    ) =>
         Ok(await _mediator.Send(queryAboutExcelDocument, cancellationToken));
 
     /// <summary>
@@ -54,9 +55,12 @@ public class AnalysisController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload, CancellationToken cancellationToken = default) =>
-        Ok(await _mediator.Send(
-            new UploadFileCommand
+    public async Task<IActionResult> UploadFile(
+        [FromForm] IFormFile fileToUpload, 
+        CancellationToken cancellationToken = default
+    ) =>
+        Ok(
+            await _mediator.Send(new UploadFileCommand
             {
                 File = fileToUpload,
                 Progress = new Progress<(
