@@ -1,4 +1,4 @@
-name: Smart Excel File Analyzer Docker Compose Network
+name: Smart Excel Analyzer
 
 x-healthcheck: &default-healthcheck
   interval: 120s
@@ -64,20 +64,16 @@ services:
       - .env
     ports:
       - "5001:5001"
+    networks:
+      - smart-excel-network
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     depends_on:
       - qdrant
       - llm-service-0
       - llm-service-1
       - llm-service-2
-    networks:
-      - smart-excel-network
-    environment:
-      - ASPNETCORE_URLS=http://+:80
-      - ASPNETCORE_ENVIRONMENT=Development
-      - Environment=Development
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -86,14 +82,24 @@ services:
       - /app/node_modules
     env_file:
       - .env
-    environment:
-      - REACT_APP_BACKEND_URL=http://backend:5001
     ports:
-      - "3000:3000"
+      - "3000:8080"
     networks:
       - smart-excel-network
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
     depends_on:
       - backend
+
+  # nginx:
+  #   image: fivemowner/smart-excel-analyzer-nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - smart-excel-network
+  #   depends_on:
+  #     - frontend
 
 networks:
   smart-excel-network:

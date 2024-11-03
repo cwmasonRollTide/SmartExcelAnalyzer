@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { FileUploadProps } from './FileUploadProps';
 
-const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL as string || 'http://localhost:5001';
+const SIGNALR_HUB_URL = process.env.VITE_SIGNALR_HUB_URL as string ?? 'http://localhost:5001';
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
@@ -17,8 +17,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactEle
       .withUrl(SIGNALR_HUB_URL)
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
+      .withServerTimeout(10000)
+      .withKeepAliveInterval(20000)
+      .withStatefulReconnect()
       .build();
-
+    newConnection.onclose((error) => {
+      console.log('SignalR Closed: ', error);
+    });
     setConnection(newConnection);
   }, []);
 

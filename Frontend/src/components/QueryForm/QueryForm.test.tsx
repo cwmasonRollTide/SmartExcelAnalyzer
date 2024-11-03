@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import React, { act } from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import QueryForm from './QueryForm';
 import { describe, expect, it, jest } from '@jest/globals';
 
@@ -10,15 +10,19 @@ describe('QueryForm', () => {
     expect(screen.getByRole('button', { name: 'Submit Query' })).toBeTruthy();
   });
 
-  it('calls onQuerySubmit with query when submitted', () => {
+  it('calls onQuerySubmit with query when submitted', async () => {
     const onQuerySubmitMock = jest.fn();
     render(<QueryForm onQuerySubmit={onQuerySubmitMock} isDocumentSelected={true} />);
     
     const input = screen.getByLabelText('Ask a question about the selected document');
     const query = 'Test query';
-    fireEvent.change(input, { target: { value: query } });
-    fireEvent.click(screen.getByRole('button', { name: 'Submit Query' }));
+    await act(async () => {
+      fireEvent.change(input, { target: { value: query } });
+      fireEvent.click(screen.getByRole('button', { name: 'Submit Query' }));
+    });
     
-    expect(onQuerySubmitMock).toHaveBeenCalledWith(query);
+    await waitFor(() => {
+      expect(onQuerySubmitMock).toHaveBeenCalledWith(query);
+    });
   });
 });

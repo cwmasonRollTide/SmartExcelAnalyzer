@@ -95,9 +95,9 @@ public class ExcelFileService : IExcelFileService
     }
 
     #region Private Excel File Processing Methods
-    private static async Task<DataTable> LoadExcelTableAsync(IFormFile file) => (await LoadExcelDataAsync(file)).Tables[0] ?? new();
-
     private static DataColumn[] GetTableColumns(DataTable table) => table.Columns.Cast<DataColumn>().ToArray();
+
+    private static async Task<DataTable> LoadExcelTableAsync(IFormFile file) => (await LoadExcelDataAsync(file)).Tables[0] ?? new();
 
     private static async Task<ConcurrentBag<ConcurrentDictionary<string, object>>> ProcessRowsAsync(
         DataTable table,
@@ -149,7 +149,7 @@ public class ExcelFileService : IExcelFileService
             {
                 var value = row[column];
                 dict[column.ColumnName] = (value is DBNull or null ? null : value) ?? string.Empty;
-                await Task.CompletedTask;
+                await Task.Yield();
             }
         );
         return dict;
@@ -286,7 +286,7 @@ public class ExcelFileService : IExcelFileService
             summary.Maxs[columnName] = values.Max();
             summary.Averages[columnName] = values.Average();
         }
-        await Task.CompletedTask;
+        await Task.Yield();
     }
 
     private static bool IsStringColumn(DataColumn column) => column.DataType == typeof(string);
@@ -322,7 +322,7 @@ public class ExcelFileService : IExcelFileService
             }
         );
         summary.HashedStrings[columnName] = hashedValues;
-        await Task.CompletedTask;
+        await Task.Yield();
     }
 
     /// <summary>

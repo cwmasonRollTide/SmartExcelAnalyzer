@@ -80,10 +80,10 @@ public class UploadFileCommandHandler(
         )>(
             async report =>
                 await _hubContext.SendProgress(
-                        report.ParseProgress, 
-                        report.SaveProgress, 
-                        cancellationToken: cancellationToken
-                    )
+                    report.ParseProgress, 
+                    report.SaveProgress, 
+                    cancellationToken
+                )
         );
 
         var summarizedExcelData = await PrepareExcelFileAsync(
@@ -117,8 +117,10 @@ public class UploadFileCommandHandler(
         );
         stopwatch.Stop();
         _logger.LogTrace(LogTimeParseTaken, stopwatch.ElapsedMilliseconds);
+        
         if (summarizedExcelData is null) 
             _logger.LogInformation(LogFailedToPrepareExcelFile, file.FileName);
+
         return summarizedExcelData;
     }
 

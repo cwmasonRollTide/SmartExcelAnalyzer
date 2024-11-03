@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: 'smartexcelanalyzer.test.com',
+    host: 'localhost',
     strictPort: true,
     proxy: {
       '/api': {
