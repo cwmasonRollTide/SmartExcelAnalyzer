@@ -1,4 +1,5 @@
 using MediatR;
+using API.Attributes;
 using Persistence.Hubs;
 using Application.Queries;
 using Application.Commands;
@@ -29,10 +30,8 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
     ///     List<Dictionary<string, object>> RelevantRows
     /// </returns>
     [HttpPost("query")]
+    [CommonResponseTypesAttribute]
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SubmitQuery(
         [FromBody] SubmitQuery queryAboutExcelDocument, 
         CancellationToken cancellationToken = default
@@ -49,11 +48,8 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
     /// <param name="fileToUpload"></param>
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
+    [CommonResponseTypesAttribute]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status408RequestTimeout)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile(
         [FromForm] IFormFile fileToUpload, 
         CancellationToken cancellationToken = default

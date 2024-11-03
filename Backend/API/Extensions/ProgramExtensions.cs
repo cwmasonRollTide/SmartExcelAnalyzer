@@ -2,7 +2,7 @@ using System.Text;
 using Qdrant.Client;
 using API.Properties;
 using API.Middleware;
-using API.Controllers;
+using API.Attributes;
 using Persistence.Hubs;
 using Application.Queries;
 using Application.Services;
@@ -53,7 +53,11 @@ public static class ProgramExtensions
     {
         builder.Services.AddSignalR();
         builder.Services.AddHealthChecks();
-        builder.Services.AddControllers().AddApplicationPart(typeof(AnalysisController).Assembly);
+        builder.Services
+            .AddControllers(options => options.AddCommonResponseTypes());
+        builder.Services
+            .AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters();
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(Constants.DefaultCorsPolicy, builder =>
@@ -127,8 +131,10 @@ public static class ProgramExtensions
     {
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc(Constants.SwaggerConfig.Version, 
-                new OpenApiInfo { 
+            c.SwaggerDoc(
+                Constants.SwaggerConfig.Version, 
+                new OpenApiInfo 
+                { 
                     Title = Constants.SwaggerConfig.Title, 
                     Version = Constants.SwaggerConfig.Version 
                 });
