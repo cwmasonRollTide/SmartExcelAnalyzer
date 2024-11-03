@@ -1,5 +1,3 @@
-name: Smart Excel File Analyzer Docker Compose Network
-
 services:
   llm-service:
     build:
