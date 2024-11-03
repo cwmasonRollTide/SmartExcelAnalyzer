@@ -61,8 +61,8 @@ services:
 
   nginx:
     build:
-      context: ./Frontend
-      dockerfile: ./nginx.Dockerfile
+      context: ./Frontend/
+      dockerfile: nginx.Dockerfile
     ports:
       - "8080:80"
     networks:
