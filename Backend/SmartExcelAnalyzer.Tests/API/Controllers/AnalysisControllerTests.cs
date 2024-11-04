@@ -9,6 +9,7 @@ using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.API.Controllers;
 
@@ -16,7 +17,8 @@ public class AnalysisControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock = new();
     private readonly Mock<IProgressHubWrapper> _hubWrapperMock = new();
-    private AnalysisController Sut => new(_mediatorMock.Object, _hubWrapperMock.Object);
+    private readonly Mock<IMemoryCache> _cacheMock = new();
+    private AnalysisController Sut => new(_mediatorMock.Object, _hubWrapperMock.Object, _cacheMock.Object);
 
     [Fact]
     public async Task SubmitQuery_ReturnsOkResult_WhenQueryIsValid()

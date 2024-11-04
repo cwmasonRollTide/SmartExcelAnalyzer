@@ -118,6 +118,7 @@ public static class ProgramExtensions
 
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddMemoryCache();
         builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
         builder.Services.AddScoped<IProgressHubWrapper, ProgressHubWrapper>();
         builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));

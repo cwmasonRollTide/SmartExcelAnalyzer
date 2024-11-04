@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Persistence.Repositories;
 
@@ -40,7 +41,8 @@ public class VectorRepository(
     ILogger<VectorRepository> _logger,
     ILLMRepository _llmRepository,
     IOptions<LLMServiceOptions> llmOptions,
-    IOptions<DatabaseOptions> databaseOptions
+    IOptions<DatabaseOptions> databaseOptions,
+    IMemoryCache _cache
 ) : IVectorDbRepository
 {
     #region Logging Message Constants
@@ -90,6 +92,7 @@ public class VectorRepository(
         }
         _logger.LogInformation(LOG_START_SAVE);
         var documentId = await SaveDocumentDataAsync(
+            vectorSpreadsheetData.FileName,
             vectorSpreadsheetData.Rows ?? [], 
             progress, 
             cancellationToken
@@ -180,6 +183,7 @@ public class VectorRepository(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     private async Task<string> SaveDocumentDataAsync(
+        string fileName,
         ConcurrentBag<ConcurrentDictionary<string, object>> rows, 
         IProgress<(double, double)>? progress, 
         CancellationToken cancellationToken = default
@@ -210,8 +214,9 @@ public class VectorRepository(
         );
         var storeEmbeddingsTask = StoreEmbeddingsAsync(
             embeddingChannel.Reader, 
-            progress, 
-            totalRows, 
+            progress,
+            totalRows,
+            fileName,
             cancellationToken
         );
         await createBatchesTask;
@@ -306,11 +311,12 @@ public class VectorRepository(
         )> reader,
         IProgress<(double, double)>? progress,
         int totalRows,
+        string fileName,
         CancellationToken cancellationToken = default
     )
     {
         var processedRows = 0;
-        string? documentId = null;
+        string? documentId = _cache.Get<string?>(fileName);
         try
         {
             cancellationToken.ThrowIfCancellationRequested();

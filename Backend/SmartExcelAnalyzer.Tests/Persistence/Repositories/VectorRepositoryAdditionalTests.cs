@@ -8,6 +8,7 @@ using Persistence.Database;
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
 using SmartExcelAnalyzer.Tests.TestUtilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
@@ -18,7 +19,8 @@ public class VectorRepositoryAdditionalTests
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
-    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
+    private readonly Mock<IMemoryCache> _cacheMock = new();
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object, _cacheMock.Object);
 
     public VectorRepositoryAdditionalTests()
     {

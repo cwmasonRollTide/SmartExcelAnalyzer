@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using FluentValidation.TestHelper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.Application;
 
@@ -59,6 +60,7 @@ public class UploadFileCommandTests
         private readonly Mock<IHubContext<ProgressHub>> _hubContextMock = new();
         private readonly Mock<IVectorDbRepository> _vectorDbRepositoryMock = new();
         private readonly Mock<ILogger<UploadFileCommandHandler>> _loggerMock = new();
+        private readonly Mock<IMemoryCache> _cacheMock = new();
         private UploadFileCommandHandler Sut => new(_excelServiceMock.Object, _vectorDbRepositoryMock.Object, _loggerMock.Object, _hubWrapperMock.Object);
 
         public UploadFileCommandHandlerTests()

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
@@ -16,13 +17,13 @@ public class VectorRepositoryTests_V2
 {
     private const int SAVE_BATCH_SIZE = 10;
     private const int COMPUTE_BATCH_SIZE = 10;
-
+    private readonly Mock<IMemoryCache> _cacheMock = new();
     private readonly Mock<IDatabaseWrapper> _databaseMock = new();
     private readonly Mock<ILLMRepository> _llmRepositoryMock = new();
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
     private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
-    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object, _cacheMock.Object);
 
     private static readonly float[] singleArray = [1.0f];
 

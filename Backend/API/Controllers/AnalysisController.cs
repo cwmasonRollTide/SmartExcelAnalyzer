@@ -5,6 +5,7 @@ using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace API.Controllers;
 
@@ -16,7 +17,7 @@ namespace API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext) : ControllerBase
+public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext, IMemoryCache _cache) : ControllerBase
 {
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
@@ -71,4 +72,69 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
                 )
             }, cancellationToken)
         );
+
+    [HttpPost("initialize-upload")]
+    [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
+    public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
+    {
+        var uploadId = Guid.NewGuid().ToString();
+        _cache.Set(request.Filename, uploadId);
+        _cache.Set(uploadId, request.Filename);
+        return Ok(new InitializeUploadResponse
+        { 
+            Filename = request.Filename, 
+            UploadId = uploadId 
+        });
+    }
+
+    [HttpPost("upload-chunk")]
+    [CommonResponseTypesAttribute]
+    [ProducesResponseType(typeof(UploadChunkResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UploadChunk(
+        [FromForm] IFormFile file,
+        [FromForm] int chunkIndex,
+        [FromForm] int totalChunks,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var uploadCommand = new UploadFileCommand
+        {
+            File = file,
+            Progress = new Progress<(
+                double ParseProgress,
+                double SaveProgress
+            )>(
+                async progressTuple =>
+                    await _hubContext.SendProgress(
+                        progressTuple.ParseProgress,
+                        progressTuple.SaveProgress,
+                        cancellationToken
+                    )
+            )
+        };
+        var uploadId = _cache.Get<string>(file.FileName);
+        double progress = (double)(chunkIndex + 1) / totalChunks * 100;
+        await _hubContext.SendProgress(progress, totalChunks, cancellationToken);
+        
+        return Ok(new UploadChunkResponse
+        {
+            Filename = file.FileName,
+            UploadId = uploadId!
+        });
+    }
+
+    [HttpPost("finalize-upload")]
+    [ProducesResponseType(typeof(FinalizeUploadResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FinalizeUpload([FromBody] FinalizeUploadRequest request, CancellationToken cancellationToken = default)
+    {
+        var fileName = _cache.Get<string>(request.UploadId);
+        await _hubContext.SendProgress(100, 100, cancellationToken);
+        _cache.Remove(request.UploadId);
+        if (fileName is not null && fileName is { Length : > 0} ) _cache.Remove(fileName);
+        return Ok(new FinalizeUploadResponse
+        { 
+            Filename = fileName,
+            UploadId = request.UploadId 
+        });
+    }
 }
