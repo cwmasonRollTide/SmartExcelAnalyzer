@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { SubmitQueryResponse } from './SubmitQueryResponse';
+import { FinalizeResponse } from './FinalizeResponse';
+import { ChunkedUploadResponse } from './ChunkedUploadResponse';
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
-export const uploadFileInChunks = async (file: File): Promise<string> => {
+export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadResponse> => {
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-  const uploadId = await initializeUpload(file.name);
+  const documentId = await initializeUpload(file.name);
 
   for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
     const start = chunkIndex * CHUNK_SIZE;
@@ -14,10 +16,8 @@ export const uploadFileInChunks = async (file: File): Promise<string> => {
 
     const formData = new FormData();
     formData.append('file', chunk);
-    formData.append('filename', file.name);
     formData.append('chunkIndex', chunkIndex.toString());
     formData.append('totalChunks', totalChunks.toString());
-    formData.append('uploadId', uploadId);
 
     await axios.post('/analysis/upload-chunk', formData, {
       headers: {
@@ -26,18 +26,31 @@ export const uploadFileInChunks = async (file: File): Promise<string> => {
     });
   }
 
-  return finalizeUpload(uploadId);
+  return finalizeUpload(documentId);
 };
 
 const initializeUpload = async (filename: string): Promise<string> => {
   const response = await axios.post('/analysis/initialize-upload', { filename });
-  return response.data.uploadId;
+  return response.data.documentId;
 };
 
-const finalizeUpload = async (uploadId: string): Promise<string> => {
-  const response = await axios.post('/analysis/finalize-upload', { uploadId });
-  return response.data.uploadId;
+const finalizeUpload = async (documentId: string): Promise<FinalizeResponse> => {
+  const response = await axios.post('/analysis/finalize-upload', { documentId });
+  return response.data;
 };
+
+export const uploadFile = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await axios.post('/analysis/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data.documentId;
+}
 
 export const submitQuery = async (
   query: string, 

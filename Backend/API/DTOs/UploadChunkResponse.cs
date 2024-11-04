@@ -1,7 +1,7 @@
-namespace API.Controllers;
+namespace API.DTOs;
 
-public class UploadChunkResponse
+public class UploadResponse
 {
     public string Filename { get; set; } = string.Empty;
-    public string UploadId { get; set; } = string.Empty;
+    public string DocumentId { get; set; } = string.Empty;
 }

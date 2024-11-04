@@ -1,5 +1,5 @@
 
 export interface ChunkedUploadResponse {
-  uploadId: string;
+  documentId: string;
   filename: string;
 }

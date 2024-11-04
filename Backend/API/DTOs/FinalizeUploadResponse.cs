@@ -1,7 +1,7 @@
-namespace API.Controllers;
+namespace API.DTOs;
 
 public class FinalizeUploadResponse
 {
-    public string UploadId { get; set; } = string.Empty;
+    public string DocumentId { get; set; } = string.Empty;
     public string? Filename { get; set; }
 }

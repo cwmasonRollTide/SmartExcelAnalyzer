@@ -1,4 +1,4 @@
-namespace API.Controllers;
+namespace API.DTOs;
 
 public class FinalizeUploadRequest
 {

@@ -1,7 +1,7 @@
-namespace API.Controllers;
+namespace API.DTOs;
 
 public class InitializeUploadResponse
 {
     public string Filename { get; set; } = string.Empty;
-    public string UploadId { get; set; } = string.Empty;
+    public string DocumentId { get; set; } = string.Empty;
 }

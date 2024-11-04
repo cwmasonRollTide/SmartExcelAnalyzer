@@ -47,6 +47,7 @@ public class AnalysisControllerTests
         var result = await Sut.UploadFile(file);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        okResult.Value.Should().BeEquivalentTo(expectedResult);
+        var expectedObject = new { DocumentId = expectedResult };
+        okResult.Value.Should().BeEquivalentTo(expectedObject);
     }
 }
