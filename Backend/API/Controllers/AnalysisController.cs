@@ -118,6 +118,10 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
             )
         };
         var uploadId = _cache.Get<string>(file.FileName);
+        if (uploadId is null) 
+            return BadRequest("Upload not found");
+
+        await _mediator.Send(uploadCommand, cancellationToken);
         double progress = (double)(chunkIndex + 1) / totalChunks * 100;
         await _hubContext.SendProgress(progress, totalChunks, cancellationToken);
 
