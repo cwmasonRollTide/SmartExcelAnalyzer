@@ -1,9 +1,12 @@
 using MediatR;
+using API.DTOs;
+using API.Attributes;
 using Persistence.Hubs;
 using Application.Queries;
 using Application.Commands;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace API.Controllers;
 
@@ -13,13 +16,10 @@ namespace API.Controllers;
 /// routes: api/analysis
 /// endpoints: /query, /upload
 /// </summary>
-public class AnalysisController(
-    IMediator mediator,
-    IProgressHubWrapper _hubContext
-) : BaseController(mediator)
+[ApiController]
+[Route("api/[controller]")]
+public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext, IMemoryCache _cache) : ControllerBase
 {
-    private const string StatusTopicName = "ReceiveProgress";
-
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
     /// Computes the embedding of the query with the LLM and compares it to the embeddings of the rows in the database.
@@ -32,10 +32,12 @@ public class AnalysisController(
     ///     List<Dictionary<string, object>> RelevantRows
     /// </returns>
     [HttpPost("query")]
+    [CommonResponseTypesAttribute]
     [ProducesResponseType(typeof(QueryAnswer), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SubmitQuery([FromBody] SubmitQuery queryAboutExcelDocument, CancellationToken cancellationToken = default) =>
+    public async Task<IActionResult> SubmitQuery(
+        [FromBody] SubmitQuery queryAboutExcelDocument,
+        CancellationToken cancellationToken = default
+    ) =>
         Ok(await _mediator.Send(queryAboutExcelDocument, cancellationToken));
 
     /// <summary>
@@ -48,26 +50,96 @@ public class AnalysisController(
     /// <param name="fileToUpload"></param>
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile fileToUpload, CancellationToken cancellationToken = default) =>
-        Ok(await _mediator.Send(
-            new UploadFileCommand
+    [CommonResponseTypesAttribute]
+    [ProducesResponseType(typeof(UploadResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UploadFile(
+        [FromForm] IFormFile fileToUpload,
+        CancellationToken cancellationToken = default
+    ) =>
+        Ok(
+            new
             {
-                File = fileToUpload,
-                Progress = new Progress<(
-                    double ParseProgress,
-                    double SaveProgress
-                )>(
-                    async progressTuple =>
-                        await _hubContext.SendProgress(
-                            progressTuple.ParseProgress,
-                            progressTuple.SaveProgress,
-                            cancellationToken
-                        )
-                )
-            }, cancellationToken)
+                DocumentId = await _mediator.Send(new UploadFileCommand
+                {
+                    File = fileToUpload,
+                    Progress = new Progress<(
+                        double ParseProgress,
+                        double SaveProgress
+                    )>(
+                        async progressTuple =>
+                            await _hubContext.SendProgress(
+                                progressTuple.ParseProgress,
+                                progressTuple.SaveProgress,
+                                cancellationToken
+                            )
+                    )
+                }, cancellationToken)
+            }
+
         );
+
+    [HttpPost("initialize-upload")]
+    [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
+    public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
+    {
+        var uploadId = Guid.NewGuid().ToString();
+        _cache.Set(request.Filename, uploadId);
+        _cache.Set(uploadId, request.Filename);
+        return Ok(new InitializeUploadResponse
+        {
+            Filename = request.Filename,
+            DocumentId = uploadId
+        });
+    }
+
+    [HttpPost("upload-chunk")]
+    [CommonResponseTypesAttribute]
+    [ProducesResponseType(typeof(UploadResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UploadChunk(
+        [FromForm] IFormFile file,
+        [FromForm] int chunkIndex,
+        [FromForm] int totalChunks,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var uploadCommand = new UploadFileCommand
+        {
+            File = file,
+            Progress = new Progress<(
+                double ParseProgress,
+                double SaveProgress
+            )>(
+                async progressTuple =>
+                    await _hubContext.SendProgress(
+                        progressTuple.ParseProgress,
+                        progressTuple.SaveProgress,
+                        cancellationToken
+                    )
+            )
+        };
+        var uploadId = _cache.Get<string>(file.FileName);
+        double progress = (double)(chunkIndex + 1) / totalChunks * 100;
+        await _hubContext.SendProgress(progress, totalChunks, cancellationToken);
+
+        return Ok(new UploadResponse
+        {
+            Filename = file.FileName,
+            DocumentId = uploadId!
+        });
+    }
+
+    [HttpPost("finalize-upload")]
+    [ProducesResponseType(typeof(FinalizeUploadResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FinalizeUpload([FromBody] FinalizeUploadRequest request, CancellationToken cancellationToken = default)
+    {
+        var fileName = _cache.Get<string>(request.UploadId);
+        await _hubContext.SendProgress(100, 100, cancellationToken);
+        _cache.Remove(request.UploadId);
+        if (fileName is not null && fileName is { Length: > 0 }) _cache.Remove(fileName);
+        return Ok(new FinalizeUploadResponse
+        {
+            Filename = fileName,
+            DocumentId = request.UploadId
+        });
+    }
 }

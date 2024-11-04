@@ -8,6 +8,7 @@ using Persistence.Database;
 using Domain.Persistence.DTOs;
 using Microsoft.Extensions.Options;
 using SmartExcelAnalyzer.Tests.TestUtilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Database;
 
@@ -18,7 +19,8 @@ public class VectorRepositoryAdditionalTests
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
-    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
+    private readonly Mock<IMemoryCache> _cacheMock = new();
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object, _cacheMock.Object);
 
     public VectorRepositoryAdditionalTests()
     {
@@ -99,31 +101,5 @@ public class VectorRepositoryAdditionalTests
         await Sut.SaveDocumentAsync(data);
 
         _databaseMock.Verify(c => c.StoreSummaryAsync(It.IsAny<string>(), It.IsAny<ConcurrentDictionary<string, object>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task ComputeEmbeddingsAsync_ShouldLogError_WhenExceptionIsThrown()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new() { ["col1"] = "val1" },
-                new() { ["col2"] = "val2" }
-            ]
-        };
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        await Sut.SaveDocumentAsync(data);
-
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("Error computing embeddings")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
     }
 }

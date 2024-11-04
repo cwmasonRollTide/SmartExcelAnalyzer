@@ -24,7 +24,7 @@ The LLM Service is built using Python and utilizes state-of-the-art language mod
 
 To set up the LLM Service, follow the instructions for your operating system:
 
-### Windows (PowerShell)
+### 🖥️ Windows (PowerShell)
 
 1. Install Python 3.x:
    - Download the Python installer from the official website: <https://www.python.org/downloads/>
@@ -59,7 +59,7 @@ To set up the LLM Service, follow the instructions for your operating system:
    python main.py
    ```
 
-### Linux
+### 🐧 Linux
 
 1. Install Python 3.x using your distribution's package manager. For example, on Ubuntu:
 
@@ -96,7 +96,7 @@ To set up the LLM Service, follow the instructions for your operating system:
    python main.py
    ```
 
-### macOS
+### 🍎 macOS
 
 1. Install Python 3.x using Homebrew:
 

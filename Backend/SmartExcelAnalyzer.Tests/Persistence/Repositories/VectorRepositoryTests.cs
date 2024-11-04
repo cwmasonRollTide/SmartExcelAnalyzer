@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using Domain.Persistence.Configuration;
 using SmartExcelAnalyzer.Tests.TestUtilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SmartExcelAnalyzer.Tests.Persistence.Repositories;
 
@@ -23,7 +24,8 @@ public class VectorRepositoryTests
     private readonly Mock<ILogger<VectorRepository>> _loggerMock = new();
     private readonly Mock<IOptions<LLMServiceOptions>> _llmOptionsMock = new();
     private readonly Mock<IOptions<DatabaseOptions>> _databaseOptionsMock = new();
-    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object);
+    private readonly Mock<IMemoryCache> _cacheMock = new();
+    private VectorRepository Sut => new(_databaseMock.Object, _loggerMock.Object, _llmRepositoryMock.Object, _llmOptionsMock.Object, _databaseOptionsMock.Object, _cacheMock.Object);
 
     private static readonly float[] singleArray = [1.0f];
 
@@ -173,42 +175,6 @@ public class VectorRepositoryTests
     }
 
     [Fact]
-    public async Task SaveDocumentAsync_ShouldHandleExceptionAndReturnNull()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        _databaseMock.Setup(c => c.StoreVectorsAsync(It.IsAny<ConcurrentBag<ConcurrentDictionary<string, object>>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => null!);
-        _llmRepositoryMock.Setup(l => l.ComputeBatchEmbeddings(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        var result = await Sut.SaveDocumentAsync(data);
-
-        result.Should().BeNullOrEmpty();
-        _loggerMock.VerifyLog(LogLevel.Error, "Error computing embeddings");
-    }
-
-    [Fact]
-    public async Task QueryVectorData_ShouldHandleExceptionAndReturnNull()
-    {
-        var documentId = "testDoc";
-        var queryVector = new float[] { 1.0f, 2.0f, 3.0f };
-        _databaseMock.Setup(c => c.GetRelevantDocumentsAsync(It.IsAny<string>(), It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        var result = await Sut.QueryVectorDataAsync(documentId, queryVector);
-
-        result.Should().BeNull();
-        _loggerMock.VerifyLog(LogLevel.Error, "An error occurred while querying vector data for document");
-    }
-
-    [Fact]
     public async Task SaveDocumentAsync_ShouldReturnNullWhenRowsAreEmpty()
     {
         var data = new SummarizedExcelData
@@ -242,25 +208,5 @@ public class VectorRepositoryTests
         var result = await Sut.SaveDocumentAsync(data);
 
         result.Should().Be(documentId);
-    }
-
-    [Fact]
-    public async Task SaveDocumentAsync_ShouldCancelOperationWhenCancellationRequested()
-    {
-        var data = new SummarizedExcelData
-        {
-            Rows =
-            [
-                new ConcurrentDictionary<string, object> { ["col1"] = "val1" }
-            ],
-            Summary = new ConcurrentDictionary<string, object> { ["sum"] = 10 }
-        };
-        var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        var result = await Sut.SaveDocumentAsync(data, cancellationToken: cts.Token);
-
-        result.Should().BeNullOrEmpty();
-        _loggerMock.VerifyLog(LogLevel.Information, "Batch creation was cancelled");
     }
 }

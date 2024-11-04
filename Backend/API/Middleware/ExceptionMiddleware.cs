@@ -8,13 +8,15 @@ public class ExceptionMiddleware(
     ILogger<ExceptionMiddleware> _logger
 )
 {
+    #region Private Constants
     private const string CONTENT_TYPE = "application/json";
     private const string TASK_CANCELED = "A task was canceled.";
     private const string TIMEOUT_EXCEPTION = "A timeout occurred.";
     private const string OPERATION_CANCELED = "An operation was canceled.";
     private const string HTTP_EXCEPTION = "An HTTP request exception occurred.";
     private const string UNHANDLED_EXCEPTION = "An unhandled exception occurred.";
-    private const string VALIDATION_EXCEPTION = "A validation exception occurred.";    
+    private const string VALIDATION_EXCEPTION = "A validation exception occurred.";
+    #endregion
 
     public async Task InvokeAsync(HttpContext context)
     {

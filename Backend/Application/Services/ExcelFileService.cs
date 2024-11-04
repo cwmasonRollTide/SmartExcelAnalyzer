@@ -89,6 +89,7 @@ public class ExcelFileService : IExcelFileService
         progress.Report((1.0, 0));
         return new()
         {
+            FileName = file.FileName,
             Rows = await rowsTask,
             Summary = await summaryTask
         };

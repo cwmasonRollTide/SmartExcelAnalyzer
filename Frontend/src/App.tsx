@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
-import { uploadFile, submitQuery } from './services/api.ts';
+import { submitQuery, uploadFileInChunks } from './services/api.ts';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';
@@ -48,7 +48,7 @@ const originalTheme = createTheme({
   },
 });
 
-function App() {
+function SmartExcelAnalyzerApp() {
   const [theme, setTheme] = useState(originalTheme);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -59,8 +59,8 @@ function App() {
 
   const handleFileUpload = async (file: File) => {
     try {
-      const documentId = await uploadFile(file);
-      const newDocument = { id: documentId, name: file.name };
+      const res = await uploadFileInChunks(file);
+      const newDocument = { id: res.documentId, name: res.filename };
       setDocuments([...documents, newDocument]);
       showToast('File uploaded successfully', 'success');
     } catch (error) {
@@ -203,4 +203,4 @@ function App() {
   );
 }
 
-export default App;
+export default SmartExcelAnalyzerApp;

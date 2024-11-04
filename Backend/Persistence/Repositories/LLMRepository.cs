@@ -144,6 +144,7 @@ public class LLMLoadBalancer(IOptions<LLMServiceOptions> options) : ILLMServiceL
 
     public string GetServiceUrl()
     {
+        // If we are in swarm mode, it handles load balancing for us
         if (_weAreInSwarmMode)
         {
             return _serviceUrl;
