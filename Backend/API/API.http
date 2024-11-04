@@ -2,6 +2,9 @@
 
 GET {{API_HostAddress}}/health
 POST {{API_HostAddress}}/api/analysis/query
+POST {{API_HostAddress}}/api/analysis/initialize-upload
+POST {{API_HostAddress}}/api/analysis/finalize-upload
+POST {{API_HostAddress}}/api/analysis/upload-chunk
 POST {{API_HostAddress}}/api/analysis/upload
 Accept: application/json
 
