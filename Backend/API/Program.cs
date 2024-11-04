@@ -1,4 +1,5 @@
 using API.Extensions;
+using static API.Extensions.ProgramExtensions;
 
 namespace API;
 
