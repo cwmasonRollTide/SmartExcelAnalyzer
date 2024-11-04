@@ -48,7 +48,7 @@ const originalTheme = createTheme({
   },
 });
 
-function App() {
+function SmartExcelAnalyzerApp() {
   const [theme, setTheme] = useState(originalTheme);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -203,4 +203,4 @@ function App() {
   );
 }
 
-export default App;
+export default SmartExcelAnalyzerApp;
