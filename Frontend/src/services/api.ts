@@ -19,7 +19,7 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
     formData.append('chunkIndex', chunkIndex.toString());
     formData.append('totalChunks', totalChunks.toString());
 
-    await axios.post('/analysis/upload-chunk', formData, {
+    await axios.post('/api/analysis/upload-chunk', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -30,12 +30,12 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
 };
 
 const initializeUpload = async (filename: string): Promise<string> => {
-  const response = await axios.post('/analysis/initialize-upload', { filename });
+  const response = await axios.post('/api/analysis/initialize-upload', { filename });
   return response.data.documentId;
 };
 
 const finalizeUpload = async (documentId: string): Promise<FinalizeResponse> => {
-  const response = await axios.post('/analysis/finalize-upload', { documentId });
+  const response = await axios.post('/api/analysis/finalize-upload', { documentId });
   return response.data;
 };
 
@@ -43,7 +43,7 @@ export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await axios.post('/analysis/upload', formData, {
+  const response = await axios.post('/api/analysis/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -56,7 +56,7 @@ export const submitQuery = async (
   query: string, 
   documentId: string
 ): Promise<SubmitQueryResponse> => {
-  const response = await axios.post<SubmitQueryResponse>('/analysis/query', {
+  const response = await axios.post<SubmitQueryResponse>('/api/analysis/query', {
     query,
     documentId,
   });
