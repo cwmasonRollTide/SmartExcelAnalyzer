@@ -13,8 +13,3 @@ services:
     build:
       context: ./Frontend/
       dockerfile: frontend.Dockerfile
-
-  nginx:
-    build:
-      context: ./Frontend/
-      dockerfile: nginx.Dockerfile
