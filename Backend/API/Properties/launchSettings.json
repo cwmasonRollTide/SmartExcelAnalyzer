@@ -16,11 +16,12 @@
           "containerName": "smartexcelanalyzer-backend-1",
           "publishAllPorts": true
         },
-        "httpPort": 5001,
+        "useSSL": true,
+        "httpPort": 44359,
         "dotnetRunMessages": true,
         "launchBrowser": true,
         "launchUrl": "swagger",
-        "applicationUrl": "http://localhost:5001",
+        "applicationUrl": "https://localhost:5001",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }

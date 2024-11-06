@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { SubmitQueryResponse } from './SubmitQueryResponse';
-import { FinalizeResponse } from './FinalizeResponse';
-import { ChunkedUploadResponse } from './ChunkedUploadResponse';
+import axios from './axiosInstance';
+import { FinalizeResponse } from './interfaces/FinalizeResponse';
+import { SubmitQueryResponse } from './interfaces/SubmitQueryResponse';
+import { ChunkedUploadResponse } from './interfaces/ChunkedUploadResponse';
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -13,7 +13,6 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
     const start = chunkIndex * CHUNK_SIZE;
     const end = Math.min(start + CHUNK_SIZE, file.size);
     const chunk = file.slice(start, end);
-
     const formData = new FormData();
     formData.append('file', chunk);
     formData.append('chunkIndex', chunkIndex.toString());

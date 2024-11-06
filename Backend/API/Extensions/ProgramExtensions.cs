@@ -10,12 +10,29 @@ using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 
 namespace API.Extensions;
 
 public static class ProgramExtensions
 {
+    [ExcludeFromCodeCoverage]
+    public static WebApplication ConfigureSmartExcelAnalyzerProgram(string[] args) => WebApplication.CreateBuilder(args)
+        .AddSmartExcelFileAnalyzerVariables()
+        .ConfigureLogging()
+        .ConfigureMediatR()
+        .ConfigureSwagger()
+        .ConfigureDatabase()
+        .ConfigureServices()
+        .ConfigureApiAccess()
+        .ConfigureHttpClient()
+        .ConfigureLLMService()
+        .Build()
+        .ConfigureCors()
+        .ConfigureMiddleware() 
+        .ConfigureProgressHub();
+    
     public static WebApplicationBuilder AddSmartExcelFileAnalyzerVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();
@@ -57,7 +74,7 @@ public static class ProgramExtensions
         builder.Services.AddControllers(options => options.AddCommonResponseTypes());
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(ConfigurationConstants.DefaultCorsPolicy, builder =>
+            options.AddPolicy(ConfigurationConstants.AppCorsPolicy, builder =>
             {
                 builder.AllowAnyOrigin()
                         .AllowAnyHeader()
@@ -145,9 +162,14 @@ public static class ProgramExtensions
     {
         if (app.Environment.IsDevelopment()) 
             app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
-
-        app.MapControllers();
+        
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseDefaultFiles();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.MapControllers();
         app.MapHealthChecks(ConfigurationConstants.HealthCheckEndpoint);
         return app;
     }
@@ -160,7 +182,7 @@ public static class ProgramExtensions
 
     public static WebApplication ConfigureCors(this WebApplication app)
     {
-        app.UseCors(ConfigurationConstants.DefaultCorsPolicy);
+        app.UseCors(ConfigurationConstants.AppCorsPolicy);
         Array.ForEach(ConfigurationConstants.SupportedUrls, app.Urls.Add);
         return app;
     }
@@ -169,15 +191,14 @@ public static class ProgramExtensions
     {
         public const string LoggingSection = "Logging";
         public const string HealthCheckEndpoint = "/health";
-        public const string DefaultCorsPolicy = "CorsPolicy";
-        public const string FrontendUrlConfig = "FrontendUrl";
+        public const string AppCorsPolicy = "AllowAllOrigins";
         public const string DefaultClientName = "DefaultClient";
         public const string AppSettingsJson = "appsettings.json";
         public const string ProgressHubEndpoint = "/progressHub";
         public const string DatabaseOptionsSection = "DatabaseOptions";
         public const string LLMServiceOptionsSection = "LLMServiceOptions";
         public const string AppSettingsEnvironmentJson = "appsettings.{0}.json";
-        public static readonly string[] SupportedUrls = ["http://localhost:5001"];
+        public static readonly string[] SupportedUrls = ["http://localhost:5001", "https://localhost:44359"];
         
         public static class ValidationMessages
         {

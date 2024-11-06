@@ -18,7 +18,11 @@ namespace API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext, IMemoryCache _cache) : ControllerBase
+public class AnalysisController(
+    IMediator _mediator, 
+    IProgressHubWrapper _hubContext, 
+    IMemoryCache _cache
+) : ControllerBase
 {
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
@@ -59,6 +63,7 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
         Ok(
             new
             {
+                Filename = fileToUpload.FileName,
                 DocumentId = await _mediator.Send(new UploadFileCommand
                 {
                     File = fileToUpload,
@@ -75,14 +80,13 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
                     )
                 }, cancellationToken)
             }
-
         );
 
     [HttpPost("initialize-upload")]
     [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
     public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
     {
-        var uploadId = Guid.NewGuid().ToString();
+        var uploadId = request.Filename + DateTime.UtcNow.Ticks.ToString()[5..];
         _cache.Set(request.Filename, uploadId);
         _cache.Set(uploadId, request.Filename);
         return Ok(new InitializeUploadResponse
