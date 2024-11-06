@@ -76,17 +76,22 @@ services:
     depends_on:
       - backend
 
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./Frontend/dist:/usr/share/nginx/html
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
+      - "8080:8080" # The Web UI (enabled by --api.insecure=true)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - smart-excel-network
     depends_on:
-      - backend
       - frontend
+      - backend
 
 networks:
   smart-excel-network:
