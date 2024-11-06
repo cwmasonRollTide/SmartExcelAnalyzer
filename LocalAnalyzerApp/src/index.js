@@ -44,7 +44,7 @@ const createWindow = () => {
   checkDockerInstallation((isInstalled) => {
     if (isInstalled) {
       // Start Docker Compose
-      exec('docker-compose up -d', { cwd: path.join(__dirname, '..', '..') }, (error, stdout, stderr) => {
+      exec('docker-compose up --build -d', { cwd: path.join(__dirname, '..', '..') }, (error, stdout, stderr) => {
         if (error) {
           console.error(`exec error: ${error}`);
           return;
