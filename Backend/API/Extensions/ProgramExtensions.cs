@@ -186,7 +186,7 @@ public static class ProgramExtensions
     {
         public const string LoggingSection = "Logging";
         public const string HealthCheckEndpoint = "/health";
-        public const string DefaultCorsPolicy = "CorsPolicy";
+        public const string DefaultCorsPolicy = "AllowAllOrigins";
         public const string FrontendUrlConfig = "FrontendUrl";
         public const string DefaultClientName = "DefaultClient";
         public const string AppSettingsJson = "appsettings.json";
@@ -194,7 +194,7 @@ public static class ProgramExtensions
         public const string DatabaseOptionsSection = "DatabaseOptions";
         public const string LLMServiceOptionsSection = "LLMServiceOptions";
         public const string AppSettingsEnvironmentJson = "appsettings.{0}.json";
-        public static readonly string[] SupportedUrls = ["http://localhost:5001"];
+        public static readonly string[] SupportedUrls = ["http://localhost:5001", "https://localhost:5001", "https://localhost:44359"];
         
         public static class ValidationMessages
         {
