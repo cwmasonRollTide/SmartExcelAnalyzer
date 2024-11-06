@@ -7,6 +7,20 @@ x-healthcheck: &default-healthcheck
   start_period: 40s
 
 services:
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - smart-excel-network
+
   qdrant:
     image: qdrant/qdrant:latest
     ports:
@@ -21,9 +35,8 @@ services:
       - .env
     networks:
       - smart-excel-network
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+    labels:
+      - "traefik.enable=false"
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -36,9 +49,8 @@ services:
       - qdrant
     networks:
       - smart-excel-network
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    labels:
+      - "traefik.enable=false"
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -48,16 +60,16 @@ services:
       - /app/bin
     env_file:
       - .env
-    ports:
-      - "5001:5001"
     networks:
       - smart-excel-network
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
     depends_on:
       - qdrant
       - llm-service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=5001"
+      - "traefik.http.routers.backend.entrypoints=web"
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
@@ -66,32 +78,15 @@ services:
       - /app/node_modules
     env_file:
       - .env
-    ports:
-      - "3000:3000"
-    networks:
-      - smart-excel-network
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-    depends_on:
-      - backend
-
-  traefik:
-    image: traefik:latest
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "80:80"
-      - "8080:8080" # The Web UI (enabled by --api.insecure=true)
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - smart-excel-network
     depends_on:
-      - frontend
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.entrypoints=web"
 
 networks:
   smart-excel-network:
