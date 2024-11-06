@@ -10,12 +10,29 @@ using Persistence.Database;
 using Persistence.Repositories;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Persistence.Configuration;
 
 namespace API.Extensions;
 
 public static class ProgramExtensions
 {
+    [ExcludeFromCodeCoverage]
+    public static WebApplication ConfigureSmartExcelAnalyzerProgram() => WebApplication.CreateBuilder()
+        .AddSmartExcelFileAnalyzerVariables()
+        .ConfigureLogging()
+        .ConfigureMediatR()
+        .ConfigureSwagger()
+        .ConfigureDatabase()
+        .ConfigureServices()
+        .ConfigureApiAccess()
+        .ConfigureHttpClient()
+        .ConfigureLLMService()
+        .Build()
+        .ConfigureCors()
+        .ConfigureMiddleware() 
+        .ConfigureProgressHub();
+    
     public static WebApplicationBuilder AddSmartExcelFileAnalyzerVariables(this WebApplicationBuilder? builder)
     {
         builder ??= WebApplication.CreateBuilder();

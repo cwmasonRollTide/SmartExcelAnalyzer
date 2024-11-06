@@ -17,8 +17,12 @@ namespace API.Controllers;
 /// endpoints: /query, /upload
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
-public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubContext, IMemoryCache _cache) : ControllerBase
+[Route("[controller]")]
+public class AnalysisController(
+    IMediator _mediator, 
+    IProgressHubWrapper _hubContext, 
+    IMemoryCache _cache
+) : ControllerBase
 {
     /// <summary>
     /// Submits a query to the LLM and returns the answer.
@@ -59,6 +63,7 @@ public class AnalysisController(IMediator _mediator, IProgressHubWrapper _hubCon
         Ok(
             new
             {
+                Filename = fileToUpload.FileName,
                 DocumentId = await _mediator.Send(new UploadFileCommand
                 {
                     File = fileToUpload,
