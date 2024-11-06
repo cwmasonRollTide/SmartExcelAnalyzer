@@ -18,7 +18,7 @@ namespace API.Extensions;
 public static class ProgramExtensions
 {
     [ExcludeFromCodeCoverage]
-    public static WebApplication ConfigureSmartExcelAnalyzerProgram() => WebApplication.CreateBuilder()
+    public static WebApplication ConfigureSmartExcelAnalyzerProgram(string[] args) => WebApplication.CreateBuilder(args)
         .AddSmartExcelFileAnalyzerVariables()
         .ConfigureLogging()
         .ConfigureMediatR()

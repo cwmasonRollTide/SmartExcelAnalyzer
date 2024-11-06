@@ -7,5 +7,5 @@ namespace API;
 [ExcludeFromCodeCoverage]
 public class Program
 {
-    public static void Main(string[] _) => ConfigureSmartExcelAnalyzerProgram().Run();
+    public static void Main(string[] args) => ConfigureSmartExcelAnalyzerProgram(args).Run();
 }
