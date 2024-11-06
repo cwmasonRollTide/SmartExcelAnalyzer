@@ -16,6 +16,12 @@ services:
     ports:
       - "80:80"
       - "8080:8080" # Traefik dashboard
+    environment:
+      - "TRAEFIK_PROVIDERS_DOCKER=true"
+      - "TRAEFIK_API_INSECURE=true"
+      - "TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80"
+      - "TRAEFIK_API_DASHBOARD=true"
+      - "PORT=80"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
