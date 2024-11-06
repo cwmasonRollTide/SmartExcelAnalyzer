@@ -80,14 +80,13 @@ public class AnalysisController(
                     )
                 }, cancellationToken)
             }
-
         );
 
     [HttpPost("initialize-upload")]
     [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
     public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
     {
-        var uploadId = Guid.NewGuid().ToString();
+        var uploadId = request.Filename + DateTime.UtcNow.Ticks.ToString()[5..];
         _cache.Set(request.Filename, uploadId);
         _cache.Set(uploadId, request.Filename);
         return Ok(new InitializeUploadResponse

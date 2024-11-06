@@ -1,33 +1,6 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:44359;",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_vs/DebugAdapter",
-      "docker": {
-        "commandName": "Docker",
-        "containerOptions": {
-          "containerName": "smartexcelanalyzer-backend-1",
-          "publishAllPorts": true
-        },
-        "httpsPort": 44359,
-        "useSSL": true,
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "applicationUrl": "https://localhost:44359;",
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        }
-      }
-    },
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
@@ -43,12 +16,12 @@
           "containerName": "smartexcelanalyzer-backend-1",
           "publishAllPorts": true
         },
-        "useSSL": false,
-        "httpPort": 5001,
+        "useSSL": true,
+        "httpPort": 44359,
         "dotnetRunMessages": true,
         "launchBrowser": true,
         "launchUrl": "swagger",
-        "applicationUrl": "http://localhost:5001",
+        "applicationUrl": "https://localhost:5001",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
