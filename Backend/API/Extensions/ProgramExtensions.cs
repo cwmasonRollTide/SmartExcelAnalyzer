@@ -74,7 +74,7 @@ public static class ProgramExtensions
         builder.Services.AddControllers(options => options.AddCommonResponseTypes());
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(ConfigurationConstants.DefaultCorsPolicy, builder =>
+            options.AddPolicy(ConfigurationConstants.AppCorsPolicy, builder =>
             {
                 builder.AllowAnyOrigin()
                         .AllowAnyHeader()
@@ -162,9 +162,14 @@ public static class ProgramExtensions
     {
         if (app.Environment.IsDevelopment()) 
             app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
-
-        app.MapControllers();
+        
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseDefaultFiles();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.MapControllers();
         app.MapHealthChecks(ConfigurationConstants.HealthCheckEndpoint);
         return app;
     }
@@ -177,7 +182,7 @@ public static class ProgramExtensions
 
     public static WebApplication ConfigureCors(this WebApplication app)
     {
-        app.UseCors(ConfigurationConstants.DefaultCorsPolicy);
+        app.UseCors(ConfigurationConstants.AppCorsPolicy);
         Array.ForEach(ConfigurationConstants.SupportedUrls, app.Urls.Add);
         return app;
     }
@@ -186,8 +191,7 @@ public static class ProgramExtensions
     {
         public const string LoggingSection = "Logging";
         public const string HealthCheckEndpoint = "/health";
-        public const string DefaultCorsPolicy = "AllowAllOrigins";
-        public const string FrontendUrlConfig = "FrontendUrl";
+        public const string AppCorsPolicy = "AllowAllOrigins";
         public const string DefaultClientName = "DefaultClient";
         public const string AppSettingsJson = "appsettings.json";
         public const string ProgressHubEndpoint = "/progressHub";
