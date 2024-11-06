@@ -79,7 +79,6 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ./Frontend/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./Frontend/dist:/usr/share/nginx/html
     ports:
       - "80:80"

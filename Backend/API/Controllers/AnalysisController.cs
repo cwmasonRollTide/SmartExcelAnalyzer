@@ -17,7 +17,7 @@ namespace API.Controllers;
 /// endpoints: /query, /upload
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AnalysisController(
     IMediator _mediator, 
     IProgressHubWrapper _hubContext, 
