@@ -6,7 +6,7 @@ import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signal
 import { FileUploadProps } from './FileUploadProps';
 import { getEnv } from '../../utils/getEnv';
 
-const SIGNALR_HUB_URL = getEnv('VITE_SIGNALR_HUB_URL', '/progressHub');
+const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || getEnv('VITE_SIGNALR_HUB_URL', '');
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);

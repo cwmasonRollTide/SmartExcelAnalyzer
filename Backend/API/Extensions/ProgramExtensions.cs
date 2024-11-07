@@ -76,7 +76,7 @@ public static class ProgramExtensions
         {
             options.AddPolicy(ConfigurationConstants.AppCorsPolicy, builder =>
             {
-                builder.AllowAnyOrigin()
+                builder.WithOrigins(ConfigurationConstants.FrontendUrl)
                         .AllowAnyHeader()
                         .AllowAnyMethod();
             });
@@ -195,6 +195,7 @@ public static class ProgramExtensions
         public const string DefaultClientName = "DefaultClient";
         public const string AppSettingsJson = "appsettings.json";
         public const string ProgressHubEndpoint = "/progressHub";
+        public const string FrontendUrl = "http://localhost:3000";
         public const string DatabaseOptionsSection = "DatabaseOptions";
         public const string LLMServiceOptionsSection = "LLMServiceOptions";
         public const string AppSettingsEnvironmentJson = "appsettings.{0}.json";
