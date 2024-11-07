@@ -150,7 +150,10 @@ The Smart Excel Analyzer follows a microservices architecture:
 
 The application uses a CQRS (Command Query Responsibility Segregation) pattern with MediatR for efficient request handling.
 
-## 🏠 Setup and Installation
+--------------------------------------------------------------------------------------
+
+<details>
+<summary><h2>🏠 Setup and Installation</h2></summary>
 
 1. **Clone the repository**:
 
@@ -196,7 +199,12 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 API documentation is available via Swagger UI. After starting the backend service, navigate to:
 [http://localhost:5001/swagger](http://localhost:5001/swagger)
 
-## 🌊 Full Workflow Example
+</details>
+
+--------------------------------------------------------------------------------------
+
+<details>
+<summary><h2>🌊 Full Workflow Example</h2></summary>
 
 ### 1. Upload Excel File
 
@@ -256,11 +264,16 @@ API documentation is available via Swagger UI. After starting the backend servic
   }
   ```
 
-## 🚀 Development
+</details>
 
-### Backend Setup
+--------------------------------------------------------------------------------------
 
-- #### BE-Setup-🖥️-Windows-PowerShell
+<details>
+<summary><h2>🚀 Development</h2></summary>
+
+## Backend Setup
+
+- ### BE-Setup-🖥️-Windows-PowerShell
 
     ```powershell
     # Install .NET 8 SDK from https://dotnet.microsoft.com/download/dotnet/8.0
@@ -291,9 +304,9 @@ API documentation is available via Swagger UI. After starting the backend servic
   dotnet restore
   ```
 
-### Frontend Setup
+## Frontend Setup
 
-- #### FE-Setup-🖥️-Windows-PowerShell
+- ### FE-Setup-🖥️-Windows-PowerShell
 
   ```powershell
   # Install Node.js from https://nodejs.org/
@@ -302,7 +315,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   npm run dev
   ```
 
-- #### FE-Setup-🍎-macOS
+- ### FE-Setup-🍎-macOS
 
   ```bash
   # Install Node.js
@@ -313,7 +326,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   npm run dev
   ```
 
-- #### FE-Setup-🐧-Linux
+- ### FE-Setup-🐧-Linux
 
   ```bash
   # Install Node.js (Ubuntu/Debian)
@@ -325,9 +338,9 @@ API documentation is available via Swagger UI. After starting the backend servic
   npm run dev
   ```
 
-### LLM Services Setup
+## LLM Services Setup
 
-- #### LLM-Setup-🖥️-Windows-PowerShell
+- ### LLM-Setup-🖥️-Windows-PowerShell
 
   ```powershell
   # Install Python 3.9+ from https://www.python.org/downloads/
@@ -337,7 +350,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-- #### LLM-Setup-🍎-macOS
+- ### LLM-Setup-🍎-macOS
 
   ```bash
   # Install Python 3.9+
@@ -349,7 +362,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-- #### LLM-Setup-🐧-Linux
+- ### LLM-Setup-🐧-Linux
 
   ```bash
   # Install Python 3.9+ (Ubuntu/Debian)
@@ -362,7 +375,7 @@ API documentation is available via Swagger UI. After starting the backend servic
   pip install -r requirements.txt
   ```
 
-### 🎼 Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
+## 🎼 Run the Whole Project With [Docker Compose](https://docs.docker.com/compose/)
 
   1. Start the Docker Compose Process:
   
@@ -388,7 +401,7 @@ API documentation is available via Swagger UI. After starting the backend servic
       docker compose down -v
       ```
 
-### 🐝 Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
+## 🐝 Run the Whole Project With [Docker Swarm](https://docs.docker.com/engine/swarm/)
 
 Another way to run the whole project is by using Docker Swarm. This is a docker service that more closely mimics a cloud environment.
 Follow these steps:
@@ -418,6 +431,8 @@ Follow these steps:
       ```powershell
       docker stack rm smart-excel-analyzer
       ```
+
+</details>
 
 ## 🐳 Docker
 

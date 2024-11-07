@@ -8,7 +8,7 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.projectLanguageModel": 2,
-    "CodeGPT.apiKey": "Ollama",
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
     "files.associations": {
         "docker-stack.yml": "dockercompose"
     }
