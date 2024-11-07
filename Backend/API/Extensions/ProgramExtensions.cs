@@ -152,7 +152,8 @@ public static class ProgramExtensions
                 new OpenApiInfo 
                 { 
                     Title = ConfigurationConstants.SwaggerConfig.Title, 
-                    Version = ConfigurationConstants.SwaggerConfig.Version 
+                    Version = ConfigurationConstants.SwaggerConfig.Version,
+                    Description = ConfigurationConstants.SwaggerConfig.Description,
                 });
             c.OperationFilter<SwaggerFileOperationFilter>();
         });
@@ -162,9 +163,14 @@ public static class ProgramExtensions
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
         if (app.Environment.IsDevelopment()) 
-            app.UseSwagger().UseSwaggerUI().UseDeveloperExceptionPage();
-        
+            app.UseSwagger()
+                .UseSwaggerUI(
+                    options => 
+                        options.SwaggerEndpoint(ConfigurationConstants.SwaggerConfig.LaunchUrl, ConfigurationConstants.SwaggerConfig.Version))
+                .UseDeveloperExceptionPage(); 
+
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseWebSockets();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseDefaultFiles();
@@ -219,7 +225,9 @@ public static class ProgramExtensions
         public static class SwaggerConfig
         {
             public const string Version = "v1";
+            public const string LaunchUrl = "/swagger/v1/swagger.json";
             public const string Title = "Smart Excel File Analyzer API";
+            public const string Description = "API for Smart Excel File Analyzer. Provides interface for uploading and analyzing Excel files (including upload in chunks).";
         }
     }
 }

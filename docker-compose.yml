@@ -1,6 +1,7 @@
 services:
   traefik:
     image: traefik:v2.9
+    container_name: traefik
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -19,6 +20,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:latest
+    container_name: qdrant
     command:
       - "./qdrant"
       - "--config-path"
@@ -38,6 +40,7 @@ services:
 
   llm-service-one:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    container_name: llm-service-one
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
@@ -55,6 +58,7 @@ services:
 
   llm-service-two:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    container_name: llm-service-two
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
@@ -72,6 +76,7 @@ services:
   
   llm-service-three:
     image: fivemowner/smart-excel-analyzer-llm:latest
+    container_name: llm-service-three
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
@@ -89,6 +94,7 @@ services:
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
+    container_name: backend
     volumes:
       - ./Backend:/src
     env_file:
@@ -100,11 +106,13 @@ services:
       - llm-service-three
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
+    container_name: frontend
     volumes:
       - ./Frontend:/app
       - /app/node_modules
