@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       proxy: {
         "/api": {
-          target: "http://localhost:5001",
+          target: env.VITE_BASE_API_URL,
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ""),

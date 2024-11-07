@@ -34,15 +34,41 @@ services:
     labels:
       - "traefik.enable=false"
 
-  llm-service:
+  llm-service-1:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
-    ports:
-      - "8000:8000"
+    depends_on:
+      - qdrant
+    networks:
+      - smart-excel-network
+    labels:
+      - "traefik.enable=false"
+
+  llm-service-2:
+    image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
+      - /model_cache:/app/model_cache
+    env_file:
+      - ./LLM/.env
+    depends_on:
+      - qdrant
+    networks:
+      - smart-excel-network
+    labels:
+      - "traefik.enable=false"
+
+  llm-service-3:
+    image: fivemowner/smart-excel-analyzer-llm:latest
+    volumes:
+      - ./LLM:/app
+      - /model_cache:/app/model_cache
+    env_file:
+      - ./LLM/.env
     depends_on:
       - qdrant
     networks:

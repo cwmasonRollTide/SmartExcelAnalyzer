@@ -413,7 +413,7 @@ Follow these steps:
       ```
 
       ```powershell
-      docker stack deploy -c "./Docker/docker-stack.yml" smart-excel-analyzer
+      docker stack deploy -c docker-stack.yml smart-excel-analyzer
       ```
 
   2. **Check the status of the services**:

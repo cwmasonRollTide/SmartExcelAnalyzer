@@ -22,7 +22,7 @@ services:
       - "8080:8080" # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./traefik.yml:/etc/traefik/traefik.yml"
+      - "./Frontend/traefik.yml:/etc/traefik/traefik.yml"
     networks:
       - smart-excel-network
     deploy:
