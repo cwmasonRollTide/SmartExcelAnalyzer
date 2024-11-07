@@ -18,11 +18,11 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
     formData.append('chunkIndex', chunkIndex.toString());
     formData.append('totalChunks', totalChunks.toString());
 
-    await axios.post('/analysis/upload-chunk', formData, {
+    console.log(await axios.post('/analysis/upload-chunk', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
+    }));
   }
 
   return finalizeUpload(documentId);

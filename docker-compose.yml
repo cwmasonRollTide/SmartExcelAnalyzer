@@ -41,6 +41,8 @@ services:
       - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
+    ports:
+      - "8000:8000"
     depends_on:
       - qdrant
     networks:

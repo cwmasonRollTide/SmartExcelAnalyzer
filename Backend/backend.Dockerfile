@@ -29,4 +29,4 @@ EXPOSE 5001
 EXPOSE 5000
 EXPOSE 44359
 
-ENTRYPOINT ["dotnet", "SmartExcelAnalyzerBackend.dll"]
+ENTRYPOINT ["dotnet", "API.dll"]

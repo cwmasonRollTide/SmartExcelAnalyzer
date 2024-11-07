@@ -55,7 +55,7 @@ public class AnalysisController(
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
     [CommonResponseTypesAttribute]
-    [ProducesResponseType(typeof(UploadResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> UploadFile(
         [FromForm] IFormFile fileToUpload,
         CancellationToken cancellationToken = default

@@ -11,6 +11,26 @@ x-logging: &default-logging
     max-file: "3"
 
 services:
+  traefik:
+    image: traefik:v2.9
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik.yml:/etc/traefik/traefik.yml"
+    networks:
+      - smart-excel-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
   qdrant:
     image: qdrant/qdrant:latest
     command:
@@ -74,6 +94,12 @@ services:
       <<: *default-logging
     depends_on:
       - qdrant
+      - llm-service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
+      - "traefik.http.routers.backend.entrypoints=web"
     deploy:
       replicas: 1
       update_config:
@@ -85,24 +111,6 @@ services:
         delay: 10s
         order: stop-first
 
-  nginx:
-    build:
-      context: ./Frontend
-      dockerfile: ./nginx.Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - smart-excel-network
-    depends_on:
-      - backend
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
     env_file:
@@ -112,17 +120,22 @@ services:
     volumes:
       - ./Frontend/src:/app/src
     ports:
-      - "3000:8080"
+      - "3000:3000"
     logging:
       <<: *default-logging
     networks:
       - smart-excel-network
+    depends_on:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.entrypoints=web"
     deploy:
       endpoint_mode: vip
       restart_policy:
         condition: on-failure
-    depends_on:
-      - nginx
 
 networks:
   smart-excel-network:

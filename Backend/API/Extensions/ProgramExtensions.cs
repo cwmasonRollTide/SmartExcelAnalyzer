@@ -137,7 +137,8 @@ public static class ProgramExtensions
     {
         builder.Services.AddMemoryCache();
         builder.Services.AddScoped<IExcelFileService, ExcelFileService>();
-        builder.Services.AddScoped<IProgressHubWrapper, ProgressHub>();
+        builder.Services.AddScoped<ProgressHub>();
+        builder.Services.AddScoped<IProgressHubWrapper, ProgressHubWrapper>();
         builder.Services.AddScoped(typeof(IWebRepository<>), typeof(WebRepository<>));
         return builder;
     }
