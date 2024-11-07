@@ -11,7 +11,7 @@ COPY . .
 RUN PROJECT_TEST_PATH=$(find . -name 'SmartExcelAnalyzer.Tests.csproj') && \
     dotnet test $PROJECT_TEST_PATH --collect:"XPlat Code Coverage"
 
-RUN dotnet publish SmartExcelAnalyzerBackend.sln -c Release -o /app/publish
+RUN dotnet publish SmartExcelAnalyzerBackend.sln -c Release -o /app/publish /p:AssemblyName=SmartExcelAnalyzerBackend
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
