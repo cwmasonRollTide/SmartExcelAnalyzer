@@ -4,14 +4,16 @@ WORKDIR /src
 COPY *.sln .
 COPY */*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*}/ && mv $file ${file%.*}/; done
-RUN dotnet restore
 
 COPY . .
+
+RUN dotnet restore
 
 RUN PROJECT_TEST_PATH=$(find . -name 'SmartExcelAnalyzer.Tests.csproj') && \
     dotnet test $PROJECT_TEST_PATH --collect:"XPlat Code Coverage"
 
-RUN dotnet publish SmartExcelAnalyzerBackend.sln -c Release -o /app/publish /p:AssemblyName=Backend
+RUN dotnet build -c Release --no-restore
+RUN dotnet publish API/API.csproj -c Release -o /app/publish /p:AssemblyName=SmartExcelAnalyzerBackend
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
@@ -27,4 +29,4 @@ EXPOSE 5001
 EXPOSE 5000
 EXPOSE 44359
 
-ENTRYPOINT ["dotnet", "Backend.dll"]
+ENTRYPOINT ["dotnet", "SmartExcelAnalyzerBackend.dll"]
