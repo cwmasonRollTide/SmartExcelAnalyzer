@@ -34,11 +34,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Include="coverlet.runsettings">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <None Update="..\SmartExcelAnalyzer.Tests\TestData\*">
