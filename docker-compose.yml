@@ -34,13 +34,17 @@ services:
     labels:
       - "traefik.enable=false"
 
-  llm-service-1:
+  llm-service-one:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
+    environment:
+      - LLM_PORT=8000
+    ports:
+      - "8000:8000"
     depends_on:
       - qdrant
     networks:
@@ -48,13 +52,17 @@ services:
     labels:
       - "traefik.enable=false"
 
-  llm-service-2:
+  llm-service-two:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
+    ports:
+      - "8001:8001"
+    environment:
+      - LLM_PORT=8001
     depends_on:
       - qdrant
     networks:
@@ -62,13 +70,17 @@ services:
     labels:
       - "traefik.enable=false"
 
-  llm-service-3:
+  llm-service-three:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
     env_file:
       - ./LLM/.env
+    ports:
+      - "8002:8002"
+    environment:
+      - LLM_PORT=8002
     depends_on:
       - qdrant
     networks:
@@ -92,7 +104,7 @@ services:
       - smart-excel-network
     depends_on:
       - qdrant
-      - llm-service
+      - llm-service-three
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
@@ -120,7 +132,8 @@ services:
 
 networks:
   smart-excel-network:
-    driver: bridge
+    driver: overlay
+    attachable: true
 
 volumes:
   model_cache:
