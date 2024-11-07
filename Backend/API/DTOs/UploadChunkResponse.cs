@@ -1,7 +1,10 @@
 namespace API.DTOs;
 
-public class UploadResponse
+public class UploadResponse : BaseResponse
 {
-    public string Filename { get; set; } = string.Empty;
-    public string DocumentId { get; set; } = string.Empty;
+    public int ChunkSize { get; set; }
+    public int ChunkCount { get; set; }
+    public int ChunkIndex { get; set; }
+    public int ChunkOffset { get; set; }
+    public int ChunkLength { get; set; }
 }

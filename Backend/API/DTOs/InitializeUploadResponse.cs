@@ -1,7 +1,5 @@
 namespace API.DTOs;
 
-public class InitializeUploadResponse
+public class InitializeUploadResponse : BaseResponse
 {
-    public string Filename { get; set; } = string.Empty;
-    public string DocumentId { get; set; } = string.Empty;
 }

@@ -190,8 +190,8 @@ public static class ProgramExtensions
     public static class ConfigurationConstants
     {
         public const string LoggingSection = "Logging";
+        public const string AppCorsPolicy = "AllowAll";
         public const string HealthCheckEndpoint = "/health";
-        public const string AppCorsPolicy = "AllowAllOrigins";
         public const string DefaultClientName = "DefaultClient";
         public const string AppSettingsJson = "appsettings.json";
         public const string ProgressHubEndpoint = "/progressHub";
