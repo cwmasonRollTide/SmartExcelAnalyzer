@@ -76,7 +76,7 @@ public static class ProgramExtensions
         {
             options.AddPolicy(ConfigurationConstants.AppCorsPolicy, builder =>
             {
-                builder.WithOrigins(ConfigurationConstants.FrontendUrl)
+                builder.AllowAnyOrigin()
                         .AllowAnyHeader()
                         .AllowAnyMethod();
             });
