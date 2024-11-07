@@ -54,6 +54,8 @@ services:
         constraints:
           - node.role == manager
           - node.labels.qdrant == true
+          - node.Hostname == traefik
+          # - node.loadbalancer.server.port == 6333
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
