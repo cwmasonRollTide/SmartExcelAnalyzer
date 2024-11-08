@@ -7,7 +7,7 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
     ports:
-      - "80:80" # Only expose Traefik's web entrypoint
+      - "80:80" # Only expose Traefik's web entrypoint. Served at localhost:3000
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./Frontend/traefik.yml:/etc/traefik/traefik.yml"
@@ -22,6 +22,8 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     container_name: qdrant
+    ports:
+      - "6333:6333"
     command:
       - "./qdrant"
       - "--config-path"
@@ -72,7 +74,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.llm-service.rule=Host(`traefik`) && PathPrefix(`/llm`)"
-      - "traefik.http.services.llm-service.loadbalancer.server.port=8000"
+      - "traefik.http.services.llm-service.loadbalancer.server.port=8001"
       - "traefik.http.routers.llm-service.entrypoints=web"
   
   llm-service-three:
@@ -90,12 +92,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.llm-service.rule=Host(`traefik`) && PathPrefix(`/llm`)"
-      - "traefik.http.services.llm-service.loadbalancer.server.port=8000"
+      - "traefik.http.services.llm-service.loadbalancer.server.port=8002"
       - "traefik.http.routers.llm-service.entrypoints=web"
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
     container_name: backend
+    ports:
+      - "5001:5001"
     volumes:
       - ./Backend:/src
     env_file:

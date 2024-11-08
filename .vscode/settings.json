@@ -10,6 +10,7 @@
     "azureFunctions.projectLanguageModel": 2,
     "CodeGPT.apiKey": "CodeGPT Plus Beta",
     "files.associations": {
-        "docker-stack.yml": "dockercompose"
+        "docker-stack.yml": "dockercompose",
+        "coverlet.runsettings": "xml",
     }
 }

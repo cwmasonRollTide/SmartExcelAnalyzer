@@ -15,7 +15,6 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_BASE_API_URL,
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, ""),
         },
         "/progressHub": {
           secure: false,
