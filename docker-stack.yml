@@ -12,7 +12,8 @@ x-logging: &default-logging
 
 services:
   traefik:
-    image: traefik:v2.9
+    image: traefik:latest
+    container_name: traefik
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -23,6 +24,11 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./Frontend/traefik.yml:/etc/traefik/traefik.yml"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=80"
+      - "traefik.http.routers.traefik.entrypoints=web"
     networks:
       - smart-excel-network
     deploy:
@@ -48,14 +54,19 @@ services:
       <<: *default-logging
     volumes:
       - qdrant_data:/qdrant/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qdrant.rule=Host(`traefik`) && PathPrefix(`/qdrant`)"
+      - "traefik.http.services.qdrant.loadbalancer.server.port=6333"
+      - "traefik.http.routers.qdrant.entrypoints=web"
     deploy:
-      replicas: 1
+      replicas: 2
       placement:
         constraints:
           - node.role == manager
           - node.labels.qdrant == true
           - node.Hostname == traefik
-          # - node.loadbalancer.server.port == 6333
+          - node.loadbalancer.server.port == 6333
 
   llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -73,12 +84,17 @@ services:
       <<: *default-logging
     depends_on:
       - qdrant
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm-service`)"
+      - "traefik.http.services.llm-service-three.loadbalancer.server.port=8002"
+      - "traefik.http.routers.llm-service-three.entrypoints=web"
     deploy:
       replicas: 4
       restart_policy:
         condition: on-failure
         delay: 5s
-        max_attempts: 3
+        max_attempts: 10
         window: 120s
 
   backend:
@@ -99,11 +115,11 @@ services:
       - llm-service
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
-      - "traefik.http.services.backend.loadbalancer.server.port=80"
       - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/smartbackend`)"
     deploy:
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 2
         delay: 10s
@@ -116,7 +132,7 @@ services:
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest
     env_file:
-      - ./Frontend/.env
+      - .env
     environment:
       - REACT_APP_BACKEND_URL=backend
     volumes:
@@ -131,7 +147,7 @@ services:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`traefik`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.entrypoints=web"
     deploy:
@@ -142,6 +158,7 @@ services:
 networks:
   smart-excel-network:
     driver: overlay
+    attachable: true
 
 volumes:
   model_cache:

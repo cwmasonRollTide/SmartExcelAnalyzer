@@ -4,6 +4,11 @@ qdrant:
   api_key: ${QDRANT_API_KEY}
   port: ${DatabaseOptions__PORT}
   host: ${DatabaseOptions__HOST}
+  distributed:
+    enabled: true
+    host: ${DatabaseOptions__HOST}
+    port: ${DatabaseOptions__PORT}
+    api_key: ${QDRANT_API_KEY}
   config_path: /qdrant/config/qdrant_config.yaml
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:${DatabaseOptions__PORT}/health"]

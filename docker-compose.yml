@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v2.9
+    image: traefik:latest
     container_name: traefik
     command:
       - "--api.insecure=true"
@@ -112,7 +112,7 @@ services:
       - llm-service-three
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/smartbackend`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
@@ -125,8 +125,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://traefik/api
-      - VITE_SIGNALR_HUB_URL=http://traefik/progressHub
+      - VITE_BASE_API_URL=http://traefik/smartbackend/api
+      - VITE_SIGNALR_HUB_URL=http://traefik/smartbackend/progressHub
     networks:
       - smart-excel-network
     depends_on:
