@@ -8,6 +8,7 @@ services:
       - "--entrypoints.web.address=:80"
     ports:
       - "80:80" # Only expose Traefik's web entrypoint. Served at localhost:3000
+      - "8080:8080" 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./Frontend/traefik.yml:/etc/traefik/traefik.yml"
@@ -55,7 +56,7 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm`)"
+      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm-service-one`)"
       - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
       - "traefik.http.routers.llm-service-one.entrypoints=web"
 
@@ -73,7 +74,7 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-two.rule=Host(`traefik`) && PathPrefix(`/llm`)"
+      - "traefik.http.routers.llm-service-two.rule=Host(`traefik`) && PathPrefix(`/llm-service-two`)"
       - "traefik.http.services.llm-service-two.loadbalancer.server.port=8001"
       - "traefik.http.routers.llm-service-two.entrypoints=web"
   
@@ -91,7 +92,7 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm`)"
+      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm-service-three`)"
       - "traefik.http.services.llm-service-three.loadbalancer.server.port=8002"
       - "traefik.http.routers.llm-service-three.entrypoints=web"
 
@@ -124,8 +125,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://backend/api
-      - VITE_SIGNALR_HUB_URL=http://backend/progressHub
+      - VITE_BASE_API_URL=http://traefik/api
+      - VITE_SIGNALR_HUB_URL=http://traefik/progressHub
     networks:
       - smart-excel-network
     depends_on:
@@ -138,7 +139,8 @@ services:
 
 networks:
   smart-excel-network:
-    driver: bridge
+    driver: overlay
+    attachable: true
 
 volumes:
   model_cache:

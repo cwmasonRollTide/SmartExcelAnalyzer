@@ -23,5 +23,5 @@ EXPOSE 8000
 EXPOSE 8001
 EXPOSE 8002
 
-ARG PORT=8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
+ARG LLM_PORT=8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${LLM_PORT}"]
