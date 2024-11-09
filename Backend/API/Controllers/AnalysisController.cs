@@ -55,7 +55,7 @@ public class AnalysisController(
     /// <returns>Document Id - Nullable</returns>
     [HttpPost("upload")]
     [CommonResponseTypesAttribute]
-    [ProducesResponseType(typeof(UploadResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> UploadFile(
         [FromForm] IFormFile fileToUpload,
         CancellationToken cancellationToken = default
@@ -83,6 +83,7 @@ public class AnalysisController(
         );
 
     [HttpPost("initialize-upload")]
+    [CommonResponseTypesAttribute]
     [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
     public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
     {
@@ -132,11 +133,17 @@ public class AnalysisController(
         return Ok(new UploadResponse
         {
             Filename = file.FileName,
-            DocumentId = uploadId!
+            DocumentId = uploadId!,
+            ChunkIndex = chunkIndex,
+            ChunkCount = totalChunks,
+            ChunkSize = (int)file.Length,
+            ChunkOffset = chunkIndex * (int)file.Length,
+            ChunkLength = (int)file.Length,
         });
     }
 
     [HttpPost("finalize-upload")]
+    [CommonResponseTypesAttribute]
     [ProducesResponseType(typeof(FinalizeUploadResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> FinalizeUpload([FromBody] FinalizeUploadRequest request, CancellationToken cancellationToken = default)
     {

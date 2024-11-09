@@ -8,7 +8,10 @@
 
   *These workflows will trigger if the respective project is changed and a pull request is created or I push directly to main. If I edit a markdown file, .env file, or .yml file, all three workflows trigger* 
 
-## 📋 Table of Contents
+----------------------------------------------------------------------------------------------------------------
+
+<details open>
+<summary><h2>📋 Table of Contents</h2></summary>
 
 - [Smart Excel Analyzer](#-smart-excel-analyzer)
   - [Table of Contents](#-table-of-contents)
@@ -42,6 +45,10 @@
   - [Docker](#-docker)
   - [Testing](#-testing)
   - [Contact](#-contact)
+
+</details>
+
+----------------------------------------------------------------------------------------------------------------
 
 ## Introduction
 
@@ -152,7 +159,7 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
 
 --------------------------------------------------------------------------------------
 
-<details>
+<details open>
 <summary><h2>🏠 Setup and Installation</h2></summary>
 
 1. **Clone the repository**:
@@ -203,7 +210,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 --------------------------------------------------------------------------------------
 
-<details>
+<details open>
 <summary><h2>🌊 Full Workflow Example</h2></summary>
 
 ### 1. Upload Excel File
@@ -268,7 +275,7 @@ API documentation is available via Swagger UI. After starting the backend servic
 
 --------------------------------------------------------------------------------------
 
-<details>
+<details open>
 <summary><h2>🚀 Development</h2></summary>
 
 ## Backend Setup
@@ -413,7 +420,7 @@ Follow these steps:
       ```
 
       ```powershell
-      docker stack deploy -c "./Docker/docker-stack.yml" smart-excel-analyzer
+      docker stack deploy -c docker-stack.yml smart-excel-analyzer
       ```
 
   2. **Check the status of the services**:

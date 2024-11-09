@@ -1,32 +1,25 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS test
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY SmartExcelAnalyzerBackend.sln .
+COPY API/API.csproj API/
+COPY Domain/Domain.csproj Domain/
+COPY Persistence/Persistence.csproj Persistence/
+COPY Application/Application.csproj Application/
+COPY SmartExcelAnalyzer.Tests/SmartExcelAnalyzer.Tests.csproj SmartExcelAnalyzer.Tests/
 
 COPY . .
+RUN dotnet restore SmartExcelAnalyzerBackend.sln
+RUN dotnet build SmartExcelAnalyzerBackend.sln -c Release --no-restore
+RUN dotnet publish API/API.csproj -c Release -o /app/publish
 
-RUN dotnet restore
-
-RUN PROJECT_TEST_PATH=$(find . -name 'SmartExcelAnalyzer.Tests.csproj') && \
-dotnet test $PROJECT_TEST_PATH --collect:"XPlat Code Coverage" --settings ./coverlet.runsettings
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libssl-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN dotnet dev-certs https --trust
-
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS runtime
 WORKDIR /app
+COPY --from=build /app/publish .
 
-COPY . .
-
-RUN dotnet restore
-
-EXPOSE 44359
+ENV ASPNETCORE_URLS=http://+:5001;https://+:44359;http://+:5000
 EXPOSE 5001
+EXPOSE 5000
+EXPOSE 44359
 
-ENTRYPOINT ["/bin/sh", "-c", "\
-    PROJECT_PATH=$(find . -name 'API.csproj') && \
-    dotnet restore $PROJECT_PATH && \
-    dotnet watch run --project $PROJECT_PATH --no-restore --urls http://+:80,http://+:5000,http://+:5001\
-"]
+ENTRYPOINT ["dotnet", "API.dll"]

@@ -6,15 +6,13 @@ namespace Persistence.Hubs;
 
 #region Hub
 public class ProgressHub(
-    ILogger<ProgressHub> _logger, 
-    IProgressHubWrapper _hubContext
+    ILogger<ProgressHub> _logger
 ) : Hub, IProgressHubWrapper
 {
-    #region SignalR methods
-    private const string RECEIVE_ERROR = "ReceiveError";
+    #region Signal R Methods
     private const string RECEIVE_PROGRESS = "ReceiveProgress";
+    private const string RECEIVE_ERROR = "ReceiveError";
     #endregion
-
     #region Log message templates
     private const string PROGRESS_ERROR = "Progress error: {Message}";
     private const string CLIENT_CONNECTED = "Client connected: {ConnectionId}";
@@ -26,13 +24,13 @@ public class ProgressHub(
     public async Task SendProgress(double progress, double total, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(PROGRESS_UPDATE, progress, total);
-        await _hubContext.SendProgress(progress, total);
+        await Clients.All.SendAsync(RECEIVE_PROGRESS, progress, total, cancellationToken: cancellationToken);
     }
 
     public async Task SendError(string message)
     {
         _logger.LogError(PROGRESS_ERROR, message);
-        await _hubContext.SendError(message);
+        await Clients.All.SendAsync(RECEIVE_ERROR, message);
     }
     #endregion
 

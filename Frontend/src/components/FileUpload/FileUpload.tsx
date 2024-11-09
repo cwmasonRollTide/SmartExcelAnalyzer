@@ -6,7 +6,7 @@ import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signal
 import { FileUploadProps } from './FileUploadProps';
 import { getEnv } from '../../utils/getEnv';
 
-const SIGNALR_HUB_URL = getEnv('VITE_SIGNALR_HUB_URL', '/progressHub');
+const SIGNALR_HUB_URL = getEnv('VITE_SIGNALR_HUB_URL', '');
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactElement => {
   const [parseProgress, setParseProgress] = useState(0);
@@ -36,6 +36,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }): React.ReactEle
           connection.on('ReceiveProgress', (parseProgress: number, saveProgress: number) => {
             setParseProgress(parseProgress * 100);
             setSaveProgress(saveProgress * 100);
+          });
+
+          connection.on('ReceiveError', (error: string) => {
+            console.error('SignalR Error: ', error);
+            setParseProgress(0);
+            setSaveProgress(0);
           });
         })
         .catch((err: Error) => console.error('SignalR Connection Error: ', err));
