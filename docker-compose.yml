@@ -18,7 +18,6 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik`)"
       - "traefik.http.services.traefik.loadbalancer.server.port=81"
       - "traefik.http.routers.traefik.entrypoints=web"
 
@@ -65,7 +64,6 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qdrant.rule=Host(`traefik`) && PathPrefix(`/qdrant`)"
       - "traefik.http.services.qdrant.loadbalancer.server.port=6333"
       - "traefik.http.routers.qdrant.entrypoints=web"
 
@@ -83,7 +81,6 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm-service-one`)"
       - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
       - "traefik.http.routers.llm-service-one.entrypoints=web"
 
@@ -101,7 +98,6 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-two.rule=Host(`traefik`) && PathPrefix(`/llm-service-two`)"
       - "traefik.http.services.llm-service-two.loadbalancer.server.port=8001"
       - "traefik.http.routers.llm-service-two.entrypoints=web"
 
@@ -119,7 +115,6 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm-service-three`)"
       - "traefik.http.services.llm-service-three.loadbalancer.server.port=8002"
       - "traefik.http.routers.llm-service-three.entrypoints=web"
 
@@ -139,7 +134,6 @@ services:
       - llm-service-three
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`) && PathPrefix(`/progressHub`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
@@ -160,7 +154,6 @@ services:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`traefik`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.entrypoints=web"
 
