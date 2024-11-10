@@ -2,13 +2,25 @@ global:
   scrape_interval: 30s 
 
 scrape_configs:
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['frontend:3000']
+
   - job_name: 'traefik'
     static_configs:
-      - targets: ['traefik:81'] 
+      - targets: ['traefik:81']
 
   - job_name: 'backend'
     static_configs:
       - targets: ['backend:5001'] 
+
+  - job_name: 'llm-service-one'
+    static_configs:
+      - targets: ['llm-service-one:8000']
+
+  - job_name: 'qdrant'
+    static_configs:
+      - targets: ['qdrant:6333']
 
   - job_name: 'prometheus'
     static_configs:

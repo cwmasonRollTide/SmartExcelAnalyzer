@@ -7,3 +7,4 @@ qdrant-client==1.12.1
 pydantic==1.10.8
 fastapi==0.77.1
 uvicorn==0.32.0
+prometheus-fastapi-instrumentator==5.9.0

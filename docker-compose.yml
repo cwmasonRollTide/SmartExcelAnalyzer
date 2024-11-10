@@ -1,5 +1,10 @@
 name: Smart Excel Analyzer
 
+x-common-depends-on: &common-depends-on
+  depends_on:
+      - 'traefik'
+      - 'prometheus'
+
 services:
   traefik:
     image: traefik:v2.9
@@ -18,6 +23,7 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik`)"
       - "traefik.http.services.traefik.loadbalancer.server.port=81"
       - "traefik.http.routers.traefik.entrypoints=web"
 
@@ -30,6 +36,11 @@ services:
       - "9090:9090"
     networks:
       - smart-excel-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus`)"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.entrypoints=web"
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -43,8 +54,14 @@ services:
       - "14268:14268"
       - "14250:14250"
       - "9411:9411"
+    <<: *common-depends-on
     networks:
       - smart-excel-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger`)"
+      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
+      - "traefik.http.routers.jaeger.entrypoints=web"
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -60,10 +77,12 @@ services:
       - ./qdrant_config.yml:/qdrant/config/qdrant_config.yaml
     env_file:
       - .env
+    <<: *common-depends-on
     networks:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.qdrant.rule=Host(`traefik`) && PathPrefix(`/qdrant`)"
       - "traefik.http.services.qdrant.loadbalancer.server.port=6333"
       - "traefik.http.routers.qdrant.entrypoints=web"
 
@@ -77,10 +96,13 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    depends_on:
+      - 'qdrant'
     networks:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm-service-one`)"
       - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
       - "traefik.http.routers.llm-service-one.entrypoints=web"
 
@@ -94,10 +116,13 @@ services:
       - "8001:8001"
     env_file:
       - .env
+    depends_on:
+      - 'qdrant'
     networks:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.llm-service-two.rule=Host(`traefik`) && PathPrefix(`/llm-service-two`)"
       - "traefik.http.services.llm-service-two.loadbalancer.server.port=8001"
       - "traefik.http.routers.llm-service-two.entrypoints=web"
 
@@ -111,10 +136,13 @@ services:
       - "8002:8002"
     env_file:
       - .env
+    depends_on:
+      - 'qdrant'
     networks:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm-service-three`)"
       - "traefik.http.services.llm-service-three.loadbalancer.server.port=8002"
       - "traefik.http.routers.llm-service-three.entrypoints=web"
 
@@ -123,6 +151,8 @@ services:
     container_name: backend
     ports:
       - "5001:5001"
+      - "5000:5000"
+      - "44349:44359"
     volumes:
       - ./Backend:/src
     env_file:
@@ -132,8 +162,11 @@ services:
     depends_on:
       - qdrant
       - llm-service-three
+      - llm-service-two
+      - llm-service-one
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/backend`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
@@ -146,20 +179,22 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://localhost:5001/api
-      - VITE_SIGNALR_HUB_URL=http://localhost:5000/progressHub
+      - VITE_BASE_API_URL=http://localhost:5001/backend/api
+      - VITE_SIGNALR_HUB_URL=http://localhost:5000/backend/progressHub
     networks:
       - smart-excel-network
     depends_on:
       - backend
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`traefik`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.entrypoints=web"
 
 networks:
   smart-excel-network:
-    driver: bridge
+    driver: overlay
+    attachable: true
 
 volumes:
   model_cache:

@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from transformers import AutoTokenizer, AutoModel
 from urllib3.exceptions import InsecureRequestWarning
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Disable SSL warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -61,6 +62,9 @@ model = pipeline("text2text-generation", model=TEXT_GENERATION_MODEL)
 # Use http:// explicitly if QDRANT_USE_HTTPS is False
 qdrant_url = f"{'https' if QDRANT_USE_HTTPS else 'http'}://{QDRANT_HOST}:{QDRANT_PORT}"
 qdrant_client = QdrantClient(url=qdrant_url, api_key=QDRANT_API_KEY, prefer_grpc=False)
+
+# Instrument the FastAPI app for Prometheus metrics
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/health", response_model=dict)
 async def health():
