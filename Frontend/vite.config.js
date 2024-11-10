@@ -13,14 +13,12 @@ export default defineConfig(({ mode }) => {
       host: "traefik",
       strictPort: true,
       proxy: {
-        "/api": {
+        "/smartapi": {
           target: baseApiUrl,
-          changeOrigin: true,
           secure: false,
         },
         "/progressHub": {
           secure: false,
-          changeOrigin: true,
           target: baseSignalRurl,
         },
       },
