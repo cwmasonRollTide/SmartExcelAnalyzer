@@ -17,9 +17,9 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.address=:81"
     ports:
-      - "80:80"
+      - "81:81"
       - "8080:8080" # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -196,6 +196,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/progressHub`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
     deploy:

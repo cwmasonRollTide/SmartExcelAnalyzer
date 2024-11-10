@@ -1,3 +1,5 @@
+name: Smart Excel Analyzer
+
 services:
   traefik:
     image: traefik:latest
@@ -5,9 +7,9 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.address=:81"
     ports:
-      - "80:80" # Only expose Traefik's web entrypoint. Served at localhost:3000
+      - "81:81" 
       - "8080:8080" # Dashboard - helpful
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -17,7 +19,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik`)"
-      - "traefik.http.services.traefik.loadbalancer.server.port=80"
+      - "traefik.http.services.traefik.loadbalancer.server.port=81"
       - "traefik.http.routers.traefik.entrypoints=web"
 
   prometheus:
@@ -137,7 +139,7 @@ services:
       - llm-service-three
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`) && PathPrefix(`/progressHub`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
