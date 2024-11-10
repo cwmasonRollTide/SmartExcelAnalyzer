@@ -14,7 +14,7 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:81"
     ports:
-      - "81:81" 
+      - "81:81"
       - "8080:8080" # Dashboard - helpful
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -166,7 +166,7 @@ services:
       - llm-service-one
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/backend`) && PathPrefix('/progressHub')"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && (PathPrefix(`/backend`) || PathPrefix(`/progressHub`))"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 
@@ -178,9 +178,8 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
-    environment:
-      - VITE_BASE_API_URL=http://traefik/backend/api
-      - VITE_SIGNALR_HUB_URL=http://traefik/backend/progressHub
+    env_file:
+      - .env
     networks:
       - smart-excel-network
     depends_on:
