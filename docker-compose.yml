@@ -13,8 +13,10 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:81"
+      - "--entrypoints.websecure.address=:443"
     ports:
       - "81:81"
+      - "443:443"
       - "8080:8080" # Dashboard - helpful
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
