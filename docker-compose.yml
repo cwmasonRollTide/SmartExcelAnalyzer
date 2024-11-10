@@ -6,29 +6,6 @@ x-common-depends-on: &common-depends-on
       - 'prometheus'
 
 services:
-  traefik:
-    image: traefik:v2.9
-    container_name: traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:81"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "81:81"
-      - "443:443"
-      - "8080:8080" # Dashboard - helpful
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./traefik.yml:/etc/traefik/traefik.yml"
-    networks:
-      - smart-excel-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik`)"
-      - "traefik.http.services.traefik.loadbalancer.server.port=81"
-      - "traefik.http.routers.traefik.entrypoints=web"
-
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -174,6 +151,29 @@ services:
       - "traefik.http.routers.backend-signalr.rule=Host(`traefik`) && PathPrefix(`/networkhost/progressHub`)"
       - "traefik.http.services.backend-signalr.loadbalancer.server.port=5000"
       - "traefik.http.routers.backend-signalr.entrypoints=web"
+
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:81"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "81:81"
+      - "443:443"
+      - "8080:8080" # Dashboard - helpful
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik.yml:/etc/traefik/traefik.yml"
+    networks:
+      - smart-excel-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=81"
+      - "traefik.http.routers.traefik.entrypoints=web"
 
   frontend:
     image: fivemowner/smart-excel-analyzer-frontend:latest

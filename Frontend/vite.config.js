@@ -3,8 +3,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
-  const baseApiUrl = getEnv('VITE_BASE_API_URL', 'http://localhost:81/traefikfilter/api')
-  const baseSignalRurl = getEnv('VITE_SIGNALR_HUB_URL', 'http://localhost:81/traefikfilter/progressHub');
+  const baseApiUrl = getEnv('VITE_BASE_API_URL', 'http://localhost:81/networkhost/api')
+  const baseSignalRurl = getEnv('VITE_SIGNALR_HUB_URL', 'http://localhost:81/networkhost/progressHub');
 
   return {
     plugins: [react()],
@@ -13,17 +13,17 @@ export default defineConfig(({ mode }) => {
       host: "traefik",
       strictPort: true,
       proxy: {
-        '/traefikfilter/api': {
+        '/networkhost/api': {
           target: baseApiUrl,
           secure: false,
           // Since we removed /smartapi from the API calls
-          rewrite: (path) => path.replace(/^\/traefikfilter\/api/, ''),
+          rewrite: (path) => path.replace(/^\/networkhost\/api/, ''),
         },
-        '/traefikfilter/progressHub': {
+        '/networkhost/progressHub': {
           target: baseSignalRurl,
           secure: false,
           ws: true,
-          rewrite: (path) => path.replace(/^\/traefikfilter/, ''),
+          rewrite: (path) => path.replace(/^\/networkhost\/progressHub/, ''),
         },
       },
     },
