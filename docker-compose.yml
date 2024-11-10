@@ -94,8 +94,8 @@ services:
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -168,7 +168,7 @@ services:
       - llm-service-one
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && (PathPrefix(`/backend`) || PathPrefix(`/progressHub`))"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && (PathPrefix(`/api`) || PathPrefix(`/progressHub`))"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
 

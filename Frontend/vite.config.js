@@ -10,18 +10,18 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       host: "traefik",
       strictPort: true,
-      // proxy: {
-      //   "/api": {
-      //     target: env.VITE_BASE_API_URL,
-      //     changeOrigin: true,
-      //     secure: false,
-      //   },
-      //   "/progressHub": {
-      //     secure: false,
-      //     changeOrigin: true,
-      //     target: env.VITE_SIGNALR_HUB_URL,
-      //   },
-      // },
+      proxy: {
+        "/api": {
+          target: env.VITE_BASE_API_URL,
+          changeOrigin: true,
+          secure: false,
+        },
+        "/progressHub": {
+          secure: false,
+          changeOrigin: true,
+          target: env.VITE_SIGNALR_HUB_URL,
+        },
+      },
     },
     build: {
       outDir: "dist",
