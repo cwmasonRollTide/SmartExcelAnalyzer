@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Paper, Snackbar, Alert, Box } from '@mui/material';
-import { submitQuery, uploadFileInChunks } from './services/api.ts';
+import { submitQuery, uploadFileInChunks } from './services/analysisApi.ts';
 import DocumentList from './components/DocumentList/DocumentList';
 import FileUpload from './components/FileUpload/FileUpload';
 import QueryForm from './components/QueryForm/QueryForm';

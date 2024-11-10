@@ -1,15 +1,7 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { FinalizeResponse } from './interfaces/FinalizeResponse';
 import { SubmitQueryResponse } from './interfaces/SubmitQueryResponse';
 import { ChunkedUploadResponse } from './interfaces/ChunkedUploadResponse';
-
-const axiosInstance = axios.create({
-  withCredentials: false,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 30000,
-});
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -26,7 +18,7 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
     formData.append('chunkIndex', chunkIndex.toString());
     formData.append('totalChunks', totalChunks.toString());
 
-    console.log(await axiosInstance.post('/smartapi/analysis/upload-chunk', formData, {
+    console.log(await axiosInstance.post('/analysis/upload-chunk', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -37,12 +29,12 @@ export const uploadFileInChunks = async (file: File): Promise<ChunkedUploadRespo
 };
 
 const initializeUpload = async (filename: string): Promise<string> => {
-  const response = await axiosInstance.post('/smartapi/analysis/initialize-upload', { filename });
+  const response = await axiosInstance.post('/analysis/initialize-upload', { filename });
   return response.data.documentId;
 };
 
 const finalizeUpload = async (documentId: string): Promise<FinalizeResponse> => {
-  const response = await axiosInstance.post('/smartapi/analysis/finalize-upload', { documentId });
+  const response = await axiosInstance.post('/analysis/finalize-upload', { documentId });
   return response.data;
 };
 
@@ -50,7 +42,7 @@ export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await axiosInstance.post('/smartapi/analysis/upload', formData, {
+  const response = await axiosInstance.post('/analysis/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -63,11 +55,9 @@ export const submitQuery = async (
   query: string, 
   documentId: string
 ): Promise<SubmitQueryResponse> => {
-  const response = await axiosInstance.post<SubmitQueryResponse>('/smartapi/analysis/query', {
+  const response = await axiosInstance.post<SubmitQueryResponse>('/analysis/query', {
     query,
     documentId,
   });
   return response.data;
 };
-
-
