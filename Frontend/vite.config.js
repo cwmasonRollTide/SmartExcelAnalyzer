@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 3000,
-      host: "traefik",
+      host: "0.0.0.0",
       strictPort: true,
       proxy: {
         "/api": {
