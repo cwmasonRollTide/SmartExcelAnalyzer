@@ -65,9 +65,9 @@ services:
       - "traefik.http.services.qdrant.loadbalancer.server.port=6333"
       - "traefik.http.routers.qdrant.entrypoints=web"
 
-  llm-service-one:
+  llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
-    container_name: llm-service-one
+    container_name: llm-service
     volumes:
       - ./LLM:/app
       - /model_cache:/app/model_cache
@@ -81,9 +81,9 @@ services:
       - smart-excel-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`)"
-      - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
-      - "traefik.http.routers.llm-service-one.entrypoints=web"
+      - "traefik.http.routers.llm-service.rule=Host(`traefik`)"
+      - "traefik.http.services.llm-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.llm-service.entrypoints=web"
 
   llm-service-two:
     image: fivemowner/smart-excel-analyzer-llm:latest
@@ -142,7 +142,7 @@ services:
       - qdrant
       - llm-service-three
       - llm-service-two
-      - llm-service-one
+      - llm-service
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/host`)"
