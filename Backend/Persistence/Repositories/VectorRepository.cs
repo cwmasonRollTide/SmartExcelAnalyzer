@@ -16,7 +16,7 @@ public interface IVectorDbRepository
 {
     Task<string?> SaveDocumentAsync(
         SummarizedExcelData vectorSpreadsheetData, 
-        IProgress<(double, double)>? progress = null,
+        IProgress<(double ParseProgress, double SaveProgress)>? progress = null,
         CancellationToken cancellationToken = default
     );
 
@@ -82,7 +82,7 @@ public class VectorRepository(
     /// <returns></returns>
     public async Task<string?> SaveDocumentAsync(
         SummarizedExcelData? vectorSpreadsheetData = null, 
-        IProgress<(double, double)>? progress = null, 
+        IProgress<(double ParseProgress, double SaveProgress)>? progress = null, 
         CancellationToken cancellationToken = default
     )
     {
@@ -309,7 +309,7 @@ public class VectorRepository(
             IEnumerable<float[]> Embeddings, 
             IEnumerable<ConcurrentDictionary<string, object>> Batch
         )> reader,
-        IProgress<(double, double)>? progress,
+        IProgress<(double ParseProgress, double SaveProgress)>? progress,
         int totalRows,
         string fileName,
         CancellationToken cancellationToken = default
@@ -344,7 +344,7 @@ public class VectorRepository(
             IEnumerable<float[]> Embeddings, 
             IEnumerable<ConcurrentDictionary<string, object>> Batch
         ) message, 
-        IProgress<(double, double)>? progress, 
+        IProgress<(double ParseProgress, double SaveProgress)>? progress, 
         int totalRows, 
         int processedRows, 
         string documentId, 
