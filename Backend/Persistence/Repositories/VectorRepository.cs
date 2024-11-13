@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Diagnostics;
+using ParallelExtensions;
 using Persistence.Database;
 using Domain.Persistence.DTOs;
 using System.Threading.Channels;
@@ -237,8 +238,7 @@ public class VectorRepository(
             var processedRows = 0;
             cancellationToken.ThrowIfCancellationRequested();
             var batch = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-            await Parallel.ForEachAsync(
-                rows, 
+            await rows.ForEachAsync(
                 cancellationToken, 
                 async (row, ct) =>
                 {
@@ -391,8 +391,7 @@ public class VectorRepository(
             CancellationToken = cancellationToken
         };
         var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
-        await Parallel.ForEachAsync(
-            pairs, 
+        await pairs.ForEachAsync(
             parallelOptions, 
             async (pair, ct) =>
             {
