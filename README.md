@@ -179,17 +179,15 @@ The application uses a CQRS (Command Query Responsibility Segregation) pattern w
     Start-Process -FilePath ".\DockerDesktopInstaller.exe" -Wait
     ```
 
-3. **Create a `.env` file in the root directory and populate it with necessary environment variables** (refer to `.env.example`).
-
-4. **Build and run the Docker containers**:
+3. **Build and run the Docker containers**:
 
     ```bash
     docker compose up --build -d
     ```
 
-5. **Access the frontend application** at [http://localhost:3000](http://localhost:3000).
+4. **Access the frontend application** at [http://localhost:3000](http://localhost:3000).
 
-6. **Access the backend API directly** at [http://localhost:5001/swagger](http://localhost:5001/swagger).
+5. **Access the backend API directly** at [http://localhost:5001/swagger](http://localhost:5001/swagger).
 
 ## Usage
 
