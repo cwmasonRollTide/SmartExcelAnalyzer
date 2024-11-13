@@ -11,5 +11,17 @@ spec:
   - port: 81
     targetPort: 3000
     name: frontend
+  - port: 82
+    targetPort: 8000
+    name: llm
+  - port: 9090
+    targetPort: 9090
+    name: prometheus
+  - port: 16686
+    targetPort: 16686
+    name: jaeger
+  - port: 6333
+    targetPort: 6333
+    name: qdrant
   selector:
     app: smart-excel-analyzer-backend
