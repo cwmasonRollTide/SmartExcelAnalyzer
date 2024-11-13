@@ -100,8 +100,6 @@ services:
       - smart-excel-network
     depends_on:
       - qdrant
-      - llm-service-three
-      - llm-service-two
       - llm-service
     labels:
       - "traefik.enable=true"
