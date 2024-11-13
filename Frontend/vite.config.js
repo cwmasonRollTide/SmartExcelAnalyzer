@@ -1,25 +1,29 @@
-import { defineConfig, loadEnv } from "vite";
+import { getEnv } from "./src/utils/getEnv"
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
+  const baseApiUrl = getEnv('VITE_BASE_API_URL', 'http://localhost:81/networkhost/api')
+  const baseSignalRurl = getEnv('VITE_SIGNALR_HUB_URL', 'http://localhost:81/networkhost/progressHub');
 
   return {
     plugins: [react()],
     server: {
       port: 3000,
-      host: "0.0.0.0",
+      host: "traefik",
       strictPort: true,
       proxy: {
-        "/api": {
-          target: env.VITE_BASE_API_URL,
-          changeOrigin: true,
+        '/networkhost/api': {
+          target: baseApiUrl,
           secure: false,
+          // Since we removed /smartapi from the API calls
+          rewrite: (path) => path.replace(/^\/networkhost\/api/, ''),
         },
-        "/progressHub": {
+        '/networkhost/progressHub': {
+          target: baseSignalRurl,
           secure: false,
-          changeOrigin: true,
-          target: env.VITE_SIGNALR_HUB_URL,
+          ws: true,
+          rewrite: (path) => path.replace(/^\/networkhost\/progressHub/, ''),
         },
       },
     },

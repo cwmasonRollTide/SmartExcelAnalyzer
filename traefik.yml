@@ -1,6 +1,8 @@
 entryPoints:
   web:
-    address: ":80"
+    address: ":81"
+  websecure:
+    address: ":443"
 
 providers:
   docker:

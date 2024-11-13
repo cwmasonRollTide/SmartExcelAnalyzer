@@ -17,9 +17,9 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.address=:81"
     ports:
-      - "80:80"
+      - "81:81"
       - "8080:8080" # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -96,7 +96,7 @@ services:
           - node.role == manager
           - node.labels.qdrant == true
 
-  llm-service-one:
+  llm-service:
     image: fivemowner/smart-excel-analyzer-llm:latest
     volumes:
       - ./LLM:/app
@@ -111,71 +111,17 @@ services:
     logging:
       <<: *default-logging
     deploy:
-      replicas: 1
+      replicas: 3
       restart_policy:
         condition: on-failure
         delay: 5s
-        max_attempts: 3
+        max_attempts: 6
         window: 120s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm-service-one`)"
-      - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
-      - "traefik.http.routers.llm-service-one.entrypoints=web"
-
-  llm-service-two:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    volumes:
-      - ./LLM:/app
-      - /model_cache:/app/model_cache
-    env_file:
-      - .env
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-    networks:
-      - smart-excel-network
-    logging:
-      <<: *default-logging
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-two.rule=Host(`traefik`) && PathPrefix(`/llm-service-two`)"
-      - "traefik.http.services.llm-service-two.loadbalancer.server.port=8001"
-      - "traefik.http.routers.llm-service-two.entrypoints=web"
-
-  llm-service-three:
-    image: fivemowner/smart-excel-analyzer-llm:latest
-    volumes:
-      - ./LLM:/app
-      - /model_cache:/app/model_cache
-    env_file:
-      - .env
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
-    networks:
-      - smart-excel-network
-    logging:
-      <<: *default-logging
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-three.rule=Host(`traefik`) && PathPrefix(`/llm-service-three`)"
-      - "traefik.http.services.llm-service-three.loadbalancer.server.port=8002"
-      - "traefik.http.routers.llm-service-three.entrypoints=web"
+      - "traefik.http.routers.llm-service.rule=Host(`traefik`) && PathPrefix(`/llm-service`)"
+      - "traefik.http.services.llm-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.llm-service.entrypoints=web"
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -192,10 +138,11 @@ services:
       <<: *default-logging
     depends_on:
       - qdrant
-      - llm-service-three
+      - llm-service
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/progressHub`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
     deploy:

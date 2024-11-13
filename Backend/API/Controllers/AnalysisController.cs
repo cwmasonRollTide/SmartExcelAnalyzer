@@ -87,7 +87,7 @@ public class AnalysisController(
     [ProducesResponseType(typeof(InitializeUploadResponse), StatusCodes.Status200OK)]
     public IActionResult InitializeUpload([FromBody] InitializeUploadRequest request)
     {
-        var uploadId = request.Filename + DateTime.UtcNow.Ticks.ToString()[5..];
+        var uploadId = request.Filename + DateTime.UtcNow.ToString()[8..];
         _cache.Set(request.Filename, uploadId);
         _cache.Set(uploadId, request.Filename);
         return Ok(new InitializeUploadResponse
