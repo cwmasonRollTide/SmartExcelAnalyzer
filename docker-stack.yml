@@ -141,10 +141,13 @@ services:
       - llm-service
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/progressHub`)"
+      - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/networkhost/api`)"
+      - "--entrypoints.web.address=:5001"
       - "traefik.http.services.backend.loadbalancer.server.port=5001"
       - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend-signalr.rule=Host(`traefik`) && PathPrefix(`/networkhost/progressHub`)"
+      - "traefik.http.services.backend-signalr.loadbalancer.server.port=5000"
+      - "traefik.http.routers.backend-signalr.entrypoints=web"
     deploy:
       replicas: 1
       update_config:
@@ -164,8 +167,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_BASE_API_URL=http://backend/api
-      - VITE_SIGNALR_HUB_URL=http://backend/progressHub
+      - VITE_BASE_API_URL=http://localhost:5001/networkhost/api
+      - VITE_SIGNALR_HUB_URL=http://localhost:5000/networkhost/progressHub
     networks:
       - smart-excel-network
     depends_on:
