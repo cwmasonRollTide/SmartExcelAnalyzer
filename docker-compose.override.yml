@@ -1,15 +1,5 @@
 services:
-  llm-service-one:
-    build:
-      context: ./LLM/
-      dockerfile: llm.Dockerfile
-
-  llm-service-two:
-    build:
-      context: ./LLM/
-      dockerfile: llm.Dockerfile
-
-  llm-service-three:
+  llm-service:
     build:
       context: ./LLM/
       dockerfile: llm.Dockerfile

@@ -119,9 +119,9 @@ services:
         window: 120s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-service-one.rule=Host(`traefik`) && PathPrefix(`/llm-service`)"
-      - "traefik.http.services.llm-service-one.loadbalancer.server.port=8000"
-      - "traefik.http.routers.llm-service-one.entrypoints=web"
+      - "traefik.http.routers.llm-service.rule=Host(`traefik`) && PathPrefix(`/llm-service`)"
+      - "traefik.http.services.llm-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.llm-service.entrypoints=web"
 
   backend:
     image: fivemowner/smart-excel-analyzer-backend:latest
@@ -138,7 +138,7 @@ services:
       <<: *default-logging
     depends_on:
       - qdrant
-      - llm-service-three
+      - llm-service
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`traefik`) && PathPrefix(`/api`)"

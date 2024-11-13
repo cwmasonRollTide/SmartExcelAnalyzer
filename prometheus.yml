@@ -14,9 +14,9 @@ scrape_configs:
     static_configs:
       - targets: ['backend:5001'] 
 
-  - job_name: 'llm-service-one'
+  - job_name: 'llm-service'
     static_configs:
-      - targets: ['llm-service-one:8000']
+      - targets: ['llm-service:8000']
 
   - job_name: 'qdrant'
     static_configs:
