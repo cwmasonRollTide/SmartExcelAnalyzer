@@ -183,6 +183,7 @@ services:
 networks:
   smart-excel-network:
     driver: overlay
+    attachable: true
 
 volumes:
   model_cache:
