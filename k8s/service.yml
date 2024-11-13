@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smart-excel-analyzer-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5001
+    name: backend
+  - port: 81
+    targetPort: 3000
+    name: frontend
+  selector:
+    app: smart-excel-analyzer-backend

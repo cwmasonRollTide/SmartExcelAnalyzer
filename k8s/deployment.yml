@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-excel-analyzer-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-excel-analyzer-backend
+  template:
+    metadata:
+      labels:
+        app: smart-excel-analyzer-backend
+    spec:
+      containers:
+      - name: backend
+        image: myacr.azurecr.io/smart-excel-analyzer-backend:$(Build.BuildId)
+        ports:
+        - containerPort: 5001
+        envFrom:
+        - secretRef:
+            name: backend-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      - name: frontend
+        image: myacr.azurecr.io/smart-excel-analyzer-frontend:$(Build.BuildId)
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: frontend-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
