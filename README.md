@@ -464,3 +464,7 @@ Follow these steps:
 - ✉️ Connor Mason - <connor.mason@fivemconsulting.com>
 
 - 💻 [GitHub Repository](https://github.com/cwmasonRollTide/SmartExcelAnalyzer.git)
+
+----------------------------------------------------------------------------------------
+
+**This is the type of work you can expect if you work with [Five M Consulting LLC](./assets/FiveMRegistration_GoodStanding.png)**
