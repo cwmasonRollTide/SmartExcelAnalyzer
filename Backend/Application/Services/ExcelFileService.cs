@@ -1,7 +1,7 @@
 using System.Data;
 using System.Text;
 using ExcelDataReader;
-using Domain.Extensionss;
+using Domain.Extensions;
 using Domain.Application;
 using Domain.Persistence.DTOs;
 using Microsoft.AspNetCore.Http;
@@ -145,7 +145,7 @@ public class ExcelFileService : IExcelFileService
     {
         var dict = new ConcurrentDictionary<string, object>(columns.Length, columns.Length);
         await columns.ForEachAsync(
-            parallelOptions,
+            cancellationToken: parallelOptions.CancellationToken,
             async (column, token) =>
             {
                 var value = row[column];
@@ -217,7 +217,7 @@ public class ExcelFileService : IExcelFileService
             .Cast<DataColumn>()
             .ToArray();
         await columns.ForEachAsync(
-            parallelOptions,
+            cancellationToken: parallelOptions.CancellationToken,
             async (column, token) =>
             {
                 if (IsNumericColumn(column, table))
@@ -310,7 +310,7 @@ public class ExcelFileService : IExcelFileService
         var hashedValues = new ConcurrentDictionary<string, string>();
         var parallelOptions = CreateParallelOptions(cancellationToken);
         await table.AsEnumerable().ForEachAsync(
-            parallelOptions, 
+            cancellationToken: parallelOptions.CancellationToken, 
             async (row, token) =>
             {
                 var value = row[column]?.ToString();

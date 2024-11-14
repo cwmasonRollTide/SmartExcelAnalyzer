@@ -4,7 +4,7 @@ public static class ParallelExtensions
 {
     public static async Task ForEachAsync<T>(
         this IEnumerable<T> source,
-        ParallelOptions parallelOptions,
+        CancellationToken cancellationToken,
         Func<T, CancellationToken, Task> body
     )
     {
@@ -13,9 +13,9 @@ public static class ParallelExtensions
                 Task.Run(
                     () => 
                     body(item, 
-                         parallelOptions.CancellationToken
+                         cancellationToken
                     ), 
-                    parallelOptions
+                    cancellationToken
                 )
             )
         );

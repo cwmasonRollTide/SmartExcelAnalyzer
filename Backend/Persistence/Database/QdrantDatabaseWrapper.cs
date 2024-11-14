@@ -1,6 +1,6 @@
 using Qdrant.Client;
 using System.Text.Json;
-using Domain.Extensionss;
+using Domain.Extensions;
 using Qdrant.Client.Grpc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -198,7 +198,7 @@ public class QdrantDatabaseWrapper(
         var parallelOptions = CreateParallelOptions(cancellationToken);
         var points = new ConcurrentBag<PointStruct>();
         await rows.ForEachAsync(
-            parallelOptions,
+            cancellationToken,
             async (row, ct) =>
             {
                 points.Add(await CreateRow(documentId!, row));

@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Diagnostics;
-using Domain.Extensionss;
+using Domain.Extensions;
 using Persistence.Database;
 using Domain.Persistence.DTOs;
 using System.Threading.Channels;
@@ -392,7 +392,7 @@ public class VectorRepository(
         };
         var pairs = batch.Zip(embeddings, (row, embedding) => (row, embedding));
         await pairs.ForEachAsync(
-            parallelOptions, 
+            cancellationToken, 
             async (pair, ct) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
