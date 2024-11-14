@@ -112,28 +112,30 @@ public class ExcelFileService : IExcelFileService
         var lastReportedProgress = 0.0;
         var totalRows = Math.Max(1, table.Rows.Count);
         var rows = new ConcurrentBag<ConcurrentDictionary<string, object>>();
-        await Task.Run(() =>
-        {
-            Parallel.For(
-                0, 
-                table.Rows.Count, 
-                parallelOptions, 
-                async i =>
-                {
-                    rows.Add(await ProcessRowAsync(table.Rows[i], columns, parallelOptions));
-                    var currentProcessed = Interlocked.Increment(ref processedRows);
-                    var currentProgress = currentProcessed / (double)totalRows;
-                    // Only report if progress has increased significantly
-                    if (currentProgress - lastReportedProgress >= 0.1)
+        await Task.Run(
+            () =>
+            {
+                Parallel.For(
+                    0, 
+                    table.Rows.Count, 
+                    parallelOptions, 
+                    async i =>
                     {
-                        var oldProgress = Interlocked.Exchange(ref lastReportedProgress, currentProgress);
-                        if (currentProgress > oldProgress) // Ensure we only report increasing progress
-                            progress?.Report((currentProgress, 0));
+                        rows.Add(await ProcessRowAsync(table.Rows[i], columns, parallelOptions));
+                        var currentProcessed = Interlocked.Increment(ref processedRows);
+                        var currentProgress = currentProcessed / (double)totalRows;
+                        // Only report if progress has increased significantly
+                        if (currentProgress - lastReportedProgress >= 0.1)
+                        {
+                            var oldProgress = Interlocked.Exchange(ref lastReportedProgress, currentProgress);
+                            if (currentProgress > oldProgress) // Ensure we only report increasing progress
+                                progress?.Report((currentProgress, 0));
+                        }
                     }
-                }
-            );
-        }, 
-        parallelOptions.CancellationToken);
+                );
+            }, 
+            parallelOptions.CancellationToken
+        );
         return rows;
     }
 
