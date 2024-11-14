@@ -29,7 +29,7 @@ jobs:
       working-directory: ./Backend
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal --no-parallel
+      run: dotnet test --no-build --verbosity normal --nologo
       working-directory: ./Backend
       
     - name: Login to DockerHub
