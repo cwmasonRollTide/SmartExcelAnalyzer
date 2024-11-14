@@ -1,4 +1,4 @@
-using API.Extensions;
+using Domain.Extensions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;

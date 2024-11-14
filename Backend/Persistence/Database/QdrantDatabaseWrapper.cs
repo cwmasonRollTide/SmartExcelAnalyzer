@@ -1,6 +1,6 @@
 using Qdrant.Client;
 using System.Text.Json;
-using ParallelExtensions;
+using Domain.Extensionss;
 using Qdrant.Client.Grpc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

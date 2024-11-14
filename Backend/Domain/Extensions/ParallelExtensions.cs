@@ -1,4 +1,4 @@
-namespace API.Extensions;
+namespace Domain.Extensions;
 
 public static class ParallelExtensions
 {
